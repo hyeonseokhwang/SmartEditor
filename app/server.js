@@ -41,7 +41,7 @@ if (hasCloudinary) {
 
 let upload;
 if (hasCloudinary) {
-  const DEFAULT_CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'gallery/Hanwool';
+  const DEFAULT_CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'Hanwool';
   const storage = new CloudinaryStorage({
     cloudinary,
     params: async (req, file) => ({
@@ -104,7 +104,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     if (!dataUrl) return res.status(400).json({ error: 'No dataUrl' });
 
     if (hasCloudinary) {
-      const DEFAULT_CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'gallery/Hanwool';
+  const DEFAULT_CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'Hanwool';
       const targetFolder = req.query.folder || req.body.folder || DEFAULT_CLOUD_FOLDER;
       const uploadRes = await cloudinary.uploader.upload(dataUrl, {
         folder: targetFolder,

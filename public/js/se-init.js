@@ -119,6 +119,7 @@
         for (const item of items) {
           if (item.type?.indexOf && item.type.indexOf('image') === 0) imageItems.push(item);
         }
+        // Case 1: Clipboard exposes image items (Chrome/Edge scenarios)
         if (imageItems.length) {
           event.preventDefault();
           for (const item of imageItems) {
@@ -135,8 +136,43 @@
             }
           }
         } else {
-          // Allow default paste then replace data URLs
-          setTimeout(replaceInlineDataAndBlobImages, 120);
+          // Case 2: Some apps (e.g., certain HWP scenarios) paste only markup with inline data/blob or local refs
+          // Let the default paste occur, then normalize and upload what got inserted.
+          setTimeout(async () => {
+            // Try to detect a single pasted image selection and upload it
+            try {
+              const sel = (doc.getSelection && doc.getSelection()) || (doc.selection && doc.selection);
+              if (sel && sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0).cloneRange();
+                const container = doc.createElement('div');
+                container.appendChild(range.cloneContents());
+                const candidateImgs = Array.from(container.querySelectorAll('img'));
+                for (const cimg of candidateImgs) {
+                  const src = cimg.getAttribute('src') || '';
+                  if (!src) continue;
+                  try {
+                    if (src.startsWith('data:image/')) {
+                      const res = await fetch('/api/upload', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ dataUrl: src }),
+                      });
+                      const data = await res.json();
+                      if (data.url) editor.exec('PASTE_HTML', [`<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`]);
+                    } else if (!isHttpUrl(src)) {
+                      const r = await fetch(src);
+                      const b = await r.blob();
+                      const data = await uploadBlob(b, 'pasted.png');
+                      if (data.url) editor.exec('PASTE_HTML', [`<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`]);
+                    }
+                  } catch (e) { /* ignore */ }
+                }
+              }
+            } catch (e) { /* ignore */ }
+
+            // Then do the general replacement pass on what exists in the editor
+            await replaceInlineDataAndBlobImages();
+          }, 150);
         }
       };
 

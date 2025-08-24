@@ -41,6 +41,6 @@ Now open <http://localhost:8080>
 
 ## Notes
 
- CLOUDINARY_FOLDER (optional, default: gallery/Hanwool)
+ CLOUDINARY_FOLDER (optional, default: Hanwool)
 
- Per-request folder override: append `?folder=gallery/Hanwool/Sub` to `/api/upload` or include `{ folder: "gallery/Hanwool/Sub" }` in the request body.
+Per-request folder override: append `?folder=Hanwool/Sub` to `/api/upload` or include `{ folder: "Hanwool/Sub" }` in the request body.
