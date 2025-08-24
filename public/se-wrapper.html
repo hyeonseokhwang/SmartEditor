@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartEditor2 Wrapper</title>
+    <style>
+      body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+      .toolbar { padding: 6px 8px; background:#f1f5f9; border-bottom:1px solid #e2e8f0; font-size:12px; color:#334155 }
+      #container { padding: 8px; }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">SmartEditor2 초기화 중…</div>
+    <div id="container">
+      <form>
+        <textarea id="ir1" name="ir1" rows="10" cols="100" style="width:100%; height:480px; display:none;"></textarea>
+      </form>
+    </div>
+
+    <script>
+      (async function(){
+        function headOk(url){
+          return fetch(url, { method: 'HEAD' }).then(r => r.ok).catch(() => false);
+        }
+        function loadScript(url){
+          return new Promise((res, rej) => { const s = document.createElement('script'); s.src = url; s.onload = res; s.onerror = rej; document.head.appendChild(s);});
+        }
+        // Prefer dist; fallback to static
+        const baseDist = '/public/vendor/smarteditor2/dist';
+        const baseStatic = '/public/vendor/smarteditor2/static';
+        const distJS = baseDist + '/js/service/HuskyEZCreator.js';
+        const staticJS = baseStatic + '/js/service/HuskyEZCreator.js';
+        const useDist = await headOk(distJS);
+        const base = useDist ? baseDist : baseStatic;
+        const jsUrl = useDist ? distJS : staticJS;
+        try {
+          await loadScript(jsUrl);
+        } catch (e) {
+          document.querySelector('.toolbar').textContent = 'SmartEditor2 스크립트 로드 실패';
+          return;
+        }
+
+        // Initialize editor
+        window.oEditors = [];
+        const sLang = 'ko_KR';
+        nhn.husky.EZCreator.createInIFrame({
+          oAppRef: window.oEditors,
+          elPlaceHolder: 'ir1',
+          sSkinURI: base + '/SmartEditor2Skin.html',
+          htParams : {
+            bUseToolbar : true,
+            bUseVerticalResizer : true,
+            bUseModeChanger : true,
+            I18N_LOCALE : sLang
+          },
+          fOnAppLoad : function(){
+            document.querySelector('.toolbar').textContent = 'SmartEditor2 준비 완료';
+            if (window.parent && window.parent.seInitAttachToEditor) {
+              try { window.parent.seInitAttachToEditor(window.oEditors.getById['ir1']); } catch {}
+            }
+          },
+          fCreator: 'createSEditor2'
+        });
+      })();
+    </script>
+  </body>
+  </html>

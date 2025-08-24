@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hanwool SmartEditor 2.0 테스트</title>
+    <link rel="stylesheet" href="/public/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>네이버 스마트에디터 2.0 데모</h1>
+      <p>한글 문서에서 붙여넣기 시 이미지 자동 업로드(<%= hasCloudinary ? 'Cloudinary' : 'Local' %>)</p>
+    </header>
+
+    <main>
+      <div id="editor-container">
+        <p>아래 SmartEditor2 에디터에서 작성하세요. (이 페이지에서 직접 초기화합니다.)</p>
+          <form onsubmit="return false;" style="margin-top:12px;">
+            <textarea id="ir1" name="ir1" rows="10" cols="100" style="width:100%;height:420px;display:none;"></textarea>
+          </form>
+          <div id="status" style="margin-top:8px;color:#64748b;font-size:13px;">Initializing SmartEditor…</div>
+      </div>
+    </main>
+
+    <!-- SmartEditor2 core loader -->
+    <script src="/public/vendor/smarteditor2/static/js/service/HuskyEZCreator.js"></script>
+    <script>
+      // Initialize SmartEditor2 directly in this page
+      (function(){
+        window.oEditors = window.oEditors || [];
+        var sLang = "ko_KR";
+        nhn.husky.EZCreator.createInIFrame({
+          oAppRef: oEditors,
+          elPlaceHolder: "ir1",
+          sSkinURI: "/public/vendor/smarteditor2/static/SmartEditor2Skin.html",
+          htParams: {
+            bUseToolbar: true,
+            bUseVerticalResizer: true,
+            bUseModeChanger: true,
+            I18N_LOCALE: sLang
+          },
+          fOnAppLoad: function(){
+            try {
+              var editor = oEditors.getById["ir1"]; // SmartEditor instance
+          document.getElementById('status').textContent = 'SmartEditor ready (click inside and type)';
+              // Focus editor to ensure immediate editability
+              try { editor.exec('FOCUS'); } catch(e) {}
+            } catch (e) {
+          document.getElementById('status').textContent = 'SmartEditor init callback error: ' + e;
+            }
+          },
+          fCreator: "createSEditor2"
+        });
+      })();
+    </script>
+  </body>
+</html>
