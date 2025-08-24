@@ -41,5 +41,6 @@ Now open <http://localhost:8080>
 
 ## Notes
 
-- Local uploads are served under `/public/uploads`. These are not persisted to a cloud.
-- Increase body limits in `app/server.js` if you hit large clipboard content.
+ CLOUDINARY_FOLDER (optional, default: gallery/Hanwool)
+
+ Per-request folder override: append `?folder=gallery/Hanwool/Sub` to `/api/upload` or include `{ folder: "gallery/Hanwool/Sub" }` in the request body.

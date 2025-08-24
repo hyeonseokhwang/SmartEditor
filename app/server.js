@@ -41,10 +41,12 @@ if (hasCloudinary) {
 
 let upload;
 if (hasCloudinary) {
+  const DEFAULT_CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'gallery/Hanwool';
   const storage = new CloudinaryStorage({
     cloudinary,
     params: async (req, file) => ({
-      folder: process.env.CLOUDINARY_FOLDER || 'hanwool-smarteditor',
+      // Allow per-request override via ?folder= or body.folder, else default
+      folder: (req.query.folder || req.body?.folder || DEFAULT_CLOUD_FOLDER),
       public_id: uuidv4(),
       resource_type: 'image',
       overwrite: false,
@@ -102,8 +104,10 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     if (!dataUrl) return res.status(400).json({ error: 'No dataUrl' });
 
     if (hasCloudinary) {
+      const DEFAULT_CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'gallery/Hanwool';
+      const targetFolder = req.query.folder || req.body.folder || DEFAULT_CLOUD_FOLDER;
       const uploadRes = await cloudinary.uploader.upload(dataUrl, {
-        folder: process.env.CLOUDINARY_FOLDER || 'hanwool-smarteditor',
+        folder: targetFolder,
         public_id: uuidv4(),
         resource_type: 'image',
       });
