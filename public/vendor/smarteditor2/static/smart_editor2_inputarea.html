@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Smart Editor&#8482; WYSIWYG Mode</title>
+</head>
+<body class="se2_inputarea" style="height:0;-webkit-nbsp-mode:normal"></body>
+<script>
+	(function(){
+		try {
+			// Make body editable and focus
+			document.designMode = 'on';
+			if (document.body) {
+				document.body.setAttribute('contenteditable', 'true');
+				document.body.contentEditable = 'true';
+				setTimeout(function(){ try { document.body.focus(); } catch(e){} }, 50);
+			}
+			// On any click, refocus
+			window.addEventListener('mousedown', function(){ try { document.body && document.body.focus(); } catch(e){} });
+		} catch(e) {}
+	})();
+	</script>
+</html>
