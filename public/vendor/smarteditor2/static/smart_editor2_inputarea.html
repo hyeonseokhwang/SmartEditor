@@ -19,5 +19,21 @@
 			window.addEventListener('mousedown', function(){ try { document.body && document.body.focus(); } catch(e){} });
 		} catch(e) {}
 	})();
-	</script>
+</script>
+<!-- Force editability and optional se-init attachment if accessible -->
+<script type="text/javascript">
+  try {
+    document.designMode = 'on';
+    if (document.body) {
+      document.body.contentEditable = 'true';
+      document.body.setAttribute('contenteditable', 'true');
+    }
+  } catch (e) {}
+  try {
+    if (window.parent && window.parent.seInitAttachToEditor && window.parent.oEditors && window.parent.oEditors.getById) {
+      var ed = window.parent.oEditors.getById["ir1"]; if (ed) window.parent.seInitAttachToEditor(ed);
+    }
+  } catch (e) {}
+</script>
+</html>
 </html>

@@ -22,12 +22,12 @@ npm install
 npm run dev
 ```
 
-Now open <http://localhost:3000>
+Now open <http://localhost:8080>
 
-## Swap to Naver SmartEditor 2.0
+## Naver SmartEditor 2.0
 
-- Replace the demo editor in `views/index.ejs` with the real SmartEditor scripts and container.
-- Hook into paste/drop events similar to `public/js/paste-handler.js` to send images to `/api/upload` and set the returned URL.
+- We serve the vendor demo directly at `/public/vendor/smarteditor2/static/SmartEditor2.html` (root redirects there).
+- `public/js/se-init.js` injects paste/drop handlers to upload images to `/api/upload` and replaces data URLs after paste.
 
 ### Installing SmartEditor2 files locally
 
@@ -36,11 +36,8 @@ Now open <http://localhost:3000>
 - https://github.com/naver/smarteditor2/releases
 - or clone https://github.com/naver/smarteditor2 and build / use `gh-pages` contents
 
-2. Place the editor files under `public/vendor/smarteditor2` so the path to the main script is:
-
-`public/vendor/smarteditor2/js/SmartEditor.js`
-
-3. Reload the app; `views/index.ejs` will attempt to load that script automatically and `public/js/se-init.js` will attach paste/drop handlers into the editor iframe.
+1. We reference the SmartEditor core bundle from CDN inside `public/vendor/smarteditor2/static/SmartEditor2Skin.html` to avoid missing local build artifacts.
+2. `public/js/se-init.js` attaches paste/drop handlers into the editor iframe once loaded.
 
 ## Notes
 
