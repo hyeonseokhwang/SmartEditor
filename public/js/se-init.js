@@ -45,6 +45,74 @@
         }
       } catch {}
 
+      async function uploadBlob(blob, suggestedName) {
+        const form = new FormData();
+        form.append('file', blob, suggestedName || 'pasted.png');
+        const res = await fetch('/api/upload', { method: 'POST', body: form });
+        return res.json();
+      }
+
+      function isHttpUrl(u) {
+        return /^https?:\/\//i.test(u);
+      }
+
+      async function replaceInlineDataAndBlobImages() {
+        // Replace <img src="data:..."> and <img src="blob:..."> and non-http src
+        const imgs = Array.from(doc.querySelectorAll('img'));
+        for (const img of imgs) {
+          const src = img.getAttribute('src') || '';
+          if (!src || isHttpUrl(src)) continue;
+          try {
+            if (src.startsWith('data:image/')) {
+              const res = await fetch('/api/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dataUrl: src }),
+              });
+              const data = await res.json();
+              if (data.url) img.src = data.url;
+            } else {
+              // blob: or other same-origin resource
+              const r = await fetch(src);
+              const b = await r.blob();
+              const data = await uploadBlob(b, (img.alt || 'pasted') + '.png');
+              if (data.url) img.src = data.url;
+            }
+          } catch (e) {
+            console.warn('se-init: failed to replace image src', src, e);
+          }
+        }
+
+        // Replace inline background-image: url(data:...)
+        const all = Array.from(doc.querySelectorAll('*'));
+        for (const el of all) {
+          const style = el.style;
+          if (!style || !style.backgroundImage) continue;
+          const m = style.backgroundImage.match(/url\(("|')?(.*?)(\1)?\)/i);
+          if (!m) continue;
+          const url = m[2] || '';
+          if (!url || isHttpUrl(url)) continue;
+          try {
+            if (url.startsWith('data:image/')) {
+              const res = await fetch('/api/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dataUrl: url }),
+              });
+              const data = await res.json();
+              if (data.url) style.backgroundImage = `url(${data.url})`;
+            } else {
+              const r = await fetch(url);
+              const b = await r.blob();
+              const data = await uploadBlob(b, 'bg-pasted.png');
+              if (data.url) style.backgroundImage = `url(${data.url})`;
+            }
+          } catch (e) {
+            console.warn('se-init: failed to replace background image', url, e);
+          }
+        }
+      }
+
       const onPaste = async (event) => {
         const items = event.clipboardData?.items || [];
         const imageItems = [];
@@ -56,11 +124,8 @@
           for (const item of imageItems) {
             const file = item.getAsFile();
             if (!file) continue;
-            const form = new FormData();
-            form.append('file', file, file.name || 'pasted.png');
             try {
-              const res = await fetch('/api/upload', { method: 'POST', body: form });
-              const data = await res.json();
+              const data = await uploadBlob(file, file.name || 'pasted.png');
               if (data.url) {
                 const imgHtml = `<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`;
                 editor.exec("PASTE_HTML", [imgHtml]);
@@ -71,25 +136,7 @@
           }
         } else {
           // Allow default paste then replace data URLs
-          setTimeout(async () => {
-            const imgs = doc.querySelectorAll('img');
-            for (const img of imgs) {
-              const src = img.getAttribute('src') || '';
-              if (src.startsWith('data:image/')) {
-                try {
-                  const res = await fetch('/api/upload', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ dataUrl: src }),
-                  });
-                  const data = await res.json();
-                  if (data.url) img.src = data.url;
-                } catch (e) {
-                  console.warn('se-init: dataUrl upload failed', e);
-                }
-              }
-            }
-          }, 100);
+          setTimeout(replaceInlineDataAndBlobImages, 120);
         }
       };
 
