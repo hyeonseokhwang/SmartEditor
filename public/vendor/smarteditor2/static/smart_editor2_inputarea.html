@@ -6,34 +6,357 @@
 </head>
 <body class="se2_inputarea" style="height:0;-webkit-nbsp-mode:normal"></body>
 <script>
-	(function(){
-		try {
-			// Make body editable and focus
-			document.designMode = 'on';
-			if (document.body) {
-				document.body.setAttribute('contenteditable', 'true');
-				document.body.contentEditable = 'true';
-				setTimeout(function(){ try { document.body.focus(); } catch(e){} }, 50);
-			}
-			// On any click, refocus
-			window.addEventListener('mousedown', function(){ try { document.body && document.body.focus(); } catch(e){} });
-		} catch(e) {}
-	})();
-</script>
-<!-- Force editability and optional se-init attachment if accessible -->
-<script type="text/javascript">
+(function(){
   try {
     document.designMode = 'on';
     if (document.body) {
-      document.body.contentEditable = 'true';
       document.body.setAttribute('contenteditable', 'true');
+      document.body.contentEditable = 'true';
+      setTimeout(function(){ try { document.body.focus(); } catch(e){} }, 50);
     }
-  } catch (e) {}
-  try {
-    if (window.parent && window.parent.seInitAttachToEditor && window.parent.oEditors && window.parent.oEditors.getById) {
-      var ed = window.parent.oEditors.getById["ir1"]; if (ed) window.parent.seInitAttachToEditor(ed);
-    }
-  } catch (e) {}
+    window.addEventListener('mousedown', function(){ try { document.body && document.body.focus(); } catch(e){} });
+  } catch(e) {}
+})();
 </script>
-</html>
+<script type="text/javascript">
+(function(){
+  var DBG = '[PASTE-INLINE]';
+  function log() { var a = [DBG]; for(var i=0;i<arguments.length;i++) a.push(arguments[i]); console.log.apply(console, a); }
+  function warn() { var a = [DBG]; for(var i=0;i<arguments.length;i++) a.push(arguments[i]); console.warn.apply(console, a); }
+
+  var BUSY = false;
+
+  function insertHTML(html) {
+    try {
+      document.execCommand('insertHTML', false, html);
+    } catch(e) {
+      try {
+        var sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          var range = sel.getRangeAt(0);
+          range.deleteContents();
+          var frag = range.createContextualFragment(html);
+          range.insertNode(frag);
+          range.collapse(false);
+        }
+      } catch(e2) { warn('insertHTML failed', e2); }
+    }
+  }
+
+  function uploadDataUrl(dataUrl) {
+    return fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataUrl: dataUrl })
+    }).then(function(r){ return r.json(); });
+  }
+
+  function uploadBlob(blob, name) {
+    var form = new FormData();
+    form.append('file', blob, name || 'pasted.png');
+    return fetch('/api/upload', { method: 'POST', body: form })
+      .then(function(r){ return r.json(); });
+  }
+
+  // Extract data:image URLs from HTML string
+  function collectDataUrls(html) {
+    if (!html) return [];
+    var re = /(data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+)/g;
+    var found = html.match(re) || [];
+    var unique = [];
+    var seen = {};
+    for (var i = 0; i < found.length; i++) {
+      if (!seen[found[i]]) { unique.push(found[i]); seen[found[i]] = true; }
+    }
+    return unique;
+  }
+
+  // Extract images from RTF \pict blocks
+  function collectFromRTF(rtf) {
+    try {
+      if (!rtf || rtf.indexOf('\\pict') === -1) return [];
+      var pictRe = /\\pict[\s\S]*?\}/g;
+      var matches = rtf.match(pictRe) || [];
+      var out = [];
+      for (var mi = 0; mi < matches.length; mi++) {
+        var block = matches[mi];
+        var isPng = /\\pngblip/.test(block);
+        var isJpg = /\\jpegblip/.test(block) || /\\jpgblip/.test(block);
+        if (!isPng && !isJpg) continue;
+        var mime = isPng ? 'image/png' : 'image/jpeg';
+        var hex = block.replace(/[^0-9A-Fa-f]/g, '');
+        if (!hex || hex.length < 40) continue;
+        var bytes = new Uint8Array(hex.length / 2);
+        for (var i = 0; i < hex.length; i += 2) bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+        if (bytes.length < 512) continue;
+        var bin = '';
+        for (var j = 0; j < bytes.length; j++) bin += String.fromCharCode(bytes[j]);
+        var b64 = btoa(bin);
+        if (b64) out.push('data:' + mime + ';base64,' + b64);
+      }
+      return out;
+    } catch(e) { return []; }
+  }
+
+  // Extract from HWP JSON comment embedded in HTML
+  function collectFromHwpJson(html) {
+    try {
+      var m = html && html.match(/<!--\[data-hwpjson\]\s*(\{[\s\S]*?\})\s*-->/i);
+      if (!m) return [];
+      var root = JSON.parse(m[1]);
+      var bidt = {};
+      var srOrder = [];
+      var seen = {};
+      var collect = function(obj) {
+        if (!obj || typeof obj !== 'object') return;
+        if (obj.bidt && typeof obj.bidt === 'object') {
+          for (var k in obj.bidt) {
+            if (typeof obj.bidt[k] === 'string' && obj.bidt[k].length > 50) bidt[k] = obj.bidt[k];
+          }
+        }
+        if (typeof obj.bi === 'string' && !seen[obj.bi]) { srOrder.push(obj.bi); seen[obj.bi] = true; }
+        if (Array.isArray(obj.bi)) {
+          for (var i = 0; i < obj.bi.length; i++) {
+            var it = obj.bi[i];
+            if (it && typeof it.sr === 'string' && !seen[it.sr]) { srOrder.push(it.sr); seen[it.sr] = true; }
+          }
+        }
+        for (var key in obj) if (Object.prototype.hasOwnProperty.call(obj, key)) collect(obj[key]);
+      };
+      collect(root);
+      var dataUrls = [];
+      for (var si = 0; si < srOrder.length; si++) {
+        var b64 = bidt[srOrder[si]];
+        if (b64) dataUrls.push('data:image/png;base64,' + b64);
+      }
+      return dataUrls;
+    } catch(e) { return []; }
+  }
+
+  // Show overlay while uploading
+  function showOverlay(msg) {
+    var ov = document.createElement('div');
+    ov.id = '__paste_overlay';
+    ov.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;z-index:999999;font-family:sans-serif;font-size:14px;';
+    ov.innerHTML = '<div style="padding:16px 20px;background:#fff;border:1px solid #ddd;border-radius:8px;font-weight:600;">' + (msg || 'uploading...') + '</div>';
+    document.body.appendChild(ov);
+    return ov;
+  }
+  function removeOverlay() {
+    var ov = document.getElementById('__paste_overlay');
+    if (ov) ov.remove();
+  }
+
+  // Upload array of data URLs, return array of remote URLs
+  function uploadAll(dataUrls) {
+    var promises = [];
+    for (var i = 0; i < dataUrls.length; i++) {
+      promises.push(uploadDataUrl(dataUrls[i]).then(function(j){ return (j && j.url) ? j.url : null; }).catch(function(){ return null; }));
+    }
+    return Promise.all(promises);
+  }
+
+  // Replace file:/// img srcs in-place with uploaded URLs (preserving position)
+  function replaceFileImgsInPlace(html, uploadedUrls) {
+    var container = document.createElement('div');
+    container.innerHTML = html;
+    var fileImgs = [];
+    var allImgs = container.querySelectorAll('img');
+    for (var i = 0; i < allImgs.length; i++) {
+      var src = allImgs[i].getAttribute('src') || '';
+      if (/^file:\/\//i.test(src)) fileImgs.push(allImgs[i]);
+    }
+    log('file:/// imgs in HTML:', fileImgs.length, '| uploaded URLs:', uploadedUrls.length);
+    for (var j = 0; j < fileImgs.length; j++) {
+      if (j < uploadedUrls.length && uploadedUrls[j]) {
+        fileImgs[j].setAttribute('src', uploadedUrls[j]);
+        fileImgs[j].style.maxWidth = '100%';
+      } else {
+        // No image data for this slot - remove the broken img
+        fileImgs[j].parentNode.removeChild(fileImgs[j]);
+      }
+    }
+    // Also clean up background-image:url(file:...)
+    var allEls = container.querySelectorAll('*');
+    for (var k = 0; k < allEls.length; k++) {
+      var style = allEls[k].getAttribute('style') || '';
+      if (/url\(.*?file:/i.test(style)) {
+        allEls[k].setAttribute('style', style.replace(/url\((['"])?.*?file:[^)]*\)/gi, 'none'));
+      }
+    }
+    return container.innerHTML;
+  }
+
+  document.addEventListener('paste', function(event) {
+    if (BUSY) { event.preventDefault(); return; }
+
+    var cd = event.clipboardData;
+    if (!cd) return;
+
+    var clipHTML = '';
+    var clipRTF = '';
+    var clipText = '';
+    try { clipHTML = cd.getData('text/html') || ''; } catch(e){}
+    try { clipRTF = cd.getData('text/rtf') || ''; } catch(e){}
+    try { clipText = cd.getData('text/plain') || ''; } catch(e){}
+
+    // Collect image file items
+    var imageFiles = [];
+    var items = cd.items || [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type && items[i].type.indexOf('image') === 0) {
+        var f = items[i].getAsFile();
+        if (f) imageFiles.push(f);
+      }
+    }
+
+    var hasFileUrls = /file:\/\//i.test(clipHTML);
+    var hasDataImages = /data:image\//i.test(clipHTML);
+
+    log('paste detected', {
+      imageFiles: imageFiles.length,
+      htmlLen: clipHTML.length,
+      rtfLen: clipRTF.length,
+      hasFileUrls: hasFileUrls,
+      hasDataImages: hasDataImages
+    });
+
+    // CASE 1: Direct image blobs in clipboard (screenshot, image copy)
+    if (imageFiles.length && !hasFileUrls) {
+      event.preventDefault();
+      BUSY = true;
+      var ov = showOverlay('이미지 ' + imageFiles.length + '개 업로드 중…');
+      var uploads = [];
+      for (var fi = 0; fi < imageFiles.length; fi++) {
+        uploads.push(uploadBlob(imageFiles[fi], imageFiles[fi].name || 'pasted.png')
+          .then(function(j){ return (j && j.url) ? j.url : null; })
+          .catch(function(){ return null; }));
+      }
+      Promise.all(uploads).then(function(urls) {
+        var html = '';
+        for (var u = 0; u < urls.length; u++) {
+          if (urls[u]) html += '<img src="' + urls[u] + '" style="max-width:100%;" alt="pasted-image" />';
+        }
+        if (html) insertHTML(html);
+        removeOverlay();
+        BUSY = false;
+        log('blob upload done', urls.filter(Boolean).length, 'images');
+      });
+      return;
+    }
+
+    // CASE 2: HTML contains data:image (inline base64 paste)
+    if (hasDataImages && !hasFileUrls) {
+      event.preventDefault();
+      BUSY = true;
+      var duList = collectDataUrls(clipHTML);
+      if (!duList.length) { BUSY = false; return; }
+      var ov2 = showOverlay('이미지 ' + duList.length + '개 업로드 중…');
+      uploadAll(duList).then(function(urls) {
+        var result = clipHTML;
+        for (var d = 0; d < duList.length; d++) {
+          if (urls[d]) {
+            var escaped = duList[d].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(escaped, 'g'), urls[d]);
+          }
+        }
+        insertHTML(result);
+        removeOverlay();
+        BUSY = false;
+        log('data:URL upload done', urls.filter(Boolean).length, 'images');
+      });
+      return;
+    }
+
+    // CASE 3: HWP paste - file:/// URLs (main target!)
+    if (hasFileUrls) {
+      event.preventDefault();
+      BUSY = true;
+      var ov3 = showOverlay('HWP 이미지 추출 및 업로드 중…');
+      log('HWP paste: extracting images from clipboard data');
+
+      // Try multiple extraction methods
+      var allDataUrls = [];
+
+      // 3a: data:image URLs already in HTML
+      var htmlDus = collectDataUrls(clipHTML);
+      if (htmlDus.length) {
+        log('found', htmlDus.length, 'data:image URLs in HTML');
+        allDataUrls = allDataUrls.concat(htmlDus);
+      }
+
+      // 3b: HWP JSON embedded images
+      var hwpDus = collectFromHwpJson(clipHTML);
+      if (hwpDus.length) {
+        log('found', hwpDus.length, 'images from HWP JSON');
+        allDataUrls = allDataUrls.concat(hwpDus);
+      }
+
+      // 3c: RTF \pict embedded images
+      var rtfDus = collectFromRTF(clipRTF);
+      if (rtfDus.length) {
+        log('found', rtfDus.length, 'images from RTF \\pict');
+        allDataUrls = allDataUrls.concat(rtfDus);
+      }
+
+      // 3d: Image file items as fallback
+      if (imageFiles.length) {
+        log('found', imageFiles.length, 'image files in clipboard');
+      }
+
+      // Count file:/// img tags in HTML to know how many we need
+      var fileImgCount = (clipHTML.match(/<img\b[^>]*\bsrc\s*=\s*['"]?file:\/\//gi) || []).length;
+      log('file:/// img tags in HTML:', fileImgCount);
+
+      if (allDataUrls.length > 0) {
+        log('uploading', allDataUrls.length, 'extracted images');
+        uploadAll(allDataUrls).then(function(urls) {
+          // Replace file:/// img srcs in their original positions
+          var result = replaceFileImgsInPlace(clipHTML, urls);
+          // Also replace any remaining data:image URLs that were in the HTML
+          for (var h = 0; h < htmlDus.length; h++) {
+            if (urls[h]) {
+              var esc = htmlDus[h].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              result = result.replace(new RegExp(esc, 'g'), urls[h]);
+            }
+          }
+          insertHTML(result);
+          removeOverlay();
+          BUSY = false;
+          log('HWP upload done', urls.filter(Boolean).length, 'images in-place');
+        });
+      } else if (imageFiles.length) {
+        // Fall back to blob upload
+        var blobUploads = [];
+        for (var bi = 0; bi < imageFiles.length; bi++) {
+          blobUploads.push(uploadBlob(imageFiles[bi], 'hwp-image.png')
+            .then(function(j){ return (j && j.url) ? j.url : null; })
+            .catch(function(){ return null; }));
+        }
+        Promise.all(blobUploads).then(function(urls) {
+          var result = replaceFileImgsInPlace(clipHTML, urls);
+          insertHTML(result);
+          removeOverlay();
+          BUSY = false;
+          log('HWP blob fallback done', urls.filter(Boolean).length, 'images in-place');
+        });
+      } else {
+        // No image data found - remove broken file:/// imgs, keep text
+        warn('HWP paste: no image data found in clipboard');
+        var result2 = replaceFileImgsInPlace(clipHTML, []);
+        if (!result2.trim() && clipText) result2 = clipText;
+        insertHTML(result2);
+        removeOverlay();
+        BUSY = false;
+      }
+      return;
+    }
+
+    // CASE 4: Normal text/html paste - let browser handle it
+    // (do nothing, default behavior)
+  });
+
+  log('paste handler attached to editor input area');
+})();
+</script>
 </html>
