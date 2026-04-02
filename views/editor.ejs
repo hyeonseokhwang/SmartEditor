@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>법문 에디터 — 한울사상</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
-  <!-- Toast UI Editor CDN -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Noto Sans KR',sans-serif;background:#F8F6F0;color:#2A1E10}
@@ -14,7 +12,7 @@
     .site-nav a{color:#E8DCC8;text-decoration:none;font-size:13px;padding:0 14px;height:44px;display:flex;align-items:center;font-family:'Noto Sans KR',sans-serif;letter-spacing:.5px;transition:color .2s}
     .site-nav a:hover,.site-nav a.active{color:#D4A840}
     .site-nav .logo{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:500;color:#E8DCC8;margin-right:8px;border-right:1px solid rgba(255,255,255,.2);padding-right:18px}
-    .page{margin-top:44px;max-width:960px;margin-left:auto;margin-right:auto;padding:24px 20px}
+    .page{margin-top:44px;max-width:1000px;margin-left:auto;margin-right:auto;padding:24px 20px}
     h1{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:400;margin-bottom:4px}
     .desc{font-size:13px;color:#7A6048;margin-bottom:20px}
     .toolbar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
@@ -25,17 +23,19 @@
     .btn-primary:hover{background:#3A2E20}
     .btn-secondary{background:#F0E8D4;color:#5A3E18;border:1px solid #DDD0B0}
     .btn-secondary:hover{background:#E8D8B8}
-    #editor-wrap{background:#fff;border:1px solid #DDD8C8;border-radius:8px;overflow:hidden}
-    .toastui-editor-defaultUI{border:none!important}
     .status-msg{font-size:12px;color:#7A6048;padding:4px 0}
     .status-msg.ok{color:#4A7A2A}
     .status-msg.err{color:#c00}
+    /* SmartEditor2 iframe wrapper */
+    #se-frame-wrap{background:#fff;border:1px solid #DDD8C8;border-radius:8px;overflow:hidden;width:100%}
+    #se-iframe{width:100%;height:520px;border:none;display:block}
+    /* Recent posts */
     .recent-posts{margin-top:28px}
     .recent-posts h3{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;margin-bottom:12px;color:#5A3E18}
     .rpost-item{background:#fff;border:1px solid #DDD8C8;border-radius:6px;padding:12px 16px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
     .rpost-item:hover{background:#F8F2E4}
     .rpost-title{font-size:14px;color:#2A1E10}
-    .rpost-meta{font-size:11px;color:#9A8870}
+    .rpost-meta{font-size:11px;color:#9A8870;white-space:nowrap;margin-left:12px}
   </style>
 </head>
 <body>
@@ -47,7 +47,6 @@
   <a href="#" class="active">에디터</a>
 </nav>
 <script>
-  // 에디터는 :8082, 메인서버는 :8080
   const mainBase = window.location.origin.replace(/:\d+$/, ':8080');
   document.getElementById('nav-home').href = mainBase + '/';
   document.getElementById('nav-home-a').href = mainBase + '/';
@@ -57,8 +56,9 @@
 
 <div class="page">
   <h1>법문·말씀 에디터</h1>
-  <p class="desc">Toast UI Editor WYSIWYG · 게시글 직접 편집·저장</p>
+  <p class="desc">SmartEditor2 WYSIWYG · 게시글 직접 편집·저장</p>
 
+  <!-- 게시판 필터 + 검색 -->
   <div class="toolbar-row">
     <select id="board-select" onchange="filterByBoard()" style="max-width:160px">
       <option value="">전체 게시판</option>
@@ -66,6 +66,8 @@
     <input type="text" id="search-input" placeholder="제목 검색…" onkeydown="if(event.key==='Enter')doSearch()" style="max-width:200px">
     <button class="btn btn-secondary" onclick="doSearch()">검색</button>
   </div>
+
+  <!-- 게시글 선택 + 저장 -->
   <div class="toolbar-row">
     <input type="text" id="post-id-input" placeholder="게시글 ID 입력 후 불러오기…">
     <button class="btn btn-secondary" onclick="loadPost()">불러오기</button>
@@ -73,84 +75,109 @@
     <span class="status-msg" id="status"></span>
   </div>
 
-  <div id="editor-wrap">
-    <div id="editor"></div>
+  <!-- SmartEditor2 iframe -->
+  <div id="se-frame-wrap">
+    <iframe id="se-iframe" src="/se-wrapper.html" title="SmartEditor2 법문 에디터"></iframe>
   </div>
 
+  <!-- 최근 게시글 목록 -->
   <div class="recent-posts">
     <h3>최근 게시글 (클릭하여 편집)</h3>
     <div id="recent-list">불러오는 중…</div>
   </div>
 </div>
 
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<!-- se-init.js: paste/drop 이미지 업로드 핸들러 -->
+<script src="/js/se-init.js"></script>
+
 <script>
 let currentPostId = null;
 
-const editor = new toastui.Editor({
-  el: document.getElementById('editor'),
-  height: '500px',
-  initialEditType: 'wysiwyg',
-  previewStyle: 'vertical',
-  placeholder: '법문·말씀 내용을 입력하세요…',
-  toolbarItems: [
-    ['heading', 'bold', 'italic', 'strike'],
-    ['hr', 'quote'],
-    ['ul', 'ol', 'task'],
-    ['table', 'image', 'link'],
-    ['code', 'codeblock'],
-    ['scrollSync'],
-  ],
-  hooks: {
-    async addImageBlobHook(blob, cb) {
-      const form = new FormData();
-      form.append('file', blob);
-      const r = await fetch('/api/upload', { method: 'POST', body: form }).then(r=>r.json());
-      cb(r.url, blob.name);
-    }
-  }
-});
+/* SE2 에디터 인스턴스 접근 헬퍼 */
+function getSeEditor() {
+  try {
+    const cw = document.getElementById('se-iframe').contentWindow;
+    return cw && cw.oEditors && cw.oEditors.getById && cw.oEditors.getById['ir1'];
+  } catch { return null; }
+}
 
+/* SE2에서 현재 HTML 가져오기 */
+function getSeHTML() {
+  const ed = getSeEditor();
+  if (!ed) return '';
+  try {
+    ed.exec('UPDATE_CONTENTS_FIELD', []);  // textarea 동기화
+  } catch {}
+  try {
+    const cw = document.getElementById('se-iframe').contentWindow;
+    return cw.document.getElementById('ir1').value || '';
+  } catch { return ''; }
+}
+
+/* SE2에 HTML 세팅 */
+function setSeHTML(html) {
+  const ed = getSeEditor();
+  if (!ed) {
+    // 에디터 미준비 시 300ms 후 재시도
+    setTimeout(() => setSeHTML(html), 300);
+    return;
+  }
+  try {
+    ed.exec('SET_IR_VALUE', [html || '']);
+  } catch (e) {
+    // fallback: textarea에 직접 세팅
+    try {
+      const cw = document.getElementById('se-iframe').contentWindow;
+      const ta = cw.document.getElementById('ir1');
+      if (ta) { ta.value = html || ''; }
+    } catch {}
+  }
+}
+
+/* 게시글 불러오기 */
 async function loadPost() {
   const pid = document.getElementById('post-id-input').value.trim();
   if (!pid) return;
   setStatus('불러오는 중…');
   try {
-    const d = await fetch('/api/posts/' + encodeURIComponent(pid)).then(r=>r.json());
+    const d = await fetch('/api/posts/' + encodeURIComponent(pid)).then(r => r.json());
     if (d.error) { setStatus('오류: ' + d.error, true); return; }
     currentPostId = d.post_id;
-    editor.setHTML(d.content_html || `<p>${(d.content||'').replace(/\n/g,'<br>')}</p>`);
+    const html = d.content_html || `<p>${(d.content || '').replace(/\n/g, '<br>')}</p>`;
+    setSeHTML(html);
     setStatus(`"${d.title}" 불러옴`, false, true);
-  } catch(e) { setStatus('오류: ' + e.message, true); }
+  } catch (e) { setStatus('오류: ' + e.message, true); }
 }
 
+/* 게시글 저장 */
 async function savePost() {
   if (!currentPostId) { setStatus('먼저 게시글을 불러오세요', true); return; }
   setStatus('저장 중…');
   try {
-    const html = editor.getHTML();
+    const html = getSeHTML();
     const r = await fetch('/api/posts/' + encodeURIComponent(currentPostId), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content_html: html }),
-    }).then(r=>r.json());
+    }).then(r => r.json());
     setStatus(r.ok ? '저장 완료' : '오류: ' + r.error, !r.ok, r.ok);
-  } catch(e) { setStatus('오류: ' + e.message, true); }
+  } catch (e) { setStatus('오류: ' + e.message, true); }
 }
 
-function setStatus(msg, isErr=false, isOk=false) {
+function setStatus(msg, isErr = false, isOk = false) {
   const el = document.getElementById('status');
   el.textContent = msg;
-  el.className = 'status-msg' + (isErr?' err':isOk?' ok':'');
+  el.className = 'status-msg' + (isErr ? ' err' : isOk ? ' ok' : '');
 }
 
+/* 게시판 목록 */
 let editorState = { board: '', search: '', page: 1 };
 
 async function loadBoards() {
-  const boards = await fetch('/api/boards').then(r=>r.json());
+  const boards = await fetch('/api/boards').then(r => r.json());
   const sel = document.getElementById('board-select');
   sel.innerHTML = '<option value="">전체 게시판</option>' +
-    boards.map(b=>`<option value="${escHtml(b.board)}">${escHtml(b.board)} (${b.count})</option>`).join('');
+    boards.map(b => `<option value="${escHtml(b.board)}">${escHtml(b.board)} (${b.count})</option>`).join('');
 }
 
 function filterByBoard() {
@@ -169,21 +196,20 @@ async function loadRecent() {
   const params = new URLSearchParams({ limit: 20, page: editorState.page });
   if (editorState.board) params.set('board', editorState.board);
   if (editorState.search) params.set('search', editorState.search);
-  const data = await fetch('/api/posts?' + params).then(r=>r.json());
+  const data = await fetch('/api/posts?' + params).then(r => r.json());
   const el = document.getElementById('recent-list');
   if (!data.posts?.length) { el.innerHTML = '<p style="color:#9A8870;padding:12px">게시글 없음</p>'; return; }
-  el.innerHTML = data.posts.map(p=>`
+  el.innerHTML = data.posts.map(p => `
     <div class="rpost-item" onclick="selectPost('${escJs(p.post_id)}','${escJs(p.title)}')">
-      <span class="rpost-title">${escHtml(p.title||'(제목없음)')}</span>
-      <span class="rpost-meta">${escHtml(p.board||'')} · ${p.created_at?new Date(p.created_at).toLocaleDateString('ko'):''}</span>
+      <span class="rpost-title">${escHtml(p.title || '(제목없음)')}</span>
+      <span class="rpost-meta">${escHtml(p.board || '')} · ${p.created_at ? new Date(p.created_at).toLocaleDateString('ko') : ''}</span>
     </div>`).join('');
-  // 페이지 버튼
-  const total = data.totalPages||1;
-  const cur = data.page||1;
+  const total = data.totalPages || 1;
+  const cur = data.page || 1;
   if (total > 1) {
     const pages = [];
-    for(let i=Math.max(1,cur-2); i<=Math.min(total,cur+2); i++)
-      pages.push(`<button onclick="goEditorPage(${i})" style="padding:4px 9px;border:1px solid #DDD8C8;border-radius:4px;background:${i===cur?'#2A1E10':'#fff'};color:${i===cur?'#E8DCC8':'#2A1E10'};cursor:pointer;font-size:12px">${i}</button>`);
+    for (let i = Math.max(1, cur - 2); i <= Math.min(total, cur + 2); i++)
+      pages.push(`<button onclick="goEditorPage(${i})" style="padding:4px 9px;border:1px solid #DDD8C8;border-radius:4px;background:${i === cur ? '#2A1E10' : '#fff'};color:${i === cur ? '#E8DCC8' : '#2A1E10'};cursor:pointer;font-size:12px">${i}</button>`);
     el.innerHTML += `<div style="display:flex;gap:4px;margin-top:10px;justify-content:center">${pages.join('')}</div>`;
   }
 }
@@ -195,8 +221,8 @@ function selectPost(pid, title) {
   loadPost();
 }
 
-function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function escJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\n/g,''); }
+function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function escJs(s) { return String(s || '').replace(/'/g, "\\'").replace(/\n/g, ''); }
 
 loadBoards();
 loadRecent();
