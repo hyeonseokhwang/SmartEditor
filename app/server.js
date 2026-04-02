@@ -150,7 +150,7 @@ app.get('/api/posts', async (req, res) => {
 
     const where = []; const params = []; let idx = 1;
     if (board)  { where.push(`p.board = $${idx++}`); params.push(board); }
-    if (search) { where.push(`(p.title ILIKE $${idx} OR p.content ILIKE $${idx})`); params.push(`%${search}%`); idx++; }
+    if (search) { where.push(`(p.title ILIKE $${idx} OR p.content ILIKE $${idx} OR p.author ILIKE $${idx})`); params.push(`%${search}%`); idx++; }
 
     const wc = where.length ? 'WHERE ' + where.join(' AND ') : '';
     const total = parseInt((await pool.query(`SELECT COUNT(*) FROM yeouiseonwon.posts p ${wc}`, params)).rows[0].count);
