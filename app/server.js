@@ -250,8 +250,9 @@ app.post('/api/chat', async (req, res) => {
     const mainKeyword = keywords[0] || question.replace(/[?？！!.,。、\s]/g,'').slice(0, 6);
 
     // 3) 3중 하이브리드 검색: 경전 pgvector + 게시글 pgvector + 게시글 키워드
+    // OR → AND: 모든 키워드를 포함하는 게시글만 반환 (오탐 방지)
     const postKeywordWhere = keywords.length > 1
-      ? keywords.map((_,i) => `(content ILIKE $${i+1} OR title ILIKE $${i+1})`).join(' OR ')
+      ? keywords.map((_,i) => `(content ILIKE $${i+1} OR title ILIKE $${i+1})`).join(' AND ')
       : `(content ILIKE $1 OR title ILIKE $1)`;
     const postKeywordParams = keywords.length > 1
       ? keywords.map(k => `%${k.replace(/[%_]/g,'\\$&')}%`)

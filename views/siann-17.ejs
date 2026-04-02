@@ -606,6 +606,84 @@
     /* Nav & footer */
     body.lang-en .nav-logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.12em;font-size:16px}
     body.lang-en .footer-brand{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:1.4rem;letter-spacing:.05em}
+
+    /* ── ARCHIVE MODAL ── */
+    .arc-overlay{display:none;position:fixed;inset:0;z-index:1800;background:rgba(0,0,0,.88);padding:20px}
+    .arc-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+    .arc-modal{max-width:1100px;width:100%;background:var(--bg);border:1px solid rgba(0,0,0,.1);border-radius:8px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5);display:flex;flex-direction:column;max-height:calc(100vh - 40px)}
+    .arc-head{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid rgba(0,0,0,.1);background:var(--md);flex-shrink:0}
+    .arc-title{font-family:var(--serif);font-size:16px;font-weight:400;color:var(--tx);letter-spacing:.04em}
+    .arc-close{background:none;border:none;cursor:pointer;color:var(--gr);font-size:26px;line-height:1;padding:0 4px;transition:color .2s}
+    .arc-close:hover{color:var(--ac)}
+    .arc-body{display:flex;flex:1;overflow:hidden}
+    .arc-sidebar{width:200px;flex-shrink:0;overflow-y:auto;border-right:1px solid rgba(0,0,0,.1);background:var(--lt);padding:8px 0}
+    .arc-board-item{padding:9px 16px;font-size:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-left:2px solid transparent;transition:all .15s;color:var(--gr)}
+    .arc-board-item:hover{background:var(--md);color:var(--tx)}
+    .arc-board-item.active{background:var(--md);border-left-color:var(--ac);color:var(--ac);font-weight:500}
+    .arc-board-cnt{font-size:10px;opacity:.6}
+    .arc-main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0}
+    .arc-searchbar{padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;gap:8px;flex-shrink:0;background:var(--bg)}
+    .arc-searchbar input{flex:1;padding:7px 10px;border:1px solid rgba(0,0,0,.12);border-radius:5px;font-size:13px;background:var(--lt);color:var(--tx);outline:none;font-family:var(--sans)}
+    .arc-searchbar input::placeholder{color:var(--gr)}
+    .arc-searchbar input:focus{border-color:var(--ac)}
+    .arc-searchbar button{padding:7px 14px;border:none;border-radius:5px;background:var(--ac);color:#fff;cursor:pointer;font-size:12px;font-family:var(--sans)}
+    .arc-post-table{width:100%;border-collapse:collapse}
+    .arc-post-table th{background:var(--lt);padding:8px 12px;text-align:left;font-size:11px;letter-spacing:.06em;color:var(--gr);border-bottom:1px solid rgba(0,0,0,.08);font-weight:400;position:sticky;top:0;z-index:1}
+    .arc-post-table td{padding:9px 12px;font-size:13px;border-bottom:1px solid rgba(0,0,0,.06);color:var(--gr)}
+    .arc-post-table tr:hover td{background:var(--lt);cursor:pointer}
+    .arc-post-title-cell{color:var(--tx);max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+    .arc-badge{font-size:10px;background:rgba(0,0,0,.06);color:var(--ac);padding:2px 7px;border-radius:10px;white-space:nowrap}
+    .arc-pagination{display:flex;justify-content:center;gap:6px;padding:12px;flex-shrink:0;flex-wrap:wrap;border-top:1px solid rgba(0,0,0,.08)}
+    .arc-pg-btn{padding:5px 10px;border:1px solid rgba(0,0,0,.12);background:var(--lt);border-radius:4px;cursor:pointer;font-size:12px;color:var(--gr);font-family:var(--sans);transition:.15s}
+    .arc-pg-btn.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+    .arc-pg-btn:hover:not(.active){background:var(--md)}
+
+    /* ── POST DETAIL ── */
+    .pd-overlay{display:none;position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.72);padding:20px;overflow-y:auto}
+    .pd-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+    .pd-modal{max-width:820px;width:100%;background:var(--bg);border-radius:8px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+    .pd-head{padding:16px 24px;background:var(--md);border-bottom:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .pd-title{font-family:var(--serif);font-size:16px;font-weight:400;color:var(--tx);line-height:1.4;flex:1;margin:0}
+    .pd-close{background:none;border:none;cursor:pointer;color:var(--gr);font-size:26px;line-height:1;flex-shrink:0;transition:color .2s}
+    .pd-close:hover{color:var(--ac)}
+    .pd-meta{padding:10px 24px;font-size:12px;color:var(--gr);background:var(--lt);border-bottom:1px solid rgba(0,0,0,.08);display:flex;gap:16px;flex-wrap:wrap}
+    .pd-body{padding:24px;font-size:14px;line-height:2;max-height:55vh;overflow-y:auto;color:var(--tx)}
+    .pd-body img{max-width:100%;height:auto;border-radius:4px;margin:8px 0}
+    .pd-body pre{white-space:pre-wrap;font-family:inherit}
+    .pd-comments{padding:16px 24px;border-top:1px solid rgba(0,0,0,.08);background:var(--lt)}
+    .pd-comment{padding:8px 12px;background:var(--bg);border-radius:4px;margin-bottom:6px;font-size:12px;color:var(--gr);border:1px solid rgba(0,0,0,.08)}
+    .pd-comment-meta{font-size:11px;color:var(--gr);margin-bottom:3px;opacity:.7}
+
+    /* ── CHAT WIDGET ── */
+    .chat-fab{position:fixed;bottom:32px;right:32px;z-index:1400;width:56px;height:56px;border-radius:50%;background:var(--ac);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:.25s}
+    .chat-fab:hover{transform:scale(1.08)}
+    .chat-fab svg{width:26px;height:26px;fill:#fff}
+    .chat-panel{position:fixed;bottom:100px;right:28px;z-index:1400;width:360px;max-height:520px;background:var(--bg);border:1px solid rgba(0,0,0,.12);border-radius:12px;box-shadow:0 16px 56px rgba(0,0,0,.25);display:none;flex-direction:column;overflow:hidden}
+    .chat-panel.open{display:flex}
+    .chat-ph{padding:12px 16px;background:var(--md);border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;gap:10px;flex-shrink:0}
+    .chat-ph-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--dk));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;color:#fff;flex-shrink:0}
+    .chat-ph-name{font-family:var(--serif);font-size:14px;color:var(--tx)}
+    .chat-ph-sub{font-size:10px;color:var(--gr);letter-spacing:.04em;margin-top:2px}
+    .chat-ph-close{background:none;border:none;cursor:pointer;color:var(--gr);font-size:22px;margin-left:auto;line-height:1;transition:color .2s}
+    .chat-ph-close:hover{color:var(--ac)}
+    .chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:200px}
+    .chat-msgs::-webkit-scrollbar{width:3px}
+    .chat-msgs::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:2px}
+    .c-msg{display:flex;gap:8px;align-items:flex-start}
+    .c-msg.user{flex-direction:row-reverse}
+    .c-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-family:var(--serif)}
+    .c-msg.user .c-avatar{background:var(--dk);color:rgba(255,255,255,.8)}
+    .c-msg.bot .c-avatar{background:linear-gradient(135deg,var(--ac),var(--dk));color:#fff}
+    .c-bubble{max-width:82%;padding:9px 12px;font-size:13px;line-height:1.75;word-break:break-word}
+    .c-msg.user .c-bubble{background:var(--dk);color:rgba(255,255,255,.9);border-radius:8px 2px 8px 8px}
+    .c-msg.bot .c-bubble{background:var(--lt);color:var(--tx);border-radius:2px 8px 8px 8px;border-left:2px solid var(--ac)}
+    .chat-input-wrap{border-top:1px solid rgba(0,0,0,.08);padding:10px;display:flex;gap:8px;flex-shrink:0}
+    .chat-input-wrap textarea{flex:1;padding:8px 10px;border:1px solid rgba(0,0,0,.12);border-radius:6px;font-size:13px;font-family:var(--sans);background:var(--lt);color:var(--tx);resize:none;outline:none;line-height:1.5;max-height:80px;overflow-y:auto}
+    .chat-input-wrap textarea::placeholder{color:var(--gr)}
+    .chat-input-wrap textarea:focus{border-color:var(--ac)}
+    .chat-send-btn{padding:8px 14px;background:var(--ac);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:var(--sans);align-self:flex-end;transition:.2s}
+    .chat-send-btn:hover{opacity:.85}
+    .chat-send-btn:disabled{opacity:.4;cursor:default}
   </style>
 </head>
 <body>
@@ -955,5 +1033,200 @@
     }
     try { if(localStorage.getItem('hanul-lang') === 'en') toggleLang(); } catch(e) {}
   </script>
+
+<!-- ══ ARCHIVE MODAL ══ -->
+<div class="arc-overlay" id="arc-overlay">
+  <div class="arc-modal">
+    <div class="arc-head">
+      <span class="arc-title">법문 아카이브 — 여의선원</span>
+      <button class="arc-close" onclick="closeArcModal()" aria-label="닫기">×</button>
+    </div>
+    <div class="arc-body">
+      <div class="arc-sidebar" id="arc-sidebar">
+        <div class="arc-board-item active" data-board="" onclick="arcSelectBoard('')">
+          전체 게시판 <span class="arc-board-cnt" id="arc-total-cnt"></span>
+        </div>
+      </div>
+      <div class="arc-main">
+        <div class="arc-searchbar">
+          <input type="text" id="arc-search" placeholder="제목·내용 검색…" onkeydown="if(event.key==='Enter')arcDoSearch()">
+          <button onclick="arcDoSearch()">검색</button>
+        </div>
+        <table class="arc-post-table">
+          <thead>
+            <tr>
+              <th>제목</th>
+              <th style="width:120px">게시판</th>
+              <th style="width:50px;text-align:center">댓글</th>
+              <th style="width:90px;white-space:nowrap">날짜</th>
+            </tr>
+          </thead>
+          <tbody id="arc-tbody">
+            <tr><td colspan="4" style="text-align:center;padding:40px;opacity:.5">불러오는 중…</td></tr>
+          </tbody>
+        </table>
+        <div class="arc-pagination" id="arc-pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POST DETAIL MODAL -->
+<div class="pd-overlay" id="pd-overlay">
+  <div class="pd-modal">
+    <div class="pd-head">
+      <h2 class="pd-title" id="pd-title">불러오는 중…</h2>
+      <button class="pd-close" onclick="closePdModal()" aria-label="닫기">×</button>
+    </div>
+    <div class="pd-meta" id="pd-meta"></div>
+    <div class="pd-body" id="pd-body"><div style="text-align:center;padding:40px;opacity:.5">불러오는 중…</div></div>
+    <div class="pd-comments" id="pd-comments"></div>
+  </div>
+</div>
+
+<!-- ══ CHAT FLOATING WIDGET ══ -->
+<button class="chat-fab" id="chat-fab" onclick="toggleChat()" aria-label="AI 한울 상담">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+</button>
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-ph">
+    <div class="chat-ph-avatar">韓</div>
+    <div>
+      <div class="chat-ph-name">한울 담당관</div>
+      <div class="chat-ph-sub">AI · 한울사상 전문 상담</div>
+    </div>
+    <button class="chat-ph-close" onclick="toggleChat()" aria-label="닫기">×</button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs">
+    <div class="c-msg bot">
+      <div class="c-avatar">韓</div>
+      <div class="c-bubble">안녕하세요. 한울사상과 여의수행에 대해 궁금하신 것을 물어보세요.</div>
+    </div>
+  </div>
+  <div class="chat-input-wrap">
+    <textarea id="chat-input" placeholder="질문을 입력하세요… (Enter=전송)" rows="2"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"></textarea>
+    <button class="chat-send-btn" id="chat-send-btn" onclick="chatSend()">전송</button>
+  </div>
+</div>
+
+<script>
+/* ══ ARCHIVE MODAL ══ */
+(function(){
+  var arcState={board:'',search:'',page:1};
+  function openArcModal(){document.getElementById('arc-overlay').classList.add('open');document.body.style.overflow='hidden';arcLoadBoards();arcLoad();}
+  function closeArcModal(){document.getElementById('arc-overlay').classList.remove('open');document.body.style.overflow='';}
+  window.openArcModal=openArcModal;window.closeArcModal=closeArcModal;
+  document.getElementById('arc-overlay').addEventListener('click',function(e){if(e.target===this)closeArcModal();});
+  document.querySelectorAll('a[href="/archive"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();openArcModal();});});
+
+  function arcSelectBoard(board){
+    arcState.board=board;arcState.page=1;
+    document.querySelectorAll('.arc-board-item').forEach(function(el){el.classList.toggle('active',el.dataset.board===board);});
+    arcLoad();
+  }
+  window.arcSelectBoard=arcSelectBoard;
+  function arcDoSearch(){arcState.search=document.getElementById('arc-search').value;arcState.page=1;arcLoad();}
+  window.arcDoSearch=arcDoSearch;
+
+  var boardsLoaded=false;
+  async function arcLoadBoards(){
+    if(boardsLoaded)return;boardsLoaded=true;
+    try{
+      var[boards,stats]=await Promise.all([fetch('/api/boards').then(r=>r.json()),fetch('/api/stats').then(r=>r.json())]);
+      var cntEl=document.getElementById('arc-total-cnt');
+      if(cntEl)cntEl.textContent='('+Number(stats.totalPosts||0).toLocaleString()+')';
+      var sb=document.getElementById('arc-sidebar');
+      boards.forEach(function(b){
+        var d=document.createElement('div');d.className='arc-board-item';d.dataset.board=b.board;
+        d.innerHTML=arcEsc(b.board)+'<span class="arc-board-cnt">'+Number(b.count).toLocaleString()+'</span>';
+        d.onclick=function(){arcSelectBoard(b.board);};sb.appendChild(d);
+      });
+    }catch(e){console.warn('arcLoadBoards',e);}
+  }
+
+  async function arcLoad(){
+    var tbody=document.getElementById('arc-tbody');
+    tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:32px;opacity:.5">불러오는 중…</td></tr>';
+    var p=new URLSearchParams({page:arcState.page,limit:20});
+    if(arcState.board)p.set('board',arcState.board);if(arcState.search)p.set('search',arcState.search);
+    try{
+      var data=await fetch('/api/posts?'+p).then(r=>r.json());
+      if(!data.posts||!data.posts.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:32px;opacity:.5">게시글이 없습니다</td></tr>';arcPager(0,1,1);return;}
+      tbody.innerHTML=data.posts.map(function(post){
+        return '<tr onclick="arcOpenPost(\''+arcEscJs(post.post_id)+'\')">'+
+          '<td><span class="arc-post-title-cell">'+arcEsc(post.title||'(제목없음)')+'</span></td>'+
+          '<td><span class="arc-badge">'+arcEsc(post.board||'-')+'</span></td>'+
+          '<td style="text-align:center">'+Number(post.comment_count||0)+'</td>'+
+          '<td style="white-space:nowrap;font-size:12px">'+(post.created_at?new Date(post.created_at).toLocaleDateString('ko'):'-')+'</td></tr>';
+      }).join('');
+      arcPager(data.total,data.page,data.totalPages);
+    }catch(e){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:32px;color:#c05">오류: '+arcEsc(e.message)+'</td></tr>';}
+  }
+
+  function arcPager(total,cur,tot){
+    var el=document.getElementById('arc-pagination');if(!tot||tot<=1){el.innerHTML='';return;}
+    var pages=[];
+    if(cur>4)pages.push('<button class="arc-pg-btn" onclick="arcGoPage(1)">1…</button>');
+    for(var i=Math.max(1,cur-3);i<=Math.min(tot,cur+3);i++)pages.push('<button class="arc-pg-btn'+(i===cur?' active':'')+'" onclick="arcGoPage('+i+')">'+i+'</button>');
+    if(cur<tot-3)pages.push('<button class="arc-pg-btn" onclick="arcGoPage('+tot+')">…'+tot+'</button>');
+    el.innerHTML=pages.join('');
+  }
+  function arcGoPage(n){arcState.page=n;arcLoad();}window.arcGoPage=arcGoPage;
+
+  async function arcOpenPost(postId){
+    document.getElementById('pd-overlay').classList.add('open');
+    document.getElementById('pd-title').textContent='불러오는 중…';
+    document.getElementById('pd-body').innerHTML='<div style="text-align:center;padding:40px;opacity:.5">불러오는 중…</div>';
+    document.getElementById('pd-meta').innerHTML='';document.getElementById('pd-comments').innerHTML='';
+    try{
+      var d=await fetch('/api/posts/'+encodeURIComponent(postId)).then(r=>r.json());
+      document.getElementById('pd-title').textContent=d.title||'(제목없음)';
+      document.getElementById('pd-meta').innerHTML='<span>'+arcEsc(d.board||'-')+'</span><span>'+arcEsc(d.author||'-')+'</span><span>'+(d.created_at?new Date(d.created_at).toLocaleString('ko'):'')+'</span>';
+      var html=d.content_html||'';
+      if(!html&&d.content)html='<pre>'+arcEsc(d.content)+'</pre>';
+      html=html.replace(/src="(https?:\/\/[^"]*pstatic\.net[^"]*)"/gi,function(m,u){return 'src="/api/img-proxy?url='+encodeURIComponent(u)+'"';});
+      document.getElementById('pd-body').innerHTML=html||'<p style="opacity:.5">내용 없음</p>';
+      if(d.comments&&d.comments.length){
+        document.getElementById('pd-comments').innerHTML='<div style="font-size:12px;font-weight:500;margin-bottom:8px;opacity:.7">댓글 '+d.comments.length+'개</div>'+
+          d.comments.map(function(c){return '<div class="pd-comment"><div class="pd-comment-meta">'+arcEsc(c.author||'-')+' · '+(c.created_at?new Date(c.created_at).toLocaleDateString('ko'):'')+'</div>'+arcEsc(c.content||'')+'</div>';}).join('');
+      }
+    }catch(e){document.getElementById('pd-body').innerHTML='<p style="color:#c05">오류: '+arcEsc(e.message)+'</p>';}
+  }
+  window.arcOpenPost=arcOpenPost;
+  function closePdModal(){document.getElementById('pd-overlay').classList.remove('open');}
+  window.closePdModal=closePdModal;
+  document.getElementById('pd-overlay').addEventListener('click',function(e){if(e.target===this)closePdModal();});
+  function arcEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function arcEscJs(s){return String(s||'').replace(/'/g,"\\'").replace(/[\r\n]/g,'');}
+})();
+
+/* ══ CHAT WIDGET ══ */
+(function(){
+  function toggleChat(){var panel=document.getElementById('chat-panel');panel.classList.toggle('open');if(panel.classList.contains('open'))document.getElementById('chat-input').focus();}
+  window.toggleChat=toggleChat;
+  document.querySelectorAll('a[href="/chat"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();toggleChat();});});
+
+  async function chatSend(){
+    var inp=document.getElementById('chat-input');var q=(inp.value||'').trim();if(!q)return;
+    var btn=document.getElementById('chat-send-btn');inp.value='';btn.disabled=true;
+    var msgs=document.getElementById('chat-msgs');
+    msgs.insertAdjacentHTML('beforeend','<div class="c-msg user"><div class="c-avatar">나</div><div class="c-bubble">'+chatEsc(q)+'</div></div>');
+    var tid='ct-'+Date.now();
+    msgs.insertAdjacentHTML('beforeend','<div class="c-msg bot" id="'+tid+'"><div class="c-avatar">韓</div><div class="c-bubble" style="display:flex;gap:4px;align-items:center"><span style="font-size:11px;opacity:.6">응답 중</span><span style="display:inline-block;width:5px;height:5px;background:currentColor;border-radius:50%;animation:bounce .8s infinite alternate"></span><span style="display:inline-block;width:5px;height:5px;background:currentColor;border-radius:50%;animation:bounce .8s .2s infinite alternate"></span></div></div>');
+    msgs.scrollTop=msgs.scrollHeight;
+    try{
+      var r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
+      var d=await r.json();
+      var tidEl=document.getElementById(tid);
+      if(tidEl)tidEl.outerHTML='<div class="c-msg bot"><div class="c-avatar">韓</div><div class="c-bubble">'+chatMd(d.answer||d.error||'오류')+'</div></div>';
+    }catch(e){var tidEl2=document.getElementById(tid);if(tidEl2)tidEl2.outerHTML='<div class="c-msg bot"><div class="c-avatar">韓</div><div class="c-bubble" style="color:#c05">오류: '+chatEsc(e.message)+'</div></div>';}
+    msgs.scrollTop=msgs.scrollHeight;btn.disabled=false;inp.focus();
+  }
+  window.chatSend=chatSend;
+  function chatEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function chatMd(s){return chatEsc(s).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/^&gt; (.+)$/gm,'<blockquote style="border-left:2px solid currentColor;padding-left:8px;margin:4px 0;opacity:.85">$1</blockquote>').replace(/\n/g,'<br>');}
+})();
+</script>
 </body>
 </html>
