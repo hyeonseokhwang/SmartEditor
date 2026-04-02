@@ -6,23 +6,57 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env') });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ── Cloudinary ──
+const hasCloudinary = process.env.CLOUDINARY_URL || (
+  process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET
+);
+
+if (hasCloudinary) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true,
+  });
+  console.log('[upload] Cloudinary 모드 활성화');
+} else {
+  console.log('[upload] 로컬 저장 모드 (Cloudinary 키 없음)');
+}
+
+// ── Multer 설정 (Cloudinary or 로컬) ──
 const UPLOADS_DIR = path.join(__dirname, '..', 'public', 'uploads');
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname) || '.png';
-    cb(null, `${uuidv4()}${ext}`);
-  },
-});
-const upload = multer({ storage, limits: { fileSize: 20 * 1024 * 1024 } });
+let upload;
+if (hasCloudinary) {
+  const cloudStorage = new CloudinaryStorage({
+    cloudinary,
+    params: async () => ({
+      folder: 'Hanwool',
+      public_id: uuidv4(),
+      resource_type: 'image',
+      overwrite: false,
+    }),
+  });
+  upload = multer({ storage: cloudStorage, limits: { fileSize: 20 * 1024 * 1024 } });
+} else {
+  const diskStorage = multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname) || '.png';
+      cb(null, `${uuidv4()}${ext}`);
+    },
+  });
+  upload = multer({ storage: diskStorage, limits: { fileSize: 20 * 1024 * 1024 } });
+}
 
 const app = express();
 const PORT = process.env.EDITOR_PORT || 8082;
@@ -96,14 +130,30 @@ app.get('/api/boards', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// 이미지 업로드 (multer 파일 또는 base64 dataUrl)
+// 이미지 업로드 (multer 파일 또는 base64 dataUrl) — Cloudinary or 로컬 fallback
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   try {
+    // multer 파일 업로드
     if (req.file) {
+      if (hasCloudinary) {
+        const url = req.file.path || req.file.secure_url;
+        return res.json({ url });
+      }
       return res.json({ url: `/public/uploads/${req.file.filename}` });
     }
+
+    // base64 dataUrl 업로드
     const { dataUrl } = req.body;
     if (!dataUrl) return res.status(400).json({ error: 'No file or dataUrl' });
+
+    if (hasCloudinary) {
+      const r = await cloudinary.uploader.upload(dataUrl, {
+        folder: 'Hanwool', public_id: uuidv4(), resource_type: 'image',
+      });
+      return res.json({ url: r.secure_url });
+    }
+
+    // 로컬 fallback
     const match = dataUrl.match(/^data:(.*?);base64,(.*)$/);
     if (!match) return res.status(400).json({ error: 'Invalid data URL' });
     const ext = (match[1].split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '');
