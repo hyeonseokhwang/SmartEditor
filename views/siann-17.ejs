@@ -624,18 +624,28 @@
     </div>
     <div class="phil-grid" style="max-width:1140px;margin:0 auto;padding:0 48px;margin-top:0;">
       <% const philData = [
-        {n:'01', name:'修道  수도', hanja:'닦아가는 길', text:'깊이 공부해서 수련과 수도를 겸해서 지도해줄 수 있어야 합니다. 수도는 스스로를 닦는 것을 넘어 세상을 함께 깨우는 길입니다. — 큰스승님 말씀'},
-        {n:'02', name:'生命場  생명장', hanja:'생명의 공명', text:'생명장(Life field)이란 생명체의 몸氣(몸을 운영하는 기운)와, 영기(靈氣:영혼의 기운)와, 지기(地氣:터전과 환경의 기운)의 조합이 이루어내는 氣의 장(場)입니다. 생명장을 통해 자기표현을 해야 상대와 충돌하지 않고, 공명현상으로 서로 조화가 이루어집니다. — 여의선원 [생명장]'},
-        {n:'03', name:'性滅濟度  성멸제도', hanja:'사람 성을 비우다', text:'성멸제도일은 자신이 멸해야 할 성, 즉 사람 성·사람 정을 소멸하는 날입니다. 부질없고 쓸모없는 것들을 버리고 영격을 높여가는 수도의 과정입니다.'},
-        {n:'04', name:'性滅五通  성멸오통', hanja:'초월하여 통하다', text:'성(性)에 묶이지 않고 초월해야 전체와 통할 수 있다. 주계좌를 득한 이후 성멸오통에 이르는 것으로 끝나는 것이 아니라 반드시 더 깊이 나아가야 한다. — 큰스승님 말씀'}
+        {n:'01', name:'修道  수도', hanja:'닦아가는 길', hanjaEn:'The Path of Practice',
+         text:'깊이 공부해서 수련과 수도를 겸해서 지도해줄 수 있어야 합니다. 수도는 스스로를 닦는 것을 넘어 세상을 함께 깨우는 길입니다. — 한울 김준원 큰스승님 말씀',
+         textEn:'One must study deeply enough to guide both training and spiritual practice. Sudo (修道) is not merely self-cultivation — it is the path of awakening the world together. — Grandmaster Kim Jun-won\'s Teaching'},
+        {n:'02', name:'生命場  생명장', hanja:'생명의 공명', hanjaEn:'Resonance of Life',
+         text:'생명장(Life field)이란 생명체의 몸氣(몸을 운영하는 기운)와, 영기(靈氣:영혼의 기운)와, 지기(地氣:터전과 환경의 기운)의 조합이 이루어내는 氣의 장(場)입니다. 생명장을 통해 자기표현을 해야 상대와 충돌하지 않고, 공명현상으로 서로 조화가 이루어집니다. — 여의선원 [생명장]',
+         textEn:'The Life Field (生命場) is the energetic field formed by body Ki (몸氣), spiritual energy (靈氣), and earth energy (地氣). Through the Life Field, authentic expression creates resonance and harmony rather than conflict. — Yeoui Seonwon [Life Field]'},
+        {n:'03', name:'性滅濟度  성멸제도', hanja:'사람 성을 비우다', hanjaEn:'Emptying Human Nature',
+         text:'성멸제도일은 자신이 멸해야 할 성, 즉 사람 성·사람 정을 소멸하는 날입니다. 부질없고 쓸모없는 것들을 버리고 영격을 높여가는 수도의 과정입니다.',
+         textEn:'The Day of Seongmyeol is dedicated to dissolving one\'s human nature (性) — personal desires and emotional attachments. By releasing the unnecessary, one elevates spiritual rank (영격) through practice.'},
+        {n:'04', name:'性滅五通  성멸오통', hanja:'초월하여 통하다', hanjaEn:'Transcend & Unite',
+         text:'성(性)에 묶이지 않고 초월해야 전체와 통할 수 있다. 주계좌를 득한 이후 성멸오통에 이르는 것으로 끝나는 것이 아니라 반드시 더 깊이 나아가야 한다. — 한울 김준원 큰스승님 말씀',
+         textEn:'Only by transcending attachment to one\'s human nature can the self unite with the whole. After attaining the master seat, reaching Seongmyeol-otong is not the end — one must continue even deeper. — Grandmaster Kim Jun-won\'s Teaching'}
       ]; %>
       <% philData.forEach(p => { %>
       <div class="phil-item">
         <div class="phil-glyph"><%= p.name.split('  ')[0] %></div>
         <div class="phil-num"><%= p.n %></div>
         <div class="phil-name"><%= p.name %></div>
-        <div class="phil-hanja"><%= p.hanja %></div>
-        <p class="phil-text"><%= p.text %></p>
+        <div class="phil-hanja" data-ko><%= p.hanja %></div>
+        <div class="phil-hanja" data-en><%= p.hanjaEn %></div>
+        <p class="phil-text" data-ko><%= p.text %></p>
+        <p class="phil-text" data-en><%= p.textEn %></p>
       </div>
       <% }); %>
     </div>
@@ -677,21 +687,24 @@
       </div>
       <div class="prog-grid">
         <% const progs = [
-          {icon:'☽', title:'새벽 명상', sub:'Dawn Meditation', text:'하루의 시작을 고요 속에서. 새벽 5시, 가장 맑은 의식으로 내면을 만납니다.'},
-          {icon:'○', title:'기(氣) 수련', sub:'Qi Practice', text:'동양 전통 기수련으로 몸의 에너지 흐름을 조율하고 생명력을 회복합니다.'},
-          {icon:'◇', title:'한울 요가', sub:'Hanul Yoga', text:'한울사상과 요가 철학의 만남. 몸의 정렬을 통해 마음의 정렬을 경험합니다.'},
-          {icon:'∞', title:'집중 수련', sub:'Intensive Retreat', text:'3박 4일 침묵 수련. 디지털과 단절하고 진정한 자신과 대면합니다.'},
-          {icon:'◎', title:'걷기 명상', sub:'Walking Meditation', text:'한 걸음 한 걸음에 의식을 담아. 숲과 땅과 함께 하는 동적 명상.'},
-          {icon:'〇', title:'공동 수련', sub:'Community Practice', text:'함께하는 수련의 힘. 공동체 안에서 더 깊은 내면의 변화를 경험합니다.'}
+          {icon:'☽', title:'새벽 명상', titleEn:'Dawn Meditation', sub:'Dawn Meditation', text:'하루의 시작을 고요 속에서. 새벽 5시, 가장 맑은 의식으로 내면을 만납니다.', textEn:'Begin the day in stillness. At 5am, meet your inner self with the clearest consciousness.'},
+          {icon:'○', title:'기(氣) 수련', titleEn:'Qi Practice', sub:'Qi Practice', text:'동양 전통 기수련으로 몸의 에너지 흐름을 조율하고 생명력을 회복합니다.', textEn:'Harmonize the body\'s energy flow through traditional Eastern Qi practice and restore vital life force.'},
+          {icon:'◇', title:'한울 요가', titleEn:'Hanul Yoga', sub:'Hanul Yoga', text:'한울사상과 요가 철학의 만남. 몸의 정렬을 통해 마음의 정렬을 경험합니다.', textEn:'A meeting of Hanul Philosophy and yoga. Through alignment of the body, experience alignment of the mind.'},
+          {icon:'∞', title:'집중 수련', titleEn:'Intensive Retreat', sub:'Intensive Retreat', text:'3박 4일 침묵 수련. 디지털과 단절하고 진정한 자신과 대면합니다.', textEn:'3-night, 4-day silent retreat. Disconnect from the digital world and face your true self.'},
+          {icon:'◎', title:'걷기 명상', titleEn:'Walking Meditation', sub:'Walking Meditation', text:'한 걸음 한 걸음에 의식을 담아. 숲과 땅과 함께 하는 동적 명상.', textEn:'Fill each step with full awareness. A moving meditation in harmony with forest and earth.'},
+          {icon:'〇', title:'공동 수련', titleEn:'Community Practice', sub:'Community Practice', text:'함께하는 수련의 힘. 공동체 안에서 더 깊은 내면의 변화를 경험합니다.', textEn:'The power of practice together. Experience deeper inner transformation within a spiritual community.'}
         ]; %>
         <% progs.forEach((p, i) => { %>
         <div class="prog-card">
           <div class="prog-card-accent"></div>
           <div class="prog-num">0<%= i+1 %></div>
           <div class="prog-icon" style="font-size:28px; color:var(--ac);"><%= p.icon %></div>
-          <div class="prog-title"><%= p.title %></div>
-          <p class="prog-text"><%= p.text %></p>
-          <a href="#contact" class="prog-link">자세히 보기 →</a>
+          <div class="prog-title" data-ko><%= p.title %></div>
+          <div class="prog-title" data-en><%= p.titleEn %></div>
+          <p class="prog-text" data-ko><%= p.text %></p>
+          <p class="prog-text" data-en><%= p.textEn %></p>
+          <a href="#contact" class="prog-link" data-ko>자세히 보기 →</a>
+          <a href="#contact" class="prog-link" data-en>Learn more →</a>
         </div>
         <% }); %>
       </div>
@@ -726,16 +739,18 @@
         </div>
         <ul class="teach-list">
           <% const teaches = [
-            {n:'01', title:'지금 이 순간', body:'과거의 기억도 미래의 불안도 아닌, 오직 지금 여기. 현재에 뿌리를 두는 것이 모든 수련의 출발입니다.'},
-            {n:'02', title:'몸이 스승이다', body:'몸은 가장 정직한 거울입니다. 긴장, 통증, 호흡의 리듬 — 몸이 보내는 신호에 귀를 기울이는 법을 배웁니다.'},
-            {n:'03', title:'침묵의 언어', body:'말이 멈출 때 비로소 들립니다. 규칙적인 침묵 수련으로 내면의 소리와 연결되는 능력을 키웁니다.'},
-            {n:'04', title:'관계가 수련이다', body:'나 혼자의 깨달음은 완전하지 않습니다. 타인과의 관계 속에서, 갈등과 용서 안에서 수련은 깊어집니다.'}
+            {n:'01', title:'지금 이 순간', titleEn:'This Present Moment', body:'과거의 기억도 미래의 불안도 아닌, 오직 지금 여기. 현재에 뿌리를 두는 것이 모든 수련의 출발입니다.', bodyEn:'Not past memories nor future anxieties — only here, now. Being rooted in the present is the starting point of all practice.'},
+            {n:'02', title:'몸이 스승이다', titleEn:'The Body Is the Teacher', body:'몸은 가장 정직한 거울입니다. 긴장, 통증, 호흡의 리듬 — 몸이 보내는 신호에 귀를 기울이는 법을 배웁니다.', bodyEn:'The body is the most honest mirror. Tension, pain, the rhythm of breath — we learn to listen to the signals the body sends.'},
+            {n:'03', title:'침묵의 언어', titleEn:'The Language of Silence', body:'말이 멈출 때 비로소 들립니다. 규칙적인 침묵 수련으로 내면의 소리와 연결되는 능력을 키웁니다.', bodyEn:'Only when words stop do we truly hear. Through regular silent practice, we cultivate the ability to connect with the voice within.'},
+            {n:'04', title:'관계가 수련이다', titleEn:'Relationship Is Practice', body:'나 혼자의 깨달음은 완전하지 않습니다. 타인과의 관계 속에서, 갈등과 용서 안에서 수련은 깊어집니다.', bodyEn:'Awakening alone is never complete. It is within relationship — in conflict and forgiveness — that practice truly deepens.'}
           ]; %>
           <% teaches.forEach(t2 => { %>
           <li class="teach-item">
             <div class="teach-num"><%= t2.n %></div>
-            <div class="teach-title"><%= t2.title %></div>
-            <p class="teach-body"><%= t2.body %></p>
+            <div class="teach-title" data-ko><%= t2.title %></div>
+            <div class="teach-title" data-en><%= t2.titleEn %></div>
+            <p class="teach-body" data-ko><%= t2.body %></p>
+            <p class="teach-body" data-en><%= t2.bodyEn %></p>
           </li>
           <% }); %>
         </ul>
@@ -748,20 +763,24 @@
     <div class="container">
       <div class="stats-row">
         <div class="stat-item">
-          <div class="stat-num">32<span class="stat-unit">년</span></div>
-          <div class="stat-label">수련원 역사</div>
+          <div class="stat-num">32<span class="stat-unit" data-ko>년</span><span class="stat-unit" data-en>yrs</span></div>
+          <div class="stat-label" data-ko>수련원 역사</div>
+          <div class="stat-label" data-en>Years of Practice</div>
         </div>
         <div class="stat-item">
           <div class="stat-num">1,200<span class="stat-unit">+</span></div>
-          <div class="stat-label">수련 이수자</div>
+          <div class="stat-label" data-ko>수련 이수자</div>
+          <div class="stat-label" data-en>Practitioners</div>
         </div>
         <div class="stat-item">
-          <div class="stat-num">12<span class="stat-unit">종</span></div>
-          <div class="stat-label">정규 수련 과정</div>
+          <div class="stat-num">12<span class="stat-unit" data-ko>종</span><span class="stat-unit" data-en></span></div>
+          <div class="stat-label" data-ko>정규 수련 과정</div>
+          <div class="stat-label" data-en>Practice Programs</div>
         </div>
         <div class="stat-item">
           <div class="stat-num">365</div>
-          <div class="stat-label">연중 수련 가능</div>
+          <div class="stat-label" data-ko>연중 수련 가능</div>
+          <div class="stat-label" data-en>Days Open</div>
         </div>
       </div>
     </div>
