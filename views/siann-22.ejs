@@ -419,26 +419,50 @@
       .nl,.ncta{display:none!important}
       .nav-mobile{display:flex}
       .lang-btn{font-size:10px;padding:4px 10px;margin-left:4px}
-      .hero-body{padding:0 28px 60px}
+      .hero-body{padding:0 24px 80px}
+      .hero-h1{font-size:clamp(1.9rem,6.5vw,3.2rem);margin-bottom:28px}
+      .hero-btn{display:block;text-align:center;padding:14px 32px;width:fit-content}
+      .hero-btn2{display:block;text-align:center;margin-left:0;padding:14px 32px;margin-top:12px;width:fit-content}
+      .phil-strip{grid-template-columns:repeat(3,1fr);height:auto}
+      .ps{padding:12px 6px;min-height:64px}
+      .ps:nth-child(4),.ps:nth-child(5){grid-column:span 1}
       .about{grid-template-columns:1fr}
-      .about-vis{height:260px}
+      .about-vis{height:220px}
       .panel{grid-template-columns:1fr;min-height:auto}
       .panel:nth-child(2){direction:ltr}
       .panel:nth-child(2) .panel-txt{text-align:left}
       .panel:nth-child(2) .divider{margin-left:0}
       .panel:nth-child(2) .p-body{margin-left:0}
-      .panel-canvas{height:200px}
-      .panel-txt{padding:44px 28px}
-      .fq{height:auto;min-height:460px;padding:60px 0}
-      .fq-inner{padding:40px 28px}
+      .panel-canvas{height:180px}
+      .panel-txt{padding:40px 24px}
+      .fq{height:auto;min-height:420px;padding:56px 0}
+      .fq-inner{padding:36px 24px}
       .prog-grid{grid-template-columns:1fr}
       .programs{padding:48px 24px}
-      .schedule{padding:56px 24px}
-      .sl-item{grid-template-columns:90px 1fr;gap:20px}
+      .schedule{padding:48px 24px}
+      .sl-item{grid-template-columns:80px 1fr;gap:16px}
       .sl-tag{display:none}
-      .cta{height:auto;min-height:380px;padding:60px 0}
-      .cta-inner{padding:40px 28px}
-      footer{padding:44px 28px}
+      .cta{height:auto;min-height:340px;padding:56px 0}
+      .cta-inner{padding:36px 24px}
+      footer{padding:44px 24px}
+    }
+    @media(max-width:480px){
+      nav{padding:0 16px}
+      .logo{font-size:13px}
+      .nav-mobile{gap:8px}
+      .nav-mobile a{font-size:9px;letter-spacing:.04em}
+      .lang-btn{padding:3px 8px;font-size:9px}
+      .hero-h1{font-size:1.7rem}
+      .hero-eyebrow{font-size:9px;letter-spacing:.28em;margin-bottom:16px}
+      .phil-strip{grid-template-columns:repeat(2,1fr)}
+      .ps:nth-child(5){grid-column:1 / -1}
+      .about-txt{padding:36px 20px}
+      .sec-title{font-size:1.4rem}
+      .panel-txt{padding:32px 20px}
+      .prog-card{padding:28px 20px}
+      .sl-item{grid-template-columns:70px 1fr;gap:12px}
+      .cta-inner{padding:32px 20px}
+      footer{padding:36px 20px}
     }
 
     /* LANGUAGE TOGGLE */
