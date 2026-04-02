@@ -605,6 +605,7 @@
     <a href="/chat" data-ko>챗봇</a><a href="/chat" data-en>AI Chat</a>
   </div>
   <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">EN</button>
+  <div id="auth-area" style="display:inline-flex;align-items:center;gap:8px;margin-left:8px"></div>
   <a href="#cta" class="ncta" data-ko>참여 신청</a>
   <a href="#cta" class="ncta" data-en>Join Us</a>
 </nav>
@@ -988,6 +989,19 @@
     try{localStorage.setItem('hanul-lang',isEn?'en':'ko');}catch(e){}
   }
   try{if(localStorage.getItem('hanul-lang')==='en')toggleLang();}catch(e){}
+
+  /* 네이버 로그인 상태 표시 */
+  (function(){
+    const area=document.getElementById('auth-area');
+    if(!area)return;
+    fetch('/api/auth/me').then(r=>r.json()).then(data=>{
+      if(data.user){
+        area.innerHTML=`<span style="font-size:11px;color:inherit;opacity:.7;letter-spacing:.04em">${data.user.nickname||data.user.name}님</span><a href="/auth/logout" style="font-size:11px;color:inherit;opacity:.5;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:1px;transition:opacity .2s" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='.5'">로그아웃</a>`;
+      } else {
+        area.innerHTML=`<a href="/auth/naver/login" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:inherit;opacity:.6;text-decoration:none;letter-spacing:.04em;transition:opacity .2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z"/></svg>네이버 로그인</a>`;
+      }
+    }).catch(()=>{});
+  })();
 </script>
 
 <!-- EDITOR MODAL (SmartEditor2 통합) -->

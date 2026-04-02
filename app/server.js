@@ -11,6 +11,7 @@ import https from 'https';
 import http from 'http';
 import pg from 'pg';
 import OpenAI from 'openai';
+import session from 'express-session';
 
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env') });
 // Load from Lucas-Initiative root .env for OPENAI_API_KEY
@@ -24,6 +25,12 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'hanul-sso-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 7 * 24 * 3600 * 1000 }, // 7일
+}));
 app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 
 app.set('views', path.join(__dirname, '..', 'views'));
@@ -465,6 +472,75 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Upload failed' });
   }
+});
+
+// ── 네이버 OAuth 2.0 ──────────────────────────────────────────
+
+// 로그인 시작 (CSRF state 생성 → 네이버 인증 페이지 리디렉트)
+app.get('/auth/naver/login', (req, res) => {
+  const state = uuidv4();
+  req.session.oauthState = state;
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: process.env.NAVER_CLIENT_ID || '',
+    redirect_uri: process.env.NAVER_CALLBACK_URL || `http://localhost:${PORT}/auth/naver/callback`,
+    state,
+  });
+  res.redirect(`https://nid.naver.com/oauth2.0/authorize?${params}`);
+});
+
+// 콜백 (code → access_token 교환 → 프로필 조회 → 세션+DB 저장)
+app.get('/auth/naver/callback', async (req, res) => {
+  try {
+    const { code, state } = req.query;
+    if (!code || state !== req.session.oauthState) return res.status(403).send('CSRF 검증 실패');
+
+    const tokenUrl = new URL('https://nid.naver.com/oauth2.0/token');
+    tokenUrl.searchParams.set('grant_type', 'authorization_code');
+    tokenUrl.searchParams.set('client_id', process.env.NAVER_CLIENT_ID || '');
+    tokenUrl.searchParams.set('client_secret', process.env.NAVER_CLIENT_SECRET || '');
+    tokenUrl.searchParams.set('code', code);
+    tokenUrl.searchParams.set('state', state);
+
+    const tokenResp = await fetch(tokenUrl);
+    const tokenData = await tokenResp.json();
+    if (tokenData.error) return res.status(400).json(tokenData);
+
+    const profileResp = await fetch('https://openapi.naver.com/v1/nid/me', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const profileData = await profileResp.json();
+    const p = profileData.response;
+
+    req.session.user = {
+      id: p.id, name: p.name, email: p.email,
+      nickname: p.nickname, profile_image: p.profile_image,
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+    };
+
+    await pool.query(`
+      INSERT INTO yeouiseonwon.users (naver_id, name, email, nickname, profile_image, access_token, refresh_token, last_login)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,NOW())
+      ON CONFLICT (naver_id) DO UPDATE SET
+        access_token=EXCLUDED.access_token, refresh_token=EXCLUDED.refresh_token, last_login=NOW()
+    `, [p.id, p.name, p.email, p.nickname, p.profile_image, tokenData.access_token, tokenData.refresh_token]);
+
+    res.redirect('/');
+  } catch (e) {
+    console.error('[naver-callback]', e.message);
+    res.status(500).send('로그인 처리 중 오류가 발생했습니다.');
+  }
+});
+
+// 로그아웃
+app.get('/auth/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/'));
+});
+
+// 현재 로그인 사용자 정보
+app.get('/api/auth/me', (req, res) => {
+  res.json({ user: req.session?.user || null });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
