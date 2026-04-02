@@ -40,20 +40,34 @@
 </head>
 <body>
 <nav class="site-nav">
-  <a href="/" class="logo">한울사상</a>
-  <a href="/">홈 (A팀)</a>
-  <a href="/v2">홈 (B팀)</a>
-  <a href="/archive">아카이브</a>
-  <a href="/chat">AI 챗봇</a>
-  <a href="/editor" class="active">에디터</a>
+  <a href="#" class="logo" id="nav-home">한울사상</a>
+  <a href="#" id="nav-home-a">홈 (A팀)</a>
+  <a href="#" id="nav-archive">아카이브</a>
+  <a href="#" id="nav-chat">AI 챗봇</a>
+  <a href="#" class="active">에디터</a>
 </nav>
+<script>
+  // 에디터는 :8082, 메인서버는 :8080
+  const mainBase = window.location.origin.replace(/:\d+$/, ':8080');
+  document.getElementById('nav-home').href = mainBase + '/';
+  document.getElementById('nav-home-a').href = mainBase + '/';
+  document.getElementById('nav-archive').href = mainBase + '/archive';
+  document.getElementById('nav-chat').href = mainBase + '/chat';
+</script>
 
 <div class="page">
   <h1>법문·말씀 에디터</h1>
   <p class="desc">Toast UI Editor WYSIWYG · 게시글 직접 편집·저장</p>
 
   <div class="toolbar-row">
-    <input type="text" id="post-id-input" placeholder="게시글 ID (post_id) 입력 후 불러오기…">
+    <select id="board-select" onchange="filterByBoard()" style="max-width:160px">
+      <option value="">전체 게시판</option>
+    </select>
+    <input type="text" id="search-input" placeholder="제목 검색…" onkeydown="if(event.key==='Enter')doSearch()" style="max-width:200px">
+    <button class="btn btn-secondary" onclick="doSearch()">검색</button>
+  </div>
+  <div class="toolbar-row">
+    <input type="text" id="post-id-input" placeholder="게시글 ID 입력 후 불러오기…">
     <button class="btn btn-secondary" onclick="loadPost()">불러오기</button>
     <button class="btn btn-primary" onclick="savePost()">저장</button>
     <span class="status-msg" id="status"></span>
@@ -130,16 +144,51 @@ function setStatus(msg, isErr=false, isOk=false) {
   el.className = 'status-msg' + (isErr?' err':isOk?' ok':'');
 }
 
+let editorState = { board: '', search: '', page: 1 };
+
+async function loadBoards() {
+  const boards = await fetch('/api/boards').then(r=>r.json());
+  const sel = document.getElementById('board-select');
+  sel.innerHTML = '<option value="">전체 게시판</option>' +
+    boards.map(b=>`<option value="${escHtml(b.board)}">${escHtml(b.board)} (${b.count})</option>`).join('');
+}
+
+function filterByBoard() {
+  editorState.board = document.getElementById('board-select').value;
+  editorState.page = 1;
+  loadRecent();
+}
+
+function doSearch() {
+  editorState.search = document.getElementById('search-input').value;
+  editorState.page = 1;
+  loadRecent();
+}
+
 async function loadRecent() {
-  const data = await fetch('/api/posts?limit=10&page=1').then(r=>r.json());
+  const params = new URLSearchParams({ limit: 20, page: editorState.page });
+  if (editorState.board) params.set('board', editorState.board);
+  if (editorState.search) params.set('search', editorState.search);
+  const data = await fetch('/api/posts?' + params).then(r=>r.json());
   const el = document.getElementById('recent-list');
-  if (!data.posts?.length) { el.textContent = '게시글 없음'; return; }
+  if (!data.posts?.length) { el.innerHTML = '<p style="color:#9A8870;padding:12px">게시글 없음</p>'; return; }
   el.innerHTML = data.posts.map(p=>`
     <div class="rpost-item" onclick="selectPost('${escJs(p.post_id)}','${escJs(p.title)}')">
       <span class="rpost-title">${escHtml(p.title||'(제목없음)')}</span>
       <span class="rpost-meta">${escHtml(p.board||'')} · ${p.created_at?new Date(p.created_at).toLocaleDateString('ko'):''}</span>
     </div>`).join('');
+  // 페이지 버튼
+  const total = data.totalPages||1;
+  const cur = data.page||1;
+  if (total > 1) {
+    const pages = [];
+    for(let i=Math.max(1,cur-2); i<=Math.min(total,cur+2); i++)
+      pages.push(`<button onclick="goEditorPage(${i})" style="padding:4px 9px;border:1px solid #DDD8C8;border-radius:4px;background:${i===cur?'#2A1E10':'#fff'};color:${i===cur?'#E8DCC8':'#2A1E10'};cursor:pointer;font-size:12px">${i}</button>`);
+    el.innerHTML += `<div style="display:flex;gap:4px;margin-top:10px;justify-content:center">${pages.join('')}</div>`;
+  }
 }
+
+function goEditorPage(n) { editorState.page = n; loadRecent(); }
 
 function selectPost(pid, title) {
   document.getElementById('post-id-input').value = pid;
@@ -149,6 +198,7 @@ function selectPost(pid, title) {
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\n/g,''); }
 
+loadBoards();
 loadRecent();
 </script>
 </body>
