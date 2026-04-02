@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>한울사랑 여의명상센터 · 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes={
+      1: {n:'Ivory Warm',  bg:'#FAFAF7',bg2:'#F4F0E8',card:'#FFF',ac:'#7A5230',acR:'122,82,48',tx:'#1A1410',t2:'#4A3828',gr:'#8A7868',nav:'rgba(250,250,247,0.97)',foot:'#1A1410',bd:'rgba(122,82,48,0.14)'},
+      2: {n:'Forest Calm', bg:'#0A1409',bg2:'#111C0E',card:'#0F1A0C',ac:'#7CB860',acR:'124,184,96',tx:'#E0EED8',t2:'#B8D4A8',gr:'#608060',nav:'rgba(10,20,9,0.97)',foot:'#050A04',bd:'rgba(124,184,96,0.18)'},
+      3: {n:'Pure White',  bg:'#FFFFFF',bg2:'#F7F7F5',card:'#FAFAFA',ac:'#333',acR:'51,51,51',tx:'#111',t2:'#444',gr:'#888',nav:'rgba(255,255,255,0.97)',foot:'#111',bd:'rgba(0,0,0,0.10)'},
+      4: {n:'Amber Night', bg:'#1A1208',bg2:'#221808',card:'#1E1408',ac:'#D08830',acR:'208,136,48',tx:'#F5EAD4',t2:'#D9C9A8',gr:'#8A7658',nav:'rgba(26,18,8,0.97)',foot:'#0E0905',bd:'rgba(208,136,48,0.18)'},
+      5: {n:'Pearl Sky',   bg:'#F4F6F8',bg2:'#EAEEF4',card:'#FFF',ac:'#4A6A9E',acR:'74,106,158',tx:'#1A2840',t2:'#3A4C68',gr:'#7A90B0',nav:'rgba(244,246,248,0.97)',foot:'#1A2840',bd:'rgba(74,106,158,0.15)'},
+      6: {n:'Night Rose',  bg:'#0D0818',bg2:'#140C28',card:'#160C2E',ac:'#C490D4',acR:'196,144,212',tx:'#F0E8FF',t2:'#D0C0F0',gr:'#8870A8',nav:'rgba(13,8,24,0.97)',foot:'#060410',bd:'rgba(196,144,212,0.18)'},
+      7: {n:'Bamboo',      bg:'#F8F5EC',bg2:'#F0EBD8',card:'#FFFDF6',ac:'#5C7A3E',acR:'92,122,62',tx:'#2A3018',t2:'#4A5830',gr:'#7A8A68',nav:'rgba(248,245,236,0.97)',foot:'#1A2010',bd:'rgba(92,122,62,0.15)'},
+      8: {n:'Stone',       bg:'#131313',bg2:'#1C1C1C',card:'#181818',ac:'#A8B4C0',acR:'168,180,192',tx:'#E8EAEC',t2:'#B8BCC4',gr:'#686E78',nav:'rgba(19,19,19,0.97)',foot:'#070707',bd:'rgba(168,180,192,0.15)'},
+      9: {n:'Teal',        bg:'#051618',bg2:'#081E22',card:'#091E24',ac:'#38B8C4',acR:'56,184,196',tx:'#E0F4F6',t2:'#B0E0E8',gr:'#508888',nav:'rgba(5,22,24,0.97)',foot:'#020A0C',bd:'rgba(56,184,196,0.18)'},
+      10:{n:'Warm Cream',  bg:'#FDFAF3',bg2:'#F5EDD8',card:'#FFF',ac:'#B8820A',acR:'184,130,10',tx:'#1A1400',t2:'#3A2E10',gr:'#8A7A40',nav:'rgba(253,250,243,0.97)',foot:'#0D0A00',bd:'rgba(184,130,10,0.15)'},
+      11:{n:'Deep Blue',   bg:'#02101C',bg2:'#041828',card:'#041828',ac:'#4A9ECC',acR:'74,158,204',tx:'#E0EEFF',t2:'#B0CCE8',gr:'#4A6A88',nav:'rgba(2,16,28,0.97)',foot:'#01080E',bd:'rgba(74,158,204,0.18)'},
+      12:{n:'Linen',       bg:'#F7F0E4',bg2:'#EDE4D4',card:'#FFFDF8',ac:'#8B6840',acR:'139,104,64',tx:'#2C2018',t2:'#4A3828',gr:'#8A7860',nav:'rgba(247,240,228,0.97)',foot:'#1C1408',bd:'rgba(139,104,64,0.15)'},
+      13:{n:'Moss',        bg:'#0A1208',bg2:'#101A0C',card:'#0E1A0C',ac:'#88BA48',acR:'136,186,72',tx:'#E4F0D8',t2:'#C0D8A8',gr:'#688850',nav:'rgba(10,18,8,0.97)',foot:'#050804',bd:'rgba(136,186,72,0.18)'},
+      14:{n:'Indigo',      bg:'#07091E',bg2:'#0C1030',card:'#0E1438',ac:'#7888D4',acR:'120,136,212',tx:'#E8EAFF',t2:'#C0C8F0',gr:'#5868A0',nav:'rgba(7,9,30,0.97)',foot:'#03040F',bd:'rgba(120,136,212,0.18)'},
+      15:{n:'Parchment',   bg:'#F4EDD8',bg2:'#EDE4C8',card:'#FBF6E8',ac:'#6B4C22',acR:'107,76,34',tx:'#2A1C08',t2:'#4A3420',gr:'#7A6040',nav:'rgba(244,237,216,0.97)',foot:'#1A1005',bd:'rgba(107,76,34,0.15)'},
+      16:{n:'Rose',        bg:'#FDF6F8',bg2:'#F5E8EC',card:'#FFF',ac:'#C06878',acR:'192,104,120',tx:'#281420',t2:'#482034',gr:'#907888',nav:'rgba(253,246,248,0.97)',foot:'#140A10',bd:'rgba(192,104,120,0.15)'},
+      17:{n:'Obsidian',    bg:'#050505',bg2:'#0A0A0A',card:'#0C0C0C',ac:'#D4A840',acR:'212,168,64',tx:'#F0EEE0',t2:'#C8C4B8',gr:'#686858',nav:'rgba(5,5,5,0.97)',foot:'#020202',bd:'rgba(212,168,64,0.18)'},
+      18:{n:'Celadon',     bg:'#0A1618',bg2:'#0E1E22',card:'#101E24',ac:'#70B4AA',acR:'112,180,170',tx:'#E0F2F0',t2:'#B8D8D4',gr:'#508880',nav:'rgba(10,22,24,0.97)',foot:'#04080A',bd:'rgba(112,180,170,0.18)'},
+      19:{n:'Sky',         bg:'#F4F6FA',bg2:'#E8EEF8',card:'#FFF',ac:'#3A5898',acR:'58,88,152',tx:'#181E38',t2:'#303C64',gr:'#7080A8',nav:'rgba(244,246,250,0.97)',foot:'#181E38',bd:'rgba(58,88,152,0.14)'},
+      20:{n:'Copper',      bg:'#100A08',bg2:'#1C1008',card:'#180E08',ac:'#C07840',acR:'192,120,64',tx:'#F4E8D4',t2:'#D4C0A8',gr:'#806048',nav:'rgba(16,10,8,0.97)',foot:'#080404',bd:'rgba(192,120,64,0.18)'}
+    };
+    const t=themes[themeId]||themes[1];
+
+    /* ─── DB 실사 이미지만 사용 (cafeptthumb, img-proxy 경유) ─── */
+    const P=u=>'/api/img-proxy?url='+encodeURIComponent(u);
+    const imgs={
+      /* ─── 화이트리스트 전수 검증 완료 — 16개 고유 실사 이미지, 중복 없음 ─── */
+      /* KakaoTalk_/Screenshot_/IMG_/숫자형 ONLY — 20220709(한자노트) 완전 제거 */
+      hero:  P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA2MDdfMjQz/MDAxNjU0NTk2MTE1MTg1.kTeD_ABAp7m2imFKm-3WxCqL-xZnoN9pZ6g3jyhExAgg.alM4y6rmabQwzojPpVH8oj9Rq4QphavnDRKVx0pCx8wg.JPEG/KakaoTalk_20220607_173341238_02.jpg?type=w1600'),
+      about: P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMTg0/MDAxNjU3MTc5MDQ1Njk5.IM54J4aogS-VOaLLblRPIjRecwk5qBBZNUWoVL7DjWEg.vIbGdFSxVzGzvMAORQRG88Jc3HVUklLBz18WE8Gr_vIg.JPEG/20220626_111145.jpg?type=w1600'),
+      ctabg: P('https://cafeptthumb-phinf.pstatic.net/MjAyNDA3MThfMzQg/MDAxNzIxMjc3MjM1MTkz.2BoJa1OnOijDRRaVoK56uRhZDlCI6kvGgPcGu6gV3FAg.PE9q6MYm3cK8GtMNPU362mw74czeXKG-_ULom165Zgwg.JPEG/KakaoTalk_20240718_133249601.jpg?type=w1600'),
+      sch1:  P('https://cafeptthumb-phinf.pstatic.net/MjAyNDA3MThfMTY3/MDAxNzIxMjc3MjY4Njk4.lPBAeKnGnDbNcD557IF7CVG38HrbtBhYv9gO_CfPIxwg.zyOXrOObBdNc7l7Z0QsqfMl_INGgyyrSrtqVp30thKYg.JPEG/KakaoTalk_20240718_005508061.jpg?type=w1600'),
+      sch2:  P('https://cafeptthumb-phinf.pstatic.net/MjAyNDA3MThfMTY3/MDAxNzIxMjc3NzMzNDAw.74Oqf4NoeNvmZHU67JzN5ZHUDV0zwaPDYarEhYfqbX4g.WxT_afSOyCymYlqZf1sI56A3hQXwzGeOSTLfJ1wUM-Eg.JPEG/KakaoTalk_20240718_010511275.jpg?type=w1600'),
+      sch3:  P('https://cafeptthumb-phinf.pstatic.net/MjAyMzAzMTdfMTE2/MDAxNjc5MDMyNDkzNjE4.WONLNOX7Xcw_K0fZ9v3CAhVTVq-IPn1bXwWsEXDWcZIg.wUf0XrSY6RPPxWy5speO7aElucR4a8y_IL8Q_rJDbqcg.JPEG/IMG_9366.jpg?type=w1600'),
+      phi1:  P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMTUz/MDAxNjU3MTgyMTA5ODM4.90bTQlcbFf0TJa2tAFw3CHGuxZE712IEBaOarIBCtOAg.LrLqEkFhjbpKpZQxmjgZs7wDWqRBUkdVoHgkOL6ZirQg.JPEG/Screenshot_20220707-100803_Photo_Editor.jpg?type=w1600'),
+      phi2:  P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDJfNjkg/MDAxNjU2NzE5Njg4ODgx.sJkuR4fh-81kXE1283hPZnFYLloC1EkDMODBUTC0TIkg.ktevv0k3zgPEO84m94hxXXlKOkytcGLtUFsTzLWMay4g.JPEG/20220702085225.jpg?type=w1600'),
+      phi3:  P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDFfMTIx/MDAxNjU2NjM3Nzg1ODg5.pdNyn4eQj2Qirg4RkWNCq2npQE5xqc45NJndpWPIK8Qg.SbGxT0le-sLJnGNB0InLFBkNNUiVWwLHSyo5lKAv1gIg.JPEG/IMG_20220701_0001.jpg?type=w1600'),
+      quote: P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDhfNzgg/MDAxNjU3MjM2NjExMDA3.MFCBBVZq2taTNOkSS1lbzZ14uQGwSIsrF8brAlu5GOYg.f1Yj1mQuCmYrOc7NRXA0lnfr4sxC46Dujwc2PFtuNUQg.JPEG/20220708082615.jpg?type=w1600'),
+      g1:    P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA0MThfMjcy/MDAxNjUwMjQ1MDA3OTU3.5rVMW8z7_9HHa0gkNIVwa1kCgoFC9YHn3aDFFooBaO8g.1WuqZwZMR0_1yKLnUtxumMk-wADR6oofIFUrk_0RGgMg.JPEG/%EC%A2%8C%ED%86%B5.jpg?type=w1600'),
+      g2:    P('https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjNfMjMy/MDAxNTk4MTgwMzU0NjYx.cEjHaZRf_VD6Qc-CbtnuNM5Az-6A36APGLo0_w3U7bAg.G3TeB5xBBChkHr7EvEK-kgmWHzO0jJW_mZdN9F26lf8g.JPEG/KakaoTalk_20200823_195242797.jpg?type=w1600'),
+      g3:    P('https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MDRfMTEx/MDAxNTk2NTQyMTE4Mzc3.Fpx_-Kt4qoml5EUkhPY-wU-lSrZS7AqBS-V2LJ9IvZQg.cUbyadf6r5ChtZfwl7IXcvds1MUFFuu00SrMhCfi3Lkg.JPEG/KakaoTalk_20200804_190954386.jpg?type=w1600'),
+      g4:    P('https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzYwMTcxNjE3.CNxv2Stxzrvath9zJ9oTPqk4_Y7KjZ-sL5ABruAId5Ug.xfKrmXsajKdnzHkUNdPqLHJnIDOKEGbMoGN5fMKO7Rsg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AC%ED%8F%AC.jpeg?type=w1600'),
+      g5:    P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMjYw/MDAxNjU3MTc5MTE0NjU5.9n-1yQWgi-NDKcI0P5Q_0NUP-NtaPLN-2JIyVt2_i-Ig.z70qTq869TlfC7FZPJSDhWHiJL5JeYJz_nPXENj3ly8g.JPEG/1656217586620.jpg?type=w1600'),
+      g6:    P('https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMjQx/MDAxNjU3MTc4NDg2MjYz.KqVW_fwVuyeEgEDQrYak1JAk6NewrCfzgY2MYD6nBNsg.zpZkcyq5kJtwbvqpqHv9iwkdJlDDWTj9tERPxRmrimEg.JPEG/Screenshot_20220624-152445_Gallery.jpg?type=w1600'),
+      p1:    P('https://cafeptthumb-phinf.pstatic.net/MjAyNjAzMThfMjUg/MDAxNzczODQ0ODk3Mjcx.tOX_Be_cuBokMB_vVo4peUITSpyhl7c4XfXQgGofpoAg.pRLAOy6aXlQzzrTG8ufYsWjfPOj7PaYIM5S31d3zZmwg.JPEG/1000017861.jpg?type=w1600'),
+      p2:    P('https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MTBfMjI1/MDAxNTk3MDA3OTQ5NjQx.-HqcRBx58LXC9HlTuPbyhG4BsXn8kgJ083tsR9NxX7Ig.KQg0EroK5j5tlHWVULEvhkseaecMYy2oYi0QCG8jOw8g.JPEG/IMG_20200810_0002.jpg?type=w1600'),
+      p3:    P('https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MTBfMjMy/MDAxNTk3MDA3MzUyOTAy._blrD6XRvqoBW8sCAPnhCOcRDrFsBqsKVNBiNAIgCyAg.QgwFTLdONvWTW8vq15p0TQsBPiBg-RiSHrg4bg9FTuEg.JPEG/IMG_20200810_0001.jpg?type=w1600')
+    };
+    %>
+
+    /* ─── RESET ─── */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Noto Sans KR',sans-serif;background:<%= t.bg %>;color:<%= t.tx %>;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    img{display:block;width:100%;height:100%;object-fit:cover}
+
+    /* ─── BADGE ─── */
+    .badge{position:fixed;top:0;left:0;right:0;z-index:9000;background:rgba(0,0,0,.92);text-align:center;padding:4px 16px;font-size:10px;letter-spacing:.06em;color:#aaa;border-bottom:2px solid <%= t.ac %>}
+    .badge b{color:<%= t.ac %>}
+    .nums{display:flex;justify-content:center;gap:3px;flex-wrap:wrap;margin-top:3px}
+    .nums a{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.08);font-size:9px;color:#999;text-decoration:none;transition:.2s}
+    .nums a:hover,.nums a.on{background:<%= t.ac %>;color:#000;font-weight:700}
+
+    /* ─── NAV ─── */
+    nav{position:fixed;top:46px;left:0;right:0;z-index:800;padding:0 72px;height:64px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,box-shadow .4s}
+    nav.solid{background:<%= t.nav %>;backdrop-filter:blur(20px);box-shadow:0 1px 0 <%= t.bd %>}
+    .logo{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:400;color:#fff;letter-spacing:.04em;text-decoration:none}
+    nav.solid .logo{color:<%= t.tx %>}
+    .nl{display:flex;gap:36px;list-style:none}
+    .nl a{font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.75);text-decoration:none;transition:color .2s}
+    nav.solid .nl a{color:<%= t.t2 %>}
+    .nl a:hover{color:<%= t.ac %>}
+    .ncta{padding:9px 26px;border:1px solid rgba(255,255,255,.5);color:#fff;font-size:11px;letter-spacing:.08em;border-radius:1px;transition:.25s;text-decoration:none}
+    nav.solid .ncta{border-color:<%= t.bd %>;color:<%= t.ac %>}
+    .ncta:hover{background:<%= t.ac %>;border-color:<%= t.ac %>;color:#fff}
+
+    /* ─── HERO (100vh fullscreen — no margin/sidebar) ─── */
+    .hero{position:relative;width:100vw;height:100vh;overflow:hidden;margin:0;padding:0}
+    .hero img{position:absolute;inset:0;transition:transform 14s ease}
+    .hero-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.04) 0%,rgba(0,0,0,.28) 48%,rgba(0,0,0,.75) 100%)}
+    .hero-body{position:absolute;bottom:0;left:0;right:0;padding:0 96px 100px;text-align:left}
+    .hero-label{font-size:10px;letter-spacing:.32em;color:rgba(255,255,255,.55);text-transform:uppercase;margin-bottom:24px;display:block}
+    .hero-h1{font-family:'Noto Serif KR',serif;font-size:clamp(2.8rem,6.5vw,5.6rem);font-weight:200;color:#fff;line-height:1.15;margin-bottom:40px;max-width:760px}
+    .hero-h1 em{font-style:normal;font-weight:400;color:<%= t.ac %>}
+    .hb1{display:inline-block;padding:16px 52px;background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff;font-size:12px;font-weight:300;letter-spacing:.14em;border-radius:0;text-decoration:none;transition:.3s}
+    .hb1:hover{background:rgba(255,255,255,.12);border-color:#fff}
+    .sc{position:absolute;bottom:32px;right:96px;display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.38);font-size:9px;letter-spacing:.18em}
+    .sc-line{width:1px;height:44px;background:linear-gradient(to bottom,rgba(255,255,255,.5),transparent);animation:scrl 2s infinite}
+    @keyframes scrl{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+    /* ─── ABOUT (split: 82% image / 18% text) ─── */
+    .about{display:grid;grid-template-columns:82% 1fr;min-height:700px}
+    .about-img{position:relative;overflow:hidden}
+    .about-img img{transition:transform 8s ease}
+    .about-img:hover img{transform:scale(1.04)}
+    .about-txt{background:<%= t.bg2 %>;display:flex;flex-direction:column;justify-content:center;padding:80px 72px}
+    .sl{display:block;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:<%= t.ac %>;margin-bottom:18px}
+    .st{font-family:'Noto Serif KR',serif;font-size:clamp(1.6rem,2.5vw,2.4rem);font-weight:300;color:<%= t.tx %>;line-height:1.45;margin-bottom:20px}
+    .sdiv{width:32px;height:1.5px;background:<%= t.ac %>;margin-bottom:28px}
+    .sq{padding-left:20px;border-left:2px solid rgba(<%= t.acR %>,0.5);font-family:'Noto Serif KR',serif;font-size:.95rem;font-weight:300;color:<%= t.t2 %>;line-height:2;font-style:italic}
+
+    /* ─── PHILOSOPHY PANELS (3 fullscreen image sections) ─── */
+    .panels{display:flex;flex-direction:column}
+    .panel{position:relative;height:660px;overflow:hidden}
+    .panel img{position:absolute;inset:0;transition:transform .7s ease}
+    .panel:hover img{transform:scale(1.05)}
+    .pov{position:absolute;inset:0}
+    .panel:nth-child(odd) .pov{background:linear-gradient(to right,rgba(0,0,0,.75) 0%,rgba(0,0,0,.25) 50%,transparent 100%)}
+    .panel:nth-child(even) .pov{background:linear-gradient(to left,rgba(0,0,0,.75) 0%,rgba(0,0,0,.25) 50%,transparent 100%)}
+    .pb{position:absolute;top:50%;transform:translateY(-50%);max-width:480px;padding:0 80px}
+    .panel:nth-child(even) .pb{right:0;left:auto;text-align:right}
+    .pn{font-size:10px;letter-spacing:.3em;color:rgba(255,255,255,.45);margin-bottom:14px}
+    .pt{font-family:'Noto Serif KR',serif;font-size:clamp(1.8rem,3.2vw,3rem);font-weight:200;color:#fff;line-height:1.25}
+    .pt em{font-style:normal;display:block;font-size:.55em;color:rgba(255,255,255,.6);font-weight:300;margin-top:6px;letter-spacing:.04em}
+
+    /* ─── GALLERY (image-only grid) ─── */
+    .gallery{background:<%= t.bg2 %>;padding:80px}
+    .gl-head{text-align:center;margin-bottom:40px}
+    .gl-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:4px}
+    .gl-item{position:relative;overflow:hidden;cursor:pointer}
+    .gl-item:first-child{grid-row:1/3}
+    .gl-item{aspect-ratio:3/2}
+    .gl-item:first-child{aspect-ratio:auto}
+    .gl-item img{transition:transform .5s ease}
+    .gl-item:hover img{transform:scale(1.08)}
+    .gl-cap{position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:flex-end;padding:16px;transition:background .3s}
+    .gl-item:hover .gl-cap{background:rgba(0,0,0,.3)}
+    .gl-cap span{font-family:'Noto Serif KR',serif;font-size:12px;color:rgba(255,255,255,0);letter-spacing:.08em;transition:color .3s}
+    .gl-item:hover .gl-cap span{color:#fff}
+
+    /* ─── PROGRAMS (image cards, hover reveal) ─── */
+    .programs{padding:100px 80px;background:<%= t.bg %>}
+    .ph{text-align:center;margin-bottom:56px}
+    .pg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+    .pc{position:relative;height:560px;overflow:hidden;cursor:pointer}
+    .pc img{position:absolute;inset:0;transition:transform .6s ease}
+    .pc:hover img{transform:scale(1.07)}
+    .pco{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.2) 50%,rgba(0,0,0,0) 100%)}
+    .pcb{position:absolute;bottom:0;left:0;right:0;padding:32px;transform:translateY(48px);transition:transform .4s ease}
+    .pc:hover .pcb{transform:translateY(0)}
+    .pcn{font-size:9px;letter-spacing:.28em;color:rgba(255,255,255,.45);margin-bottom:8px}
+    .pct{font-family:'Noto Serif KR',serif;font-size:1.3rem;font-weight:300;color:#fff;line-height:1.35;margin-bottom:8px}
+    .pcd{font-size:12px;color:rgba(255,255,255,.65);line-height:1.75;opacity:0;transition:opacity .4s .1s}
+    .pc:hover .pcd{opacity:1}
+
+    /* ─── FULLSCREEN QUOTE ─── */
+    .fq{position:relative;height:640px;overflow:hidden}
+    .fq img{position:absolute;inset:0;transition:transform 10s ease}
+    .fq:hover img{transform:scale(1.04)}
+    .fq-ov{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+    .fq-body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 80px;text-align:center}
+    .fq-mark{font-size:7rem;font-family:Georgia,serif;color:rgba(255,255,255,.12);line-height:1;margin-bottom:-20px}
+    .fq-q{font-family:'Noto Serif KR',serif;font-size:clamp(1.4rem,2.8vw,2.2rem);font-weight:200;color:#fff;line-height:1.85;max-width:820px;margin-bottom:28px}
+    .fq-cite{font-size:11px;letter-spacing:.22em;color:rgba(<%= t.acR %>,.85);text-transform:uppercase}
+
+    /* ─── SCHEDULE ─── */
+    .schedule{background:<%= t.bg2 %>;padding:88px 80px}
+    .sl-list{margin-top:48px}
+    .sl-item{display:grid;grid-template-columns:100px 1fr auto;align-items:center;gap:40px;padding:24px 0;border-bottom:1px solid <%= t.bd %>}
+    .sl-item:first-child{border-top:1px solid <%= t.bd %>}
+    .sd{text-align:center}
+    .sd-day{font-family:'Noto Serif KR',serif;font-size:2rem;font-weight:200;color:<%= t.ac %>;line-height:1}
+    .sd-mon{font-size:9px;letter-spacing:.16em;color:<%= t.gr %>}
+    .si h4{font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:400;color:<%= t.tx %>;margin-bottom:3px}
+    .si p{font-size:12px;color:<%= t.t2 %>}
+    .stag{display:inline-block;padding:5px 16px;border:1px solid <%= t.bd %>;font-size:9px;letter-spacing:.12em;color:<%= t.ac %>}
+
+    /* ─── CTA (image background) ─── */
+    .cta{position:relative;height:440px;overflow:hidden}
+    .cta img{position:absolute;inset:0;transition:transform 8s ease}
+    .cta:hover img{transform:scale(1.04)}
+    .cta-ov{position:absolute;inset:0;background:rgba(0,0,0,.52)}
+    .cta-body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}
+    .cta-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:200;color:#fff;line-height:1.5;margin-bottom:28px}
+    .cta-btn{display:inline-block;padding:14px 52px;background:#fff;color:<%= t.tx %>;font-size:13px;font-weight:500;letter-spacing:.1em;text-decoration:none;border-radius:1px;transition:.25s}
+    .cta-btn:hover{background:<%= t.ac %>;color:#fff;transform:translateY(-2px)}
+
+    /* ─── FOOTER ─── */
+    footer{background:<%= t.foot %>;padding:60px 80px 44px;color:rgba(255,255,255,.4)}
+    .ft{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:40px;padding-bottom:44px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .fb{font-family:'Noto Serif KR',serif;font-size:1.3rem;color:<%= t.ac %>;font-weight:300;margin-bottom:8px}
+    .ftg{font-size:12px;line-height:1.9;max-width:240px}
+    .ftl{display:flex;flex-direction:column;gap:8px}
+    .ftl a{font-size:12px;color:rgba(255,255,255,.35);text-decoration:none;letter-spacing:.04em;transition:color .2s}
+    .ftl a:hover{color:<%= t.ac %>}
+    .fcopy{padding-top:24px;font-size:11px;text-align:center}
+
+    /* ─── REVEAL ─── */
+    .r{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+    .r.v{opacity:1;transform:translateY(0)}
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width:1024px){nav{padding:0 40px}.hero-body{padding:0 40px 72px}.fq-body{padding:40px 48px}.gallery{padding:56px 32px}.programs{padding:64px 40px}.schedule{padding:64px 40px}footer{padding:48px 40px}}
+    @media(max-width:768px){.nl,.ncta{display:none}.hero{margin:0}.hero-body{padding:0 28px 56px}.about{grid-template-columns:1fr}.about-img{height:360px}.about-txt{padding:48px 32px}.panel{height:360px}.pb{padding:0 28px;max-width:100%}.pg{grid-template-columns:1fr}.gl-grid{grid-template-columns:1fr 1fr}.gl-item:first-child{grid-row:auto}.programs,.schedule,.gallery{padding:48px 24px}.sl-item{grid-template-columns:80px 1fr;gap:24px}.stag{display:none}footer{padding:40px 28px}}
+  </style>
+</head>
+<body>
+
+<!-- BADGE -->
+<div class="badge">
+  <div><b>한울사랑</b> &nbsp;A팀 대표 시안 (미르+하나+유나 합작) &nbsp;|&nbsp; <b><%= t.n %></b></div>
+  <div class="nums">
+    <% for(let i=1;i<=20;i++){ %><a href="/siann-11/<%= i %>" class="<%= themeId==i?'on':'' %>"><%= i %></a><% } %>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="logo">한울사랑</a>
+  <ul class="nl">
+    <li><a href="#about">한울사상</a></li>
+    <li><a href="#phil">가르침</a></li>
+    <li><a href="#programs">프로그램</a></li>
+    <li><a href="#schedule">일정</a></li>
+  </ul>
+  <a href="#cta" class="ncta">참여 신청</a>
+</nav>
+
+<!-- HERO — 100vh 풀스크린, 여백 없음 -->
+<section class="hero" id="hero">
+  <img src="<%= imgs.hero %>" alt="명상 수련">
+  <div class="hero-ov"></div>
+  <div class="hero-body">
+    <span class="hero-label">한울영성계발원 · 여의명상센터</span>
+    <h1 class="hero-h1">내면의 고요 속으로<br><em>한울의 길</em></h1>
+    <a href="#about" class="hb1">한울사상 알아보기</a>
+  </div>
+  <div class="sc"><div class="sc-line"></div><span>SCROLL</span></div>
+</section>
+
+<!-- ABOUT — 이미지 60%, 텍스트 최소 -->
+<section class="about" id="about">
+  <div class="about-img r"><img src="<%= imgs.about %>" alt="자연 수련"></div>
+  <div class="about-txt">
+    <span class="sl">한울사상</span>
+    <h2 class="st">하늘의 뜻으로<br>사는 삶의 길</h2>
+    <div class="sdiv"></div>
+    <div class="sq r">"수도자 1인은 세상자 만인이요,<br>중생자 억이라"</div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY — 풀스크린 이미지 3 패널 -->
+<section class="panels" id="phil">
+  <div class="panel r">
+    <img src="<%= imgs.phi1 %>" alt="손지손지심">
+    <div class="pov"></div>
+    <div class="pb">
+      <div class="pn">01</div>
+      <h3 class="pt">손지손지심<em>損之損之心</em></h3>
+    </div>
+  </div>
+  <div class="panel r">
+    <img src="<%= imgs.phi2 %>" alt="생명장">
+    <div class="pov"></div>
+    <div class="pb">
+      <div class="pn">02</div>
+      <h3 class="pt">생명장<em>生命場</em></h3>
+    </div>
+  </div>
+  <div class="panel r">
+    <img src="<%= imgs.phi3 %>" alt="제도">
+    <div class="pov"></div>
+    <div class="pb">
+      <div class="pn">03</div>
+      <h3 class="pt">제도<em>制道</em></h3>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY — 이미지만, 캡션은 호버 시 -->
+<section class="gallery" id="gallery">
+  <div class="gl-head r">
+    <span class="sl">아카이브</span>
+    <h2 class="st">한울사랑의 기록</h2>
+  </div>
+  <div class="gl-grid">
+    <div class="gl-item r"><img src="<%= imgs.g1 %>" alt="좌통수련"><div class="gl-cap"><span>좌통수련</span></div></div>
+    <div class="gl-item r"><img src="<%= imgs.g2 %>" alt="수련 현장"><div class="gl-cap"><span>수련 현장</span></div></div>
+    <div class="gl-item r"><img src="<%= imgs.g3 %>" alt="자연 명상"><div class="gl-cap"><span>자연 명상</span></div></div>
+    <div class="gl-item r"><img src="<%= imgs.g4 %>" alt="천지연"><div class="gl-cap"><span>천지연 소풍</span></div></div>
+    <div class="gl-item r"><img src="<%= imgs.g5 %>" alt="야외 수행"><div class="gl-cap"><span>야외 수행</span></div></div>
+    <div class="gl-item r"><img src="<%= imgs.g6 %>" alt="공동체 수련"><div class="gl-cap"><span>공동체 수련</span></div></div>
+  </div>
+</section>
+
+<!-- PROGRAMS — 3 이미지 카드 -->
+<section class="programs" id="programs">
+  <div class="ph r">
+    <span class="sl">수행 프로그램</span>
+    <h2 class="st">당신의 수행을 시작하세요</h2>
+  </div>
+  <div class="pg">
+    <div class="pc r">
+      <img src="<%= imgs.p1 %>" alt="명상 입문">
+      <div class="pco"></div>
+      <div class="pcb">
+        <div class="pcn">01</div>
+        <div class="pct">명상 입문</div>
+        <div class="pcd">매주 토요일 오전 10시</div>
+      </div>
+    </div>
+    <div class="pc r">
+      <img src="<%= imgs.p2 %>" alt="집중 수련">
+      <div class="pco"></div>
+      <div class="pcb">
+        <div class="pcn">02</div>
+        <div class="pct">집중 수련</div>
+        <div class="pcd">1박 2일 · 12명 한정</div>
+      </div>
+    </div>
+    <div class="pc r">
+      <img src="<%= imgs.p3 %>" alt="심화 과정">
+      <div class="pco"></div>
+      <div class="pcb">
+        <div class="pcn">03</div>
+        <div class="pct">심화 과정</div>
+        <div class="pcd">토요일 오후 2시 · 경전 원문</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FULLSCREEN QUOTE -->
+<section class="fq" id="quote">
+  <img src="<%= imgs.quote %>" alt="한울사랑">
+  <div class="fq-ov"></div>
+  <div class="fq-body">
+    <div class="fq-mark r">❝</div>
+    <blockquote class="fq-q r">한울이 나이고<br>내가 한울이다</blockquote>
+    <cite class="fq-cite r">— 한울사상</cite>
+  </div>
+</section>
+
+<!-- PROGRAMS TEASER (3 image strip replacing calendar UI) -->
+<section class="schedule" id="schedule">
+  <div style="text-align:center;padding-bottom:48px">
+    <span class="sl r">수련 안내</span>
+    <h2 class="st r">함께하는 수행의 길</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px">
+    <div style="position:relative;height:320px;overflow:hidden">
+      <img src="<%= imgs.sch1 %>" alt="수련" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;padding:28px">
+        <span style="font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:300;color:#fff;letter-spacing:.08em">매주 토요일</span>
+      </div>
+    </div>
+    <div style="position:relative;height:320px;overflow:hidden">
+      <img src="<%= imgs.sch2 %>" alt="소풍" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;padding:28px">
+        <span style="font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:300;color:#fff;letter-spacing:.08em">야외 수행</span>
+      </div>
+    </div>
+    <div style="position:relative;height:320px;overflow:hidden">
+      <img src="<%= imgs.sch3 %>" alt="공동체" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;padding:28px">
+        <span style="font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:300;color:#fff;letter-spacing:.08em">공동 명상</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="cta">
+  <img src="<%= imgs.ctabg %>" alt="참여">
+  <div class="cta-ov"></div>
+  <div class="cta-body">
+    <h2 class="cta-h r">한울사상과 함께하세요</h2>
+    <a href="http://211.104.37.65:4200" target="_blank" class="cta-btn r">법문 아카이브 방문 →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft">
+    <div>
+      <div class="fb">한울사랑</div>
+      <p class="ftg">한울영성계발원 · 여의명상센터<br>한울사상 수련 안내</p>
+    </div>
+    <div class="ftl">
+      <a href="#about">한울사상</a>
+      <a href="#phil">핵심 가르침</a>
+      <a href="#programs">수행 프로그램</a>
+      <a href="#schedule">강의 일정</a>
+      <a href="http://211.104.37.65:4200" target="_blank">법문 아카이브</a>
+    </div>
+  </div>
+  <div class="fcopy">© 2026 한울사랑 · 여의명상센터</div>
+</footer>
+
+<script>
+  /* ─ NAV scroll ─ */
+  const nav=document.getElementById('nav');
+  const onScroll=()=>nav.classList.toggle('solid',scrollY>80);
+  addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+
+  /* ─ Reveal ─ */
+  const io=new IntersectionObserver(es=>{
+    es.forEach((e,i)=>{
+      if(e.isIntersecting){
+        setTimeout(()=>e.target.classList.add('v'),i%5*60);
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.r').forEach(el=>io.observe(el));
+
+  /* ─ Hero parallax ─ */
+  const hi=document.querySelector('.hero img');
+  let tick=false;
+  addEventListener('scroll',()=>{
+    if(!tick){requestAnimationFrame(()=>{
+      if(hi&&scrollY<innerHeight)hi.style.transform=`translateY(${scrollY*.28}px)scale(1.04)`;
+      tick=false;
+    });tick=true;}
+  },{passive:true});
+</script>
+</body>
+</html>

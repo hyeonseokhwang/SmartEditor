@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — L18 플로팅 카드 모자이크 · 테마 <%= themeId %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen',      bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', footerBg:'#030D07', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White',      bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', footerBg:'#1A1A1A', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', footerBg:'#0E0905', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist',       bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', footerBg:'#2A3547', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple',   bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', footerBg:'#080410', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo',          bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', footerBg:'#1A2010', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain',  bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', footerBg:'#080808', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal',       bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', footerBg:'#030B0D', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber',      bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', footerBg:'#0D0700', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night',     bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', footerBg:'#01060E', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand',       bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', footerBg:'#1C1408', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green',      bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', footerBg:'#050804', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', footerBg:'#03040F', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment',       bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', footerBg:'#1A1005', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz',     bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', footerBg:'#0D0608', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian',        bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', footerBg:'#020202', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon',         bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', footerBg:'#05080A', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White',    bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', footerBg:'#1A2440', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    %>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: <%= t.bg %>; --deep: <%= t.deep %>; --mid: <%= t.mid %>; --card: <%= t.card %>;
+      --accent: <%= t.accent %>; --accentLt: <%= t.accentLt %>; --accentDk: <%= t.accentDk %>;
+      --text: <%= t.text %>; --text2: <%= t.text2 %>; --gray: <%= t.gray %>;
+      --border: <%= t.border %>; --footerBg: <%= t.footerBg %>;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+    /* 시안 배지 */
+    .siann-badge { position: fixed; top: 12px; right: 12px; z-index: 9999; display: flex; flex-wrap: wrap; gap: 4px; max-width: 420px; justify-content: flex-end; }
+    .siann-badge a { display: inline-block; padding: 3px 7px; font-size: 10px; border-radius: 3px; background: var(--card); color: var(--accent); border: 1px solid var(--border); text-decoration: none; transition: all 0.2s; }
+    .siann-badge a:hover, .siann-badge a.active { background: var(--accent); color: var(--bg); }
+
+    /* ── FLOATING HERO ── */
+    .floating-hero { min-height: 100vh; position: relative; display: flex; align-items: center; padding: 80px 60px; overflow: hidden; }
+    .floating-hero-bg { position: absolute; inset: 0; }
+    .floating-hero-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.15; }
+    .floating-hero-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, var(--mid) 0%, var(--bg) 60%); }
+
+    /* 메인 히어로 카드 (약간 기울어짐) */
+    .hero-main-card {
+      position: relative; z-index: 2;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 60px;
+      max-width: 560px;
+      transform: rotate(-1.5deg);
+      box-shadow: 20px 20px 60px rgba(0,0,0,0.4), -5px -5px 20px rgba(0,0,0,0.1);
+    }
+    .hero-main-card .eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accentLt); margin-bottom: 16px; }
+    .hero-main-card h1 { font-family: 'Noto Serif KR', serif; font-size: clamp(2.5rem,5vw,4rem); font-weight: 900; color: var(--accent); line-height: 1.1; margin-bottom: 16px; }
+    .hero-main-card p { font-size: 1rem; color: var(--text2); line-height: 1.8; margin-bottom: 24px; }
+    .hero-main-card .actions { display: flex; gap: 12px; }
+    .btn-float { display: inline-block; padding: 10px 24px; font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif; text-decoration: none; transition: all 0.2s; font-weight: 500; }
+    .btn-float.primary { background: var(--accent); color: var(--bg); }
+    .btn-float.outline { border: 1px solid var(--accent); color: var(--accent); }
+    .btn-float:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+
+    /* 플로팅 작은 카드들 */
+    .float-card-1 {
+      position: absolute; z-index: 3;
+      top: 15%; right: 8%;
+      background: var(--accent); color: var(--bg);
+      padding: 24px 28px;
+      transform: rotate(2deg);
+      box-shadow: 8px 8px 24px rgba(0,0,0,0.3);
+      max-width: 200px;
+    }
+    .float-card-1 .n { font-size: 2.5rem; font-weight: 900; line-height: 1; }
+    .float-card-1 .l { font-size: 0.78rem; margin-top: 4px; opacity: 0.8; }
+    .float-card-2 {
+      position: absolute; z-index: 3;
+      bottom: 15%; right: 15%;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      padding: 20px 24px;
+      transform: rotate(-2.5deg);
+      box-shadow: 8px 8px 24px rgba(0,0,0,0.3);
+      max-width: 220px;
+    }
+    .float-card-2 blockquote { font-family: 'Noto Serif KR', serif; font-size: 0.9rem; color: var(--accentLt); line-height: 1.7; }
+    .float-card-3 {
+      position: absolute; z-index: 2;
+      top: 10%; left: 40%;
+      background: var(--mid);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      transform: rotate(1.5deg);
+      box-shadow: 6px 6px 18px rgba(0,0,0,0.25);
+    }
+    .float-card-3 p { font-size: 0.8rem; color: var(--text2); }
+
+    /* ── 모자이크 섹션 ── */
+    .mosaic-section { padding: 80px 60px; max-width: 1400px; margin: 0 auto; }
+    .mosaic-title { font-family: 'Noto Serif KR', serif; font-size: 2.5rem; font-weight: 700; color: var(--accent); margin-bottom: 60px; }
+
+    .mosaic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; position: relative; }
+    .mosaic-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 36px;
+      position: relative;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .mosaic-card:hover { transform: translateY(-6px) rotate(0.5deg); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .mosaic-card:nth-child(1) { transform: rotate(-0.8deg); margin-top: 20px; }
+    .mosaic-card:nth-child(1):hover { transform: translateY(-6px) rotate(-0.3deg); }
+    .mosaic-card:nth-child(2) { transform: rotate(0.5deg); }
+    .mosaic-card:nth-child(2):hover { transform: translateY(-6px) rotate(0.5deg); }
+    .mosaic-card:nth-child(3) { transform: rotate(-1.2deg); margin-top: -10px; }
+    .mosaic-card:nth-child(3):hover { transform: translateY(-6px) rotate(-0.8deg); }
+    .mosaic-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent); }
+    .mosaic-card .char { font-family: 'Noto Serif KR', serif; font-size: 3rem; font-weight: 900; color: var(--accent); opacity: 0.2; position: absolute; top: 12px; right: 16px; line-height: 1; }
+    .mosaic-card h3 { font-family: 'Noto Serif KR', serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 12px; position: relative; z-index: 1; }
+    .mosaic-card p { font-size: 0.9rem; color: var(--text2); line-height: 1.8; position: relative; z-index: 1; }
+
+    /* ── 이미지 + 카드 오버랩 섹션 ── */
+    .overlap-section { padding: 60px; position: relative; }
+    .overlap-img { width: 100%; height: 500px; overflow: hidden; }
+    .overlap-img img { width: 100%; height: 100%; object-fit: cover; }
+    .overlap-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1200px; margin: -80px auto 0; position: relative; z-index: 2; padding: 0 60px; }
+    .overlap-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .overlap-card:nth-child(1) { transform: rotate(-1deg); }
+    .overlap-card:nth-child(2) { transform: rotate(0.8deg); margin-top: 16px; }
+    .overlap-card:nth-child(3) { transform: rotate(-0.5deg); }
+    .overlap-card h3 { font-family: 'Noto Serif KR', serif; font-size: 1rem; color: var(--accent); margin-bottom: 8px; }
+    .overlap-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.7; }
+    .overlap-card .tag { font-size: 0.72rem; color: var(--gray); margin-top: 8px; }
+
+    /* ── 법문 인용구 스크롤 ── */
+    .quote-scroll-section { padding: 80px 60px; background: var(--deep); overflow: hidden; }
+    .quote-scroll-title { font-family: 'Noto Serif KR', serif; font-size: 1.5rem; color: var(--accentLt); margin-bottom: 48px; text-align: center; }
+    .quotes-scatter { position: relative; min-height: 400px; max-width: 1200px; margin: 0 auto; }
+    .scatter-quote {
+      position: absolute;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 24px 28px;
+      box-shadow: 8px 8px 24px rgba(0,0,0,0.3);
+    }
+    .scatter-quote:nth-child(1) { top: 0; left: 0; max-width: 380px; transform: rotate(-1.5deg); }
+    .scatter-quote:nth-child(2) { top: 60px; left: 35%; max-width: 360px; transform: rotate(1deg); }
+    .scatter-quote:nth-child(3) { top: 20px; right: 0; max-width: 340px; transform: rotate(-0.8deg); }
+    .scatter-quote blockquote { font-family: 'Noto Serif KR', serif; font-size: 0.95rem; color: var(--text); line-height: 1.7; }
+    .scatter-quote cite { font-size: 0.72rem; color: var(--gray); display: block; margin-top: 8px; }
+
+    /* ── 아카이브 플로팅 섹션 ── */
+    .archive-float { padding: 120px 60px; position: relative; overflow: hidden; }
+    .archive-float-bg { position: absolute; inset: 0; }
+    .archive-float-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.12; }
+    .archive-float-bg::after { content: ''; position: absolute; inset: 0; background: var(--bg); opacity: 0.8; }
+    .archive-float-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    .archive-num-card {
+      background: var(--accent);
+      padding: 60px 40px;
+      text-align: center;
+      transform: rotate(-2deg);
+      box-shadow: 15px 15px 40px rgba(0,0,0,0.4);
+    }
+    .archive-num-card .n { font-size: 5rem; font-weight: 900; color: var(--bg); line-height: 1; }
+    .archive-num-card .l { font-size: 0.9rem; color: var(--bg); opacity: 0.8; margin-top: 8px; }
+    .archive-text { }
+    .archive-text h2 { font-family: 'Noto Serif KR', serif; font-size: 2rem; color: var(--text); margin-bottom: 12px; }
+    .archive-text p { font-size: 0.95rem; color: var(--text2); line-height: 1.8; margin-bottom: 20px; }
+    .archive-text a { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 12px 24px; font-size: 0.88rem; text-decoration: none; }
+    .archive-text a:hover { background: var(--accent); color: var(--bg); }
+
+    /* ── 프로그램 플로팅 그리드 ── */
+    .prog-float-section { padding: 80px 60px; }
+    .prog-float-section h2 { font-family: 'Noto Serif KR', serif; font-size: 2rem; color: var(--accentLt); margin-bottom: 60px; }
+    .prog-float-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .prog-float-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 28px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border-bottom: 3px solid var(--accent);
+    }
+    .prog-float-card:nth-child(odd) { transform: rotate(-0.5deg); }
+    .prog-float-card:nth-child(even) { transform: rotate(0.7deg); margin-top: 12px; }
+    .prog-float-card:hover { transform: translateY(-8px) rotate(0deg); box-shadow: 0 16px 32px rgba(0,0,0,0.3); }
+    .prog-float-card h3 { font-family: 'Noto Serif KR', serif; font-size: 1.1rem; color: var(--accent); margin-bottom: 8px; }
+    .prog-float-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.7; margin-bottom: 10px; }
+    .prog-float-card .sch { font-size: 0.72rem; color: var(--gray); }
+
+    /* 이미지 갤러리 플로팅 */
+    .gallery-float { padding: 40px 60px 80px; }
+    .gallery-float-inner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1200px; margin: 0 auto; }
+    .gallery-float-item { overflow: hidden; }
+    .gallery-float-item:nth-child(1) { transform: rotate(-1.2deg); }
+    .gallery-float-item:nth-child(2) { transform: rotate(0.8deg); margin-top: 24px; }
+    .gallery-float-item:nth-child(3) { transform: rotate(-0.6deg); }
+    .gallery-float-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+
+    /* 푸터 */
+    footer { background: var(--footerBg); padding: 60px; border-top: 1px solid var(--border); }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
+    .footer-brand h3 { font-family: 'Noto Serif KR', serif; font-size: 1.4rem; color: var(--accent); margin-bottom: 10px; }
+    .footer-brand p { font-size: 0.85rem; color: var(--gray); line-height: 1.7; }
+    .footer-col h4 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accentLt); margin-bottom: 12px; }
+    .footer-col a { display: block; font-size: 0.85rem; color: var(--text2); text-decoration: none; margin-bottom: 6px; }
+    .footer-col a:hover { color: var(--accent); }
+    .footer-copy { max-width: 1200px; margin: 32px auto 0; padding-top: 24px; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--gray); text-align: center; }
+  </style>
+</head>
+<body>
+
+<nav class="siann-badge">
+  <% for(let i=1;i<=20;i++){ %>
+    <a href="/siann-18/<%= i %>" class="<%= themeId==i?'active':'' %>">T<%= i %></a>
+  <% } %>
+</nav>
+
+<!-- FLOATING HERO -->
+<section class="floating-hero">
+  <div class="floating-hero-bg">
+    <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzYwMTcxNjE3.CNxv2Stxzrvath9zJ9oTPqk4_Y7KjZ-sL5ABruAId5Ug.xfKrmXsajKdnzHkUNdPqLHJnIDOKEGbMoGN5fMKO7Rsg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AC%ED%8F%AC.jpeg?type=w1600" alt="배경">
+  </div>
+  <div class="hero-main-card">
+    <div class="eyebrow">여의명상센터 · 한울사상</div>
+    <h1>하늘의 뜻으로<br>사는 삶</h1>
+    <p>우주도리(道), 영적진화(靈), 세상에 대한 책임(責)을 삶 속에서 실천하는 수련 공동체</p>
+    <div class="actions">
+      <a href="#programs" class="btn-float primary">수련 시작하기</a>
+      <a href="http://211.104.37.65:4200" class="btn-float outline" target="_blank">법문 아카이브</a>
+    </div>
+  </div>
+  <div class="float-card-1">
+    <div class="n">10,313</div>
+    <div class="l">법문 아카이브</div>
+  </div>
+  <div class="float-card-2">
+    <blockquote>"나비가 될 번데기는 오늘도 껍질을 깨는 중이다"</blockquote>
+  </div>
+  <div class="float-card-3">
+    <p>우주의 모든 것은 돈다 ✦</p>
+  </div>
+</section>
+
+<!-- 모자이크 철학 섹션 -->
+<section class="mosaic-section">
+  <h2 class="mosaic-title">한울사상의 세 기둥</h2>
+  <div class="mosaic-grid">
+    <div class="mosaic-card">
+      <div class="char">道</div>
+      <h3>우주도리(道)</h3>
+      <p>우주의 근본 원리와 질서를 깨닫고 그에 따라 사는 삶. 우주의 모든 것은 돈다. 그 회전 속에서 중심을 잡고 바르게 사는 것이 도(道)를 따르는 삶이다.</p>
+    </div>
+    <div class="mosaic-card">
+      <div class="char">靈</div>
+      <h3>영적진화(靈)</h3>
+      <p>인간 의식의 끊임없는 진화와 영적 성장의 여정. 나비가 될 번데기는 오늘도 껍질을 깨는 중이다. 손지손지심으로 매일 비워나간다.</p>
+    </div>
+    <div class="mosaic-card">
+      <div class="char">責</div>
+      <h3>세상책임(責)</h3>
+      <p>깨달음을 바탕으로 세상과 공동체에 헌신하는 실천. 진정한 영적 완성은 세상과의 연결 속에서 이루어진다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 이미지 + 카드 오버랩 -->
+<div class="overlap-section">
+  <div class="overlap-img">
+    <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTMx/MDAxNTk4MjcwMDA4OTE4.4i2ym-0dQC_hoe1BoDZAPf79dL-Qa8oaXpcr6OyRaAEg.xNbYjehBR-WE8FUjQ6JP3ETwI6VSO3PZLc0xB20WiWog.JPEG/%EC%9D%98%EB%A1%9C%EC%9B%80.jpg?type=w1600" alt="의로움">
+  </div>
+  <div class="overlap-cards">
+    <div class="overlap-card">
+      <h3>제도(制道)</h3>
+      <p>자기 자신을 다스리는 규율의 도. 한울사상 수련의 첫 번째 관문.</p>
+      <div class="tag">핵심 가르침 · 01</div>
+    </div>
+    <div class="overlap-card">
+      <h3>생명장(生命場)</h3>
+      <p>생명의 에너지장. 우주의 생명력과 공명하는 수련법.</p>
+      <div class="tag">핵심 가르침 · 02</div>
+    </div>
+    <div class="overlap-card">
+      <h3>손지손지심(損之損之心)</h3>
+      <p>끊임없이 비워나가는 마음. 노자의 지혜를 실천적으로 체현.</p>
+      <div class="tag">핵심 가르침 · 03</div>
+    </div>
+  </div>
+</div>
+
+<!-- 인용구 산포 -->
+<section class="quote-scroll-section">
+  <div class="quote-scroll-title">한울사상의 법문</div>
+  <div class="quotes-scatter">
+    <div class="scatter-quote">
+      <blockquote>나비가 될 번데기는 오늘도 껍질을 깨는 중이다</blockquote>
+      <cite>— 한울사상 법문</cite>
+    </div>
+    <div class="scatter-quote">
+      <blockquote>죄는 조이는 것이다 — 스스로를 締約하지 말고, 우주의 흐름 속에 열린 존재로 살아가라</blockquote>
+      <cite>— 한울사상 법문</cite>
+    </div>
+    <div class="scatter-quote">
+      <blockquote>우주의 모든 것은 돈다. 그 회전의 중심에 한울이 있다</blockquote>
+      <cite>— 한울사상 법문</cite>
+    </div>
+  </div>
+</section>
+
+<!-- 아카이브 플로팅 -->
+<section class="archive-float">
+  <div class="archive-float-bg">
+    <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjNfMjMy/MDAxNTk4MTgwMzU0NjYx.cEjHaZRf_VD6Qc-CbtnuNM5Az-6A36APGLo0_w3U7bAg.G3TeB5xBBChkHr7EvEK-kgmWHzO0jJW_mZdN9F26lf8g.JPEG/KakaoTalk_20200823_195242797.jpg?type=w1600" alt="">
+  </div>
+  <div class="archive-float-inner">
+    <div class="archive-num-card">
+      <div class="n">10,313</div>
+      <div class="l">법문 아카이브</div>
+    </div>
+    <div class="archive-text">
+      <h2>법문 아카이브</h2>
+      <p>수십 년의 가르침이 담긴 방대한 법문 아카이브. 한울사상의 모든 지혜가 여기에 있습니다.</p>
+      <a href="http://211.104.37.65:4200" target="_blank">아카이브 열기 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 프로그램 플로팅 그리드 -->
+<section id="programs" class="prog-float-section">
+  <h2>여의명상센터 수련 프로그램</h2>
+  <div class="prog-float-grid">
+    <div class="prog-float-card">
+      <h3>집중수련</h3>
+      <p>일상을 벗어난 깊은 침묵 속 수련. 제도, 생명장 통합.</p>
+      <div class="sch">정기 개설</div>
+    </div>
+    <div class="prog-float-card">
+      <h3>생명장수련</h3>
+      <p>우주 생명 에너지와 공명하는 체험적 수련.</p>
+      <div class="sch">정기 진행</div>
+    </div>
+    <div class="prog-float-card">
+      <h3>기운영</h3>
+      <p>우주 기운을 운영하는 심화 수련법.</p>
+      <div class="sch">정기 진행</div>
+    </div>
+    <div class="prog-float-card">
+      <h3>토요법문</h3>
+      <p>매주 토요일 한울사상 법문 강의.</p>
+      <div class="sch">매주 토요일</div>
+    </div>
+    <div class="prog-float-card">
+      <h3>지기문화답사</h3>
+      <p>자연 속 지기(地氣)를 느끼는 탐방.</p>
+      <div class="sch">월 1회</div>
+    </div>
+    <div class="prog-float-card">
+      <h3>공동체활동</h3>
+      <p>세상책임(責)의 실천. 함께하는 공동체.</p>
+      <div class="sch">상시 참여</div>
+    </div>
+  </div>
+</section>
+
+<!-- 갤러리 플로팅 -->
+<div class="gallery-float">
+  <div class="gallery-float-inner">
+    <div class="gallery-float-item">
+      <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTA0/MDAxNTk4MjcxODc5NzI0.mXb9CIQbcw24UrkOVWnBlTWhahS8eMB-0dLFxeGsUPgg.q-aLd5qsW7stRiQYwjg7KgimuCDjWnKWp1pp8WRfIEcg.JPEG/%ED%91%9C%EC%99%80_%ED%8F%AC.jpg?type=w1600" alt="">
+    </div>
+    <div class="gallery-float-item">
+      <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMjI4/MDAxNTk4NTEyNDk2MDEx.J3Q_U1w_GEKIP_XvmwmbgVxqkwPuSV77pX1jaPkUKGQg.0h6tVJ13kA4-tFIBhyEUsrUGno44hvjyd14fvuZfyiUg.JPEG/1.jpg?type=w1600" alt="">
+    </div>
+    <div class="gallery-float-item">
+      <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMTE2/MDAxNTk4NTEyNDg1ODY4.CeSwedtGPRZ7UkAy69aAT30cq9sYQIlkOPmXR1iXgVIg.QnwGi48OyhM3BcWw-ixRQ4SmMHd9Yyp5kkB5uCJVB0gg.JPEG/2.jpg?type=w1600" alt="">
+    </div>
+  </div>
+</div>
+
+<!-- 푸터 -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h3>한울사상</h3>
+      <p>하늘의 뜻으로 사는 삶을 탐구하는 수련 공동체. 여의명상센터.</p>
+    </div>
+    <div class="footer-col">
+      <h4>한울사상</h4>
+      <a href="#">우주도리(道)</a>
+      <a href="#">영적진화(靈)</a>
+      <a href="#">세상책임(責)</a>
+    </div>
+    <div class="footer-col">
+      <h4>수련</h4>
+      <a href="#">집중수련</a>
+      <a href="#">토요법문</a>
+      <a href="http://211.104.37.65:4200" target="_blank">법문 아카이브</a>
+    </div>
+  </div>
+  <div class="footer-copy">© 한울사상 여의명상센터 · 테마 <%= themeId %> (<%= t.name %>) · 레이아웃 18 — 플로팅 카드 모자이크</div>
+</footer>
+
+</body>
+</html>

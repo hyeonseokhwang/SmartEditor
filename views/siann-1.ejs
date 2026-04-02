@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — L1 좌측 사이드바 · 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #152444 0%, #080D1A 65%)', footerBg:'#030810', navBg:'rgba(8,13,26,0.98)', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen',      bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #0F3022 0%, #071510 65%)', footerBg:'#030D07', navBg:'rgba(7,21,16,0.98)', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White',      bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #E8E8E0 0%, #FAFAF8 65%)', footerBg:'#1A1A1A', navBg:'rgba(250,250,248,0.98)', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #3A2810 0%, #1C1208 65%)', footerBg:'#0E0905', navBg:'rgba(28,18,8,0.98)', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist',       bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #D8E4F5 0%, #F2F4F7 65%)', footerBg:'#2A3547', navBg:'rgba(242,244,247,0.98)', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple',   bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #2A1048 0%, #100818 65%)', footerBg:'#080410', navBg:'rgba(16,8,24,0.98)', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo',          bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #E0EDD4 0%, #F8F5EC 65%)', footerBg:'#1A2010', navBg:'rgba(248,245,236,0.98)', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain',  bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #282828 0%, #141414 65%)', footerBg:'#080808', navBg:'rgba(20,20,20,0.98)', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal',       bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #0E3038 0%, #061518 65%)', footerBg:'#030B0D', navBg:'rgba(6,21,24,0.98)', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber',      bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #3A2400 0%, #1A0E00 65%)', footerBg:'#0D0700', navBg:'rgba(26,14,0,0.98)', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night',     bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #062040 0%, #020C1B 65%)', footerBg:'#01060E', navBg:'rgba(2,12,27,0.98)', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand',       bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #EAD8BC 0%, #F7F0E4 65%)', footerBg:'#1C1408', navBg:'rgba(247,240,228,0.98)', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green',      bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #162814 0%, #0A1208 65%)', footerBg:'#050804', navBg:'rgba(10,18,8,0.98)', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #141A48 0%, #070A1F 65%)', footerBg:'#03040F', navBg:'rgba(7,10,31,0.98)', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment',       bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #E8D8B4 0%, #F4EDD8 65%)', footerBg:'#1A1005', navBg:'rgba(244,237,216,0.98)', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz',     bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #3A1820 0%, #1A0C10 65%)', footerBg:'#0D0608', navBg:'rgba(26,12,16,0.98)', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian',        bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #181818 0%, #050505 65%)', footerBg:'#020202', navBg:'rgba(5,5,5,0.98)', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon',         bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #142C30 0%, #0A1618 65%)', footerBg:'#05080A', navBg:'rgba(10,22,24,0.98)', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White',    bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #D8E4F2 0%, #F4F6FA 65%)', footerBg:'#1A2440', navBg:'rgba(244,246,250,0.98)', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #2C1810 0%, #12080A 65%)', footerBg:'#080408', navBg:'rgba(18,8,10,0.98)', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    %>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       <%= t.bg %>;
+      --deep:     <%= t.deep %>;
+      --mid:      <%= t.mid %>;
+      --card:     <%= t.card %>;
+      --gold:     <%= t.accent %>;
+      --gold-lt:  <%= t.accentLt %>;
+      --gold-dk:  <%= t.accentDk %>;
+      --cream:    <%= t.text %>;
+      --cream-2:  <%= t.text2 %>;
+      --gray:     <%= t.gray %>;
+      --border:   <%= t.border %>;
+      --serif:    'Noto Serif KR', 'Malgun Gothic', serif;
+      --sans:     'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      --sidebar-w: 280px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--cream); overflow-x: hidden; }
+
+    /* ── 시안 배지 ── */
+    .siann-badge {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(0,0,0,0.88); color: #fff; text-align: center;
+      padding: 5px 16px; font-size: 11px; letter-spacing: 0.1em;
+      border-bottom: 2px solid <%= t.accent %>;
+    }
+    .siann-badge .b-row1 { margin-bottom: 3px; }
+    .siann-badge .b-row1 span { color: <%= t.accent %>; font-weight: 700; }
+    .siann-badge .b-row2 { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    .siann-badge .b-row2 a {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); font-size: 10px; color: #ccc;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .siann-badge .b-row2 a:hover,
+    .siann-badge .b-row2 a.cur { background: <%= t.accent %>; color: #000; font-weight: 700; }
+
+    /* ── LAYOUT 1: 좌측 고정 사이드바 ── */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 52px; /* badge height */
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      top: 52px; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--deep);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 48px 36px;
+      z-index: 100;
+      overflow-y: auto;
+    }
+    .sb-logo {
+      font-family: var(--serif);
+      font-size: 22px; font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .sb-logo span { color: var(--cream); }
+    .sb-tagline {
+      font-family: var(--serif);
+      font-size: 11px; font-weight: 300;
+      color: var(--gray);
+      letter-spacing: 0.15em;
+      margin-bottom: 60px;
+    }
+    .sb-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sb-nav a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      color: var(--cream-2);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      border-radius: 4px;
+      transition: all 0.22s;
+      position: relative;
+    }
+    .sb-nav a::before {
+      content: '';
+      display: block;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--gold-dk);
+      transition: all 0.22s;
+    }
+    .sb-nav a:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--gold);
+    }
+    .sb-nav a:hover::before { background: var(--gold); width: 6px; height: 6px; }
+    .sb-divider { height: 1px; background: var(--border); margin: 20px 0; }
+    .sb-bottom { display: flex; flex-direction: column; gap: 12px; }
+    .sb-cta {
+      display: block;
+      padding: 12px 20px;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      border-radius: 3px;
+      text-align: center;
+      transition: background 0.22s;
+    }
+    .sb-cta:hover { background: var(--gold-lt); }
+    .sb-info {
+      font-size: 10px;
+      color: var(--gray);
+      letter-spacing: 0.1em;
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    /* MAIN */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-height: 100vh;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      background: <%= t.heroBg %>;
+      padding: 80px 72px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-mandala {
+      position: absolute;
+      right: -40px; top: 50%;
+      transform: translateY(-50%);
+      width: 600px; height: 600px;
+      opacity: 0.22;
+      pointer-events: none;
+    }
+    .hero-mandala svg { width: 100%; height: 100%; animation: spin 90s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hero-content { position: relative; z-index: 2; max-width: 560px; }
+    .eyebrow {
+      display: inline-block;
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 0.48em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 28px;
+      padding-left: 2px;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(44px, 6vw, 80px);
+      font-weight: 600; line-height: 1.1;
+      color: var(--cream); margin-bottom: 24px;
+    }
+    .hero-title em { font-style: normal; color: var(--gold); display: block; font-size: 0.62em; font-weight: 300; margin-top: 8px; letter-spacing: 0.04em; }
+    .hero-body {
+      font-family: var(--serif);
+      font-size: 17px; font-weight: 300;
+      color: var(--cream-2); line-height: 2.0;
+      margin-bottom: 48px;
+    }
+    .hero-quote {
+      border-left: 2px solid var(--gold);
+      padding: 16px 20px;
+      margin-bottom: 48px;
+      background: rgba(255,255,255,0.03);
+    }
+    .hero-quote p {
+      font-family: var(--serif);
+      font-size: 14px; font-weight: 300;
+      color: var(--cream-2); line-height: 1.9;
+      font-style: italic;
+    }
+    .hero-btn {
+      display: inline-block;
+      padding: 14px 36px;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: all 0.22s;
+    }
+    .hero-btn:hover { background: var(--gold-lt); transform: translateY(-2px); }
+
+    /* ABOUT */
+    .about {
+      background: var(--mid);
+      padding: 100px 72px;
+    }
+    .sec-label {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.44em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 16px;
+    }
+    .sec-title {
+      font-family: var(--serif);
+      font-size: clamp(26px, 3.2vw, 40px);
+      font-weight: 500; color: var(--cream);
+      line-height: 1.3; margin-bottom: 16px;
+    }
+    .sec-bar { width: 40px; height: 2px; background: var(--gold); margin-bottom: 32px; }
+    .about-text {
+      font-family: var(--serif);
+      font-size: 16px; font-weight: 300;
+      color: var(--cream-2); line-height: 2.0;
+      max-width: 640px; margin-bottom: 60px;
+    }
+    .about-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .pillar {
+      background: var(--card);
+      padding: 44px 32px 40px;
+      position: relative; overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .pillar:hover { transform: translateY(-6px); }
+    .pillar-hanja {
+      font-family: var(--serif);
+      font-size: 56px; font-weight: 700;
+      color: <%= t.accent %>12;
+      position: absolute; top: 20px; right: 20px;
+      line-height: 1; pointer-events: none;
+    }
+    .pillar-num { font-size: 10px; letter-spacing: 0.3em; color: var(--gold-dk); margin-bottom: 20px; }
+    .pillar h3 { font-family: var(--serif); font-size: 22px; font-weight: 500; color: var(--cream); margin-bottom: 10px; }
+    .pillar-sub { font-size: 11px; letter-spacing: 0.18em; color: var(--gold); margin-bottom: 16px; }
+    .pillar p { font-family: var(--serif); font-size: 14px; font-weight: 300; color: var(--cream-2); line-height: 1.95; }
+
+    /* TEACHINGS */
+    .teachings {
+      background: var(--bg);
+      padding: 100px 72px;
+    }
+    .teach-list { margin-top: 52px; display: flex; flex-direction: column; gap: 0; }
+    .teach-item {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0;
+      padding: 44px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .teach-item:first-child { border-top: 1px solid var(--border); }
+    .teach-icon {
+      display: flex; align-items: flex-start; justify-content: center;
+      padding-top: 4px;
+    }
+    .teach-icon-inner {
+      width: 48px; height: 48px;
+      border: 1px solid var(--gold-dk);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-size: 20px; color: var(--gold);
+    }
+    .teach-body {}
+    .teach-body h3 {
+      font-family: var(--serif);
+      font-size: 22px; font-weight: 500;
+      color: var(--cream); margin-bottom: 6px;
+    }
+    .teach-hanja { font-size: 11px; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 14px; }
+    .teach-body p { font-family: var(--serif); font-size: 15px; font-weight: 300; color: var(--cream-2); line-height: 1.95; max-width: 600px; }
+
+    /* QUOTES */
+    .quotes {
+      background: var(--deep);
+      padding: 100px 72px;
+    }
+    .quote-stack { margin-top: 60px; display: flex; flex-direction: column; gap: 56px; }
+    .q-item { max-width: 640px; }
+    .q-mark { font-family: var(--serif); font-size: 56px; font-weight: 700; color: var(--gold); line-height: 0.6; margin-bottom: 14px; opacity: 0.45; }
+    .q-text { font-family: var(--serif); font-size: clamp(17px, 2.2vw, 24px); font-weight: 400; color: var(--cream); line-height: 1.75; margin-bottom: 18px; }
+    .q-attr { font-family: var(--serif); font-size: 12px; font-weight: 300; color: var(--gold); letter-spacing: 0.08em; }
+
+    /* CENTER */
+    .center-sec {
+      background: var(--mid);
+      padding: 100px 72px;
+    }
+    .programs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      margin-top: 52px;
+    }
+    .prog {
+      background: var(--card);
+      padding: 32px 28px;
+      transition: background 0.2s;
+    }
+    .prog:hover { background: var(--deep); }
+    .prog h4 { font-family: var(--serif); font-size: 17px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
+    .prog p { font-family: var(--serif); font-size: 13px; font-weight: 300; color: var(--cream-2); line-height: 1.85; }
+
+    /* ARCHIVE */
+    .archive-sec {
+      background: var(--bg);
+      padding: 120px 72px;
+      text-align: center;
+    }
+    .archive-count {
+      font-family: var(--serif);
+      font-size: clamp(72px, 12vw, 128px);
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 8px;
+      opacity: 0.85;
+    }
+    .archive-unit { font-size: 11px; letter-spacing: 0.4em; color: var(--gray); text-transform: uppercase; margin-bottom: 32px; }
+    .archive-desc { font-family: var(--serif); font-size: 17px; font-weight: 300; color: var(--cream-2); line-height: 1.85; max-width: 480px; margin: 0 auto 44px; }
+
+    /* FOOTER */
+    footer {
+      background: <%= t.footerBg %>;
+      padding: 56px 72px;
+      border-top: 1px solid var(--border);
+    }
+    .ft-inner { display: flex; gap: 48px; justify-content: space-between; flex-wrap: wrap; }
+    .ft-brand .logo { font-family: var(--serif); font-size: 19px; color: var(--gold); font-weight: 600; margin-bottom: 12px; }
+    .ft-brand p { font-size: 13px; color: var(--gray); line-height: 1.8; max-width: 240px; }
+    .ft-col h4 { font-size: 10px; letter-spacing: 0.36em; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
+    .ft-col ul { list-style: none; }
+    .ft-col li { margin-bottom: 8px; }
+    .ft-col a { font-size: 13px; color: var(--gray); text-decoration: none; transition: color .2s; }
+    .ft-col a:hover { color: var(--cream); }
+    .ft-copy { margin-top: 36px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.05); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--gray); }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      :root { --sidebar-w: 240px; }
+      .hero, .about, .teachings, .quotes, .center-sec, .archive-sec, footer { padding-left: 40px; padding-right: 40px; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .about-pillars, .programs-grid { grid-template-columns: 1fr; }
+      .teach-item { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 시안 배지 -->
+<div class="siann-badge">
+  <div class="b-row1">L<span>1</span> 좌측 사이드바 · 테마 <span><%= themeId %>/20 — <%= themes[themeId]?.name || '' %></span></div>
+  <div class="b-row2">
+    <% for(let i=1;i<=20;i++){ %>
+    <a href="/siann-1/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a>
+    <% } %>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <a href="#" class="sb-logo">한울<span>사상</span></a>
+    <p class="sb-tagline">여의명상센터 · 한울영성계발원</p>
+
+    <nav class="sb-nav">
+      <a href="#hero">시작</a>
+      <a href="#about">한울이란</a>
+      <a href="#teachings">핵심 가르침</a>
+      <a href="#quotes">법문 발췌</a>
+      <a href="#center">여의명상센터</a>
+      <a href="#archive">법문 아카이브</a>
+    </nav>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-bottom">
+      <a href="http://211.104.37.65:4200" class="sb-cta" target="_blank">법문 아카이브 →</a>
+      <p class="sb-info">수도자 1인은 세상자 만인이요<br>중생자 억이라</p>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-mandala">
+        <svg viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="300" cy="300" r="295" stroke="<%= t.accent %>30" stroke-width="1"/>
+          <circle cx="300" cy="300" r="260" stroke="<%= t.accent %>40" stroke-width="0.5"/>
+          <circle cx="300" cy="300" r="220" stroke="<%= t.accent %>50" stroke-width="1"/>
+          <circle cx="300" cy="300" r="175" stroke="<%= t.accent %>60" stroke-width="1"/>
+          <circle cx="300" cy="300" r="130" stroke="<%= t.accent %>70" stroke-width="1"/>
+          <circle cx="300" cy="300" r="88"  stroke="<%= t.accent %>90" stroke-width="1.5"/>
+          <circle cx="300" cy="300" r="50"  fill="<%= t.accent %>18" stroke="<%= t.accent %>AA" stroke-width="1.5"/>
+          <line x1="300" y1="10" x2="300" y2="590" stroke="<%= t.accent %>20" stroke-width="0.5"/>
+          <line x1="10" y1="300" x2="590" y2="300" stroke="<%= t.accent %>20" stroke-width="0.5"/>
+          <line x1="88" y1="88" x2="512" y2="512" stroke="<%= t.accent %>18" stroke-width="0.5"/>
+          <line x1="512" y1="88" x2="88" y2="512" stroke="<%= t.accent %>18" stroke-width="0.5"/>
+          <text x="300" y="30" text-anchor="middle" font-family="serif" font-size="16" fill="<%= t.accent %>AA">天</text>
+          <text x="300" y="588" text-anchor="middle" font-family="serif" font-size="16" fill="<%= t.accent %>AA">地</text>
+          <text x="22" y="305" text-anchor="middle" font-family="serif" font-size="16" fill="<%= t.accent %>AA">人</text>
+          <text x="578" y="305" text-anchor="middle" font-family="serif" font-size="16" fill="<%= t.accent %>AA">氣</text>
+        </svg>
+      </div>
+      <div class="hero-content">
+        <span class="eyebrow">한울영성계발원 · 여의명상센터</span>
+        <h1 class="hero-title">
+          한울사상
+          <em>하늘의 뜻으로 사는 삶</em>
+        </h1>
+        <p class="hero-body">한울은 동서고금의 어떤 종교나 사상과도 구별되는<br>독자적 사상 체계입니다.</p>
+        <div class="hero-quote">
+          <p>나비가 될 번데기는 무엇인가를 단단하게 붙잡지 않고서는<br>허물을 벗고 나올 수 없다</p>
+        </div>
+        <a href="http://211.104.37.65:4200" class="hero-btn" target="_blank">법문 아카이브 보기</a>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+      <p class="sec-label">한울이란</p>
+      <h2 class="sec-title">한울(韓蔚)은 하늘의 순우리말<br>만물의 근원</h2>
+      <div class="sec-bar"></div>
+      <p class="about-text">한울은 동서고금의 어떤 종교나 사상과도 구별되는 독자적 사상 체계입니다. 우주의 이치(道)가 인간의 삶 속에서 어떻게 펼쳐지는가를 밝히고, 그 이치에 따라 사는 삶의 길을 제시합니다.</p>
+      <div class="about-pillars">
+        <div class="pillar"><span class="pillar-hanja">道</span><p class="pillar-num">01</p><h3>우주도리</h3><p class="pillar-sub">우주의 이치를 깨닫다</p><p>"우주의 모든 것은 돈다 — 자전하고 공전하는 것이 우주의 도리." 한울사상은 우주의 순환 원리를 삶의 근본으로 삼습니다.</p></div>
+        <div class="pillar"><span class="pillar-hanja">靈</span><p class="pillar-num">02</p><h3>영적 진화</h3><p class="pillar-sub">한울의 존재로 깨어나다</p><p>인간은 수련과 실천을 통해 더 높은 존재로 진화할 수 있습니다. 번데기가 나비가 되듯, 인간도 더 높은 존재로 변화합니다.</p></div>
+        <div class="pillar"><span class="pillar-hanja">責</span><p class="pillar-num">03</p><h3>세상에 대한 책임</h3><p class="pillar-sub">한 사람이 세상을 바꾼다</p><p>"수도자 1인은 세상자 만인이요, 중생자 억이라." 개인의 수행이 곧 세상을 위한 실천입니다.</p></div>
+      </div>
+    </section>
+
+    <!-- TEACHINGS -->
+    <section class="teachings" id="teachings">
+      <p class="sec-label">핵심 가르침</p>
+      <h2 class="sec-title">한울사상이 가리키는<br>세 가지 길</h2>
+      <div class="sec-bar"></div>
+      <div class="teach-list">
+        <div class="teach-item">
+          <div class="teach-icon"><div class="teach-icon-inner">制</div></div>
+          <div class="teach-body">
+            <h3>제도 (制道)</h3><p class="teach-hanja">수행의 목표이자 결과물</p>
+            <p>제도는 도를 삶 속에서 구현하고 세상의 질서를 바로잡는 것입니다. 수행의 목표는 깨달음을 넘어 세상에 대한 책임으로 완성됩니다.</p>
+          </div>
+        </div>
+        <div class="teach-item">
+          <div class="teach-icon"><div class="teach-icon-inner">場</div></div>
+          <div class="teach-body">
+            <h3>생명장 (生命場)</h3><p class="teach-hanja">몸을 감싸는 기(氣)의 장</p>
+            <p>생명장은 몸을 감싸고 있는 에너지 장(場)입니다. 이 장이 강하고 맑을수록 건강하고 밝은 삶이 펼쳐집니다.</p>
+          </div>
+        </div>
+        <div class="teach-item">
+          <div class="teach-icon"><div class="teach-icon-inner">損</div></div>
+          <div class="teach-body">
+            <h3>수련 — 손지손지심</h3><p class="teach-hanja">損之損之心 · 채우기보다 비우는 수행</p>
+            <p>"죄는 조이는 것이다." 한울의 수련은 비우는 것에서 시작합니다. 덜고 또 덜어내는 마음이 수행의 핵심입니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUOTES -->
+    <section class="quotes" id="quotes">
+      <p class="sec-label">큰스승님 법문</p>
+      <h2 class="sec-title">실제 법문에서 가져온<br>한울의 말씀</h2>
+      <div class="sec-bar"></div>
+      <div class="quote-stack">
+        <div class="q-item"><div class="q-mark">"</div><p class="q-text">나비가 될 번데기는 무엇인가를<br>단단하게 붙잡지 않고서는<br>허물을 벗고 나올 수 없다</p><p class="q-attr">— 한울 법문 아카이브 수록</p></div>
+        <div class="q-item"><div class="q-mark">"</div><p class="q-text">죄는 조이는 것이다.<br>자신과 상대를 무리하게 조이는 것</p><p class="q-attr">— 한울 법문 아카이브 수록</p></div>
+        <div class="q-item"><div class="q-mark">"</div><p class="q-text">우주의 모든 것은 돈다.<br>자전하고 공전하는 것이 우주의 도리</p><p class="q-attr">— 한울 법문 아카이브 수록</p></div>
+      </div>
+    </section>
+
+    <!-- CENTER -->
+    <section class="center-sec" id="center">
+      <p class="sec-label">여의명상센터</p>
+      <h2 class="sec-title">한울영성계발원<br>수련 프로그램</h2>
+      <div class="sec-bar"></div>
+      <div class="programs-grid">
+        <div class="prog"><h4>집중수련</h4><p>한울사상의 깊이를 체험하는 집중 수련 과정</p></div>
+        <div class="prog"><h4>생명장 수련</h4><p>몸을 감싸는 기(氣)의 장을 키우는 수련</p></div>
+        <div class="prog"><h4>기운영</h4><p>우주의 기운을 바르게 운용하는 수행법</p></div>
+        <div class="prog"><h4>토요법문</h4><p>매주 토요일 법문 청취 및 공동 수련</p></div>
+        <div class="prog"><h4>지기문화답사</h4><p>우주도리를 자연 속에서 체험하는 답사</p></div>
+        <div class="prog"><h4>공동체 활동</h4><p>한울사상을 함께 실천하는 삶의 공동체</p></div>
+      </div>
+    </section>
+
+    <!-- ARCHIVE -->
+    <section class="archive-sec" id="archive">
+      <p class="sec-label" style="text-align:center;margin-bottom:20px;">법문 아카이브</p>
+      <div class="archive-count">10,313</div>
+      <p class="archive-unit">법문과 가르침</p>
+      <p class="archive-desc">수십 년에 걸쳐 수집된 한울 법문 전체를 아카이빙했습니다.<br>검색하고, 읽고, 당신만의 방식으로 한울사상을 만나보세요.</p>
+      <a href="http://211.104.37.65:4200" class="hero-btn" target="_blank">법문 아카이브 열기</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="ft-inner">
+        <div class="ft-brand">
+          <div class="logo">한울영성계발원</div>
+          <p>여의명상센터 · 한울사상<br>하늘의 뜻으로 사는 삶을 실천하는<br>수련 공동체</p>
+        </div>
+        <div class="ft-col"><h4>한울사상</h4><ul><li><a href="#about">한울이란</a></li><li><a href="#teachings">핵심 가르침</a></li><li><a href="#quotes">법문 발췌</a></li></ul></div>
+        <div class="ft-col"><h4>여의명상센터</h4><ul><li><a href="#center">집중수련</a></li><li><a href="#center">생명장 수련</a></li><li><a href="#center">토요법문</a></li></ul></div>
+        <div class="ft-col"><h4>법문 아카이브</h4><ul><li><a href="http://211.104.37.65:4200" target="_blank">아카이브 열기</a></li></ul></div>
+      </div>
+      <div class="ft-copy">
+        <span>© 2026 한울영성계발원 여의명상센터. All rights reserved.</span>
+        <span>수도자 1인은 세상자 만인이요 — 한울사상</span>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // 현재 섹션 하이라이트
+  const navLinks = document.querySelectorAll('.sb-nav a');
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.background = a.getAttribute('href') === '#' + current ? 'rgba(255,255,255,0.06)' : '';
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--gold)' : '';
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>

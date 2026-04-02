@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>한울사상 L5 에디토리얼 매거진 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen',      bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', footerBg:'#030D07', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White',      bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', footerBg:'#1A1A1A', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', footerBg:'#0E0905', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist',       bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', footerBg:'#2A3547', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple',   bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', footerBg:'#080410', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo',          bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', footerBg:'#1A2010', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain',  bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', footerBg:'#080808', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal',       bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', footerBg:'#030B0D', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber',      bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', footerBg:'#0D0700', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night',     bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', footerBg:'#01060E', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand',       bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', footerBg:'#1C1408', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green',      bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', footerBg:'#050804', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', footerBg:'#03040F', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment',       bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', footerBg:'#1A1005', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz',     bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', footerBg:'#0D0608', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian',        bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', footerBg:'#020202', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon',         bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', footerBg:'#05080A', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White',    bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', footerBg:'#1A2440', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    %>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:<%= t.bg %>;--deep:<%= t.deep %>;--mid:<%= t.mid %>;--card:<%= t.card %>;
+      --accent:<%= t.accent %>;--accentLt:<%= t.accentLt %>;--accentDk:<%= t.accentDk %>;
+      --text:<%= t.text %>;--text2:<%= t.text2 %>;--gray:<%= t.gray %>;
+      --border:<%= t.border %>;--footerBg:<%= t.footerBg %>;
+      --serif:'Noto Serif KR','Malgun Gothic',serif;
+      --sans:'Noto Sans KR','Malgun Gothic',sans-serif;
+    }
+    html{scroll-behavior:smooth;}
+    body{font-family:var(--sans);background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+    /* ── 배지 ── */
+    .siann-badge{position:fixed;top:0;left:0;right:0;z-index:2000;background:rgba(0,0,0,0.92);color:#fff;text-align:center;padding:5px 16px;font-size:11px;letter-spacing:0.1em;border-bottom:2px solid <%= t.accent %>;}
+    .siann-badge .b-row1{margin-bottom:3px;}
+    .siann-badge .b-row1 span{color:<%= t.accent %>;font-weight:700;}
+    .siann-badge .b-row2{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;}
+    .siann-badge .b-row2 a{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:10px;color:#ccc;text-decoration:none;transition:background 0.2s;}
+    .siann-badge .b-row2 a:hover,.siann-badge .b-row2 a.cur{background:<%= t.accent %>;color:#000;font-weight:700;}
+
+    /* ── 상단 내비 ── */
+    .mag-nav{position:fixed;top:52px;left:0;right:0;z-index:900;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 60px;background:<%= t.bg %>ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+    .mag-logo{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--accent);text-decoration:none;letter-spacing:0.06em;}
+    .mag-links{display:flex;gap:0;}
+    .mag-links a{padding:0 16px;height:52px;display:flex;align-items:center;font-size:11px;letter-spacing:0.1em;color:var(--text2);text-decoration:none;border-bottom:2px solid transparent;transition:all 0.22s;}
+    .mag-links a:hover{color:var(--accent);border-bottom-color:var(--accent);}
+    .mag-cta a{font-size:11px;padding:8px 22px;background:var(--accent);color:var(--bg);text-decoration:none;letter-spacing:0.08em;font-weight:700;transition:opacity 0.2s;}
+    .mag-cta a:hover{opacity:0.82;}
+
+    /* ── 히어로: 큰 이미지 60% + 오버랩 텍스트 카드 ── */
+    .mag-hero{margin-top:104px;position:relative;display:grid;grid-template-columns:60fr 40fr;min-height:90vh;}
+    .hero-img-wrap{position:relative;overflow:hidden;}
+    .hero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 8s ease;}
+    .hero-img-wrap:hover img{transform:scale(1.04);}
+    .hero-img-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.2) 60%,transparent 100%);}
+    .hero-text-panel{display:flex;flex-direction:column;justify-content:center;padding:80px 60px;background:var(--deep);position:relative;}
+    .hero-issue{font-size:10px;letter-spacing:0.6em;text-transform:uppercase;color:var(--accent);margin-bottom:28px;}
+    .hero-h1{font-family:var(--serif);font-size:clamp(42px,5.5vw,72px);font-weight:700;color:var(--text);line-height:1.0;margin-bottom:20px;}
+    .hero-tagline{font-family:var(--serif);font-size:clamp(15px,1.8vw,22px);font-weight:300;color:var(--text2);line-height:1.7;margin-bottom:36px;}
+    .hero-divider{width:48px;height:2px;background:var(--accent);margin-bottom:28px;}
+    .hero-desc{font-size:14px;line-height:1.9;color:var(--gray);}
+    /* 히어로 위에 떠있는 텍스트 (left img에) */
+    .hero-float{position:absolute;bottom:60px;left:60px;z-index:3;max-width:400px;}
+    .hero-float-title{font-family:var(--serif);font-size:clamp(28px,4vw,48px);font-weight:600;color:#fff;line-height:1.1;text-shadow:0 2px 20px rgba(0,0,0,0.5);}
+    .hero-float-sub{font-size:13px;color:rgba(255,255,255,0.7);margin-top:8px;letter-spacing:0.08em;}
+
+    /* ── 편집 에디터 노트 바 ── */
+    .editor-bar{background:var(--accent);padding:14px 60px;display:flex;align-items:center;gap:24px;}
+    .eb-label{font-size:10px;letter-spacing:0.5em;color:var(--bg);text-transform:uppercase;font-weight:700;white-space:nowrap;}
+    .eb-text{font-family:var(--serif);font-size:14px;color:var(--bg);font-weight:300;opacity:0.9;}
+
+    /* ── 기사 그리드: 큰 이미지 블록들 ── */
+    .articles{padding:60px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;}
+
+    /* 기사 1: 풀 가로폭 이미지 탑 */
+    .art-feature{grid-column:1/8;display:grid;grid-template-rows:auto auto;gap:0;}
+    .art-feature .art-img{position:relative;overflow:hidden;height:420px;}
+    .art-feature .art-img img{width:100%;height:100%;object-fit:cover;transition:transform 6s ease;}
+    .art-feature:hover .art-img img{transform:scale(1.04);}
+    .art-feature .art-img .art-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 50%);}
+    .art-feature .art-body{background:var(--card);padding:36px 40px;}
+
+    /* 기사 2: 사이드 좁은 기사 */
+    .art-side{grid-column:8/13;display:flex;flex-direction:column;gap:24px;}
+    .art-small{background:var(--card);display:grid;grid-template-columns:120px 1fr;gap:0;overflow:hidden;}
+    .art-small .as-img{height:120px;overflow:hidden;}
+    .art-small .as-img img{width:100%;height:100%;object-fit:cover;transition:transform 5s ease;}
+    .art-small:hover .as-img img{transform:scale(1.06);}
+    .art-small .as-body{padding:16px 18px;display:flex;flex-direction:column;justify-content:center;}
+
+    /* 기사 3: 풀 가로 이미지 아래 */
+    .art-wide{grid-column:1/13;display:grid;grid-template-columns:55fr 45fr;overflow:hidden;}
+    .art-wide .aw-img{position:relative;height:380px;overflow:hidden;}
+    .art-wide .aw-img img{width:100%;height:100%;object-fit:cover;transition:transform 7s ease;}
+    .art-wide:hover .aw-img img{transform:scale(1.04);}
+    .art-wide .aw-body{background:var(--mid);padding:60px 56px;display:flex;flex-direction:column;justify-content:center;}
+
+    /* 기사 4: 3 컬럼 미니 카드 */
+    .art-trio{grid-column:1/13;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+    .art-card{background:var(--card);overflow:hidden;}
+    .art-card .ac-img{height:220px;overflow:hidden;position:relative;}
+    .art-card .ac-img img{width:100%;height:100%;object-fit:cover;transition:transform 6s ease;}
+    .art-card:hover .ac-img img{transform:scale(1.06);}
+    .art-card .ac-body{padding:24px 24px 28px;}
+
+    /* 공통 기사 타이포 */
+    .art-cat{font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+    .art-title{font-family:var(--serif);font-size:clamp(18px,2vw,26px);font-weight:600;color:var(--text);line-height:1.3;margin-bottom:10px;}
+    .art-lead{font-size:13px;line-height:1.85;color:var(--text2);}
+    .art-meta{font-size:11px;color:var(--gray);margin-top:12px;letter-spacing:0.05em;}
+
+    /* ── 인용구 풀 블리드 ── */
+    .fullquote{padding:80px 100px;background:var(--deep);text-align:center;position:relative;overflow:hidden;}
+    .fq-mark{position:absolute;top:20px;left:50%;transform:translateX(-50%);font-family:var(--serif);font-size:220px;font-weight:700;color:var(--accent);opacity:0.05;line-height:1;pointer-events:none;}
+    .fq-text{font-family:var(--serif);font-size:clamp(22px,3.5vw,44px);font-weight:300;color:var(--text);line-height:1.7;max-width:900px;margin:0 auto 28px;position:relative;}
+    .fq-line{width:40px;height:1px;background:var(--accent);margin:0 auto 20px;}
+    .fq-source{font-size:11px;letter-spacing:0.4em;color:var(--gray);text-transform:uppercase;}
+
+    /* ── 수련 프로그램 섹션 ── */
+    .prog-section{padding:80px 60px;background:var(--bg);}
+    .ps-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;border-bottom:2px solid var(--accent);padding-bottom:20px;}
+    .ps-title{font-family:var(--serif);font-size:clamp(28px,3.5vw,44px);color:var(--text);}
+    .ps-sub{font-size:12px;letter-spacing:0.3em;color:var(--gray);text-transform:uppercase;}
+    .prog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+    .prog-item{background:var(--card);padding:40px 36px;border-top:3px solid transparent;transition:border-color 0.3s,background 0.3s;position:relative;overflow:hidden;}
+    .prog-item:hover{border-top-color:var(--accent);background:var(--deep);}
+    .prog-num{font-family:var(--serif);font-size:56px;font-weight:700;color:var(--accent);opacity:0.1;position:absolute;top:12px;right:20px;line-height:1;}
+    .prog-icon{width:32px;height:2px;background:var(--accent);margin-bottom:24px;}
+    .prog-name{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--text);margin-bottom:12px;}
+    .prog-desc{font-size:13px;line-height:1.9;color:var(--text2);}
+
+    /* ── 아카이브 CTA ── */
+    .archive-spread{display:grid;grid-template-columns:1fr 1fr;min-height:400px;}
+    .as-left{background:var(--accent);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:80px 60px;text-align:center;}
+    .asl-num{font-family:var(--serif);font-size:clamp(60px,10vw,110px);font-weight:700;color:var(--bg);line-height:1;}
+    .asl-label{font-size:12px;letter-spacing:0.4em;color:var(--bg);opacity:0.7;margin-bottom:4px;}
+    .asl-sub{font-family:var(--serif);font-size:16px;color:var(--bg);opacity:0.85;margin-top:12px;}
+    .as-right{background:var(--deep);display:flex;flex-direction:column;justify-content:center;padding:80px 60px;}
+    .asr-label{font-size:10px;letter-spacing:0.5em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;}
+    .asr-h{font-family:var(--serif);font-size:clamp(24px,3vw,40px);color:var(--text);line-height:1.3;margin-bottom:20px;}
+    .asr-p{font-size:14px;line-height:1.9;color:var(--text2);margin-bottom:36px;}
+    .asr-btn{display:inline-block;padding:14px 44px;background:var(--accent);color:var(--bg);text-decoration:none;font-size:13px;letter-spacing:0.15em;font-weight:700;transition:opacity 0.2s;}
+    .asr-btn:hover{opacity:0.82;}
+
+    /* ── 풋터 ── */
+    footer{background:var(--footerBg);padding:48px 60px;border-top:1px solid var(--border);}
+    .ft-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;}
+    .ft-brand{font-family:var(--serif);font-size:18px;color:var(--accent);font-weight:700;margin-bottom:10px;}
+    .ft-tagline{font-size:12px;color:var(--gray);line-height:1.7;}
+    .ft-menu{display:flex;flex-direction:column;gap:8px;}
+    .ft-menu a{font-size:12px;color:var(--gray);text-decoration:none;transition:color 0.2s;}
+    .ft-menu a:hover{color:var(--accent);}
+    .ft-copy{font-size:11px;color:var(--gray);opacity:0.45;margin-top:32px;grid-column:1/4;}
+
+    @media(max-width:1024px){
+      .mag-hero{grid-template-columns:1fr;}
+      .hero-img-wrap{height:60vw;}
+      .articles{padding:32px 24px;}
+      .art-feature{grid-column:1/13;}
+      .art-side{grid-column:1/13;flex-direction:row;flex-wrap:wrap;}
+      .art-small{flex:1 1 280px;}
+      .art-wide{grid-column:1/13;grid-template-columns:1fr;}
+      .archive-spread{grid-template-columns:1fr;}
+      .ft-grid{grid-template-columns:1fr;}
+      .ft-copy{grid-column:1;}
+    }
+    @media(max-width:768px){
+      .mag-nav{padding:0 20px;}.mag-links,.mag-cta{display:none;}
+      .art-trio{grid-template-columns:1fr;}
+      .prog-grid{grid-template-columns:1fr;}
+      .fullquote{padding:56px 32px;}
+      .prog-section{padding:56px 24px;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="siann-badge">
+  <div class="b-row1">L<span>5</span> [에디토리얼 매거진] &middot; 테마 <span><%= themeId %>/20 &mdash; <%= themes[themeId] ? themes[themeId].name : '' %></span></div>
+  <div class="b-row2"><% for(let i=1;i<=20;i++){ %><a href="/siann-5/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a><% } %></div>
+</div>
+
+<nav class="mag-nav">
+  <a href="#" class="mag-logo">한울사상</a>
+  <div class="mag-links">
+    <a href="#about">사상</a>
+    <a href="#art-wide">가르침</a>
+    <a href="#programs">수련</a>
+    <a href="#archive">법문</a>
+  </div>
+  <div class="mag-cta"><a href="http://211.104.37.65:4200" target="_blank">법문 아카이브</a></div>
+</nav>
+
+<!-- 히어로 -->
+<section class="mag-hero" id="top">
+  <div class="hero-img-wrap">
+    <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjNfMjMy/MDAxNTk4MTgwMzU0NjYx.cEjHaZRf_VD6Qc-CbtnuNM5Az-6A36APGLo0_w3U7bAg.G3TeB5xBBChkHr7EvEK-kgmWHzO0jJW_mZdN9F26lf8g.JPEG/KakaoTalk_20200823_195242797.jpg?type=w1600" alt="한울사상" />
+    <div class="hero-img-overlay"></div>
+    <div class="hero-float">
+      <div class="hero-float-title">하늘의 뜻으로<br>사는 삶</div>
+      <div class="hero-float-sub">한울영성계발원 · 여의명상센터</div>
+    </div>
+  </div>
+  <div class="hero-text-panel">
+    <div class="hero-issue">한울사상 · 특집호</div>
+    <h1 class="hero-h1">한울<br>사상</h1>
+    <div class="hero-tagline">우주 만물의 근원, 하늘의 이치를<br>삶 속에서 체득하다</div>
+    <div class="hero-divider"></div>
+    <p class="hero-desc">한울사상은 동서고금의 어떤 종교나 사상과도 구별되는 독자적 사상 체계입니다. 道·靈·責이 하나로 어우러진 삶의 원리를 탐구합니다.</p>
+  </div>
+</section>
+
+<!-- 에디터 노트 바 -->
+<div class="editor-bar">
+  <span class="eb-label">이번 호</span>
+  <span class="eb-text">한울사상의 세 기둥 — 우주도리(道) · 영적진화(靈) · 세상책임(責) — 과 수련의 길</span>
+</div>
+
+<!-- 기사 그리드 -->
+<div class="articles" id="about">
+
+  <!-- feature: 큰 이미지 -->
+  <div class="art-feature">
+    <div class="art-img">
+      <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTMx/MDAxNTk4MjcwMDA4OTE4.4i2ym-0dQC_hoe1BoDZAPf79dL-Qa8oaXpcr6OyRaAEg.xNbYjehBR-WE8FUjQ6JP3ETwI6VSO3PZLc0xB20WiWog.JPEG/%EC%9D%98%EB%A1%9C%EC%9B%80.jpg?type=w1600" alt="의로움" />
+      <div class="art-overlay"></div>
+    </div>
+    <div class="art-body">
+      <div class="art-cat">한울이란</div>
+      <div class="art-title">우주도리 — 우주의 모든 것은 돈다</div>
+      <p class="art-lead">자전하고 공전하는 것이 우주의 도리. 한울사상은 이 위대한 순환 원리를 삶의 근본으로 삼습니다. 인간의 삶도, 역사도 이 흐름 속에 있습니다.</p>
+      <div class="art-meta">道 · 우주도리</div>
+    </div>
+  </div>
+
+  <!-- side: 좁은 기사 3개 -->
+  <div class="art-side">
+    <div class="art-small">
+      <div class="as-img">
+        <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzYwMTcxNjE3.CNxv2Stxzrvath9zJ9oTPqk4_Y7KjZ-sL5ABruAId5Ug.xfKrmXsajKdnzHkUNdPqLHJnIDOKEGbMoGN5fMKO7Rsg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AD%ED%8F%AC.jpeg?type=w1600" alt="천지연폭포" />
+      </div>
+      <div class="as-body">
+        <div class="art-cat">영적진화</div>
+        <div class="art-title" style="font-size:15px;">靈 — 영적 진화의 길</div>
+        <div class="art-meta">번데기가 나비가 되듯, 수련을 통해 더 높은 존재로.</div>
+      </div>
+    </div>
+    <div class="art-small">
+      <div class="as-img">
+        <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMjI4/MDAxNTk4NTEyNDk2MDEx.J3Q_U1w_GEKIP_XvmwmbgVxqkwPuSV77pX1jaPkUKGQg.0h6tVJ13kA4-tFIBhyEUsrUGno44hvjyd14fvuZfyiUg.JPEG/1.jpg?type=w1600" alt="한울1" />
+      </div>
+      <div class="as-body">
+        <div class="art-cat">제도</div>
+        <div class="art-title" style="font-size:15px;">制道 — 자신을 다스리는 도</div>
+        <div class="art-meta">내면의 질서에서 외적 세계로 확장되는 실천.</div>
+      </div>
+    </div>
+    <div class="art-small">
+      <div class="as-img">
+        <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMTE2/MDAxNTk4NTEyNDg1ODY4.CeSwedtGPRZ7UkAy69aAT30cq9sYQIlkOPmXR1iXgVIg.QnwGi48OyhM3BcWw-ixRQ4SmMHd9Yyp5kkB5uCJVB0gg.JPEG/2.jpg?type=w1600" alt="한울2" />
+      </div>
+      <div class="as-body">
+        <div class="art-cat">세상책임</div>
+        <div class="art-title" style="font-size:15px;">責 — 홍익인간의 실천</div>
+        <div class="art-meta">수도자 1인은 세상자 만인이요.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- wide: 큰 가로 이미지 -->
+  <div class="art-wide" id="art-wide">
+    <div class="aw-img">
+      <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTA0/MDAxNTk4MjcxODc5NzI0.mXb9CIQbcw24UrkOVWnBlTWhahS8eMB-0dLFxeGsUPgg.q-aLd5qsW7stRiQYwjg7KgimuCDjWnKWp1pp8WRfIEcg.JPEG/%ED%91%9C%EC%99%80_%ED%8F%AC.jpg?type=w1600" alt="표와 포" />
+    </div>
+    <div class="aw-body">
+      <div class="art-cat">손지손지심</div>
+      <div class="art-title">損之損之心 — 덜어내고 또 덜어내는 마음</div>
+      <p class="art-lead">죄는 조이는 것이다. 한울의 수련은 비우는 것에서 시작합니다. 채우기보다 비울 때 진정한 자유를 얻습니다. 번데기가 나비가 되려면 단단히 붙잡아야 합니다. 그 역설 속에서 생명의 진화가 시작됩니다.</p>
+      <div class="art-meta">생명장 수련 · 기운영 · 제도</div>
+    </div>
+  </div>
+
+  <!-- trio: 3 카드 -->
+  <div class="art-trio">
+    <div class="art-card">
+      <div class="ac-img"><img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzYwMTcxNjE3.CNxv2Stxzrvath9zJ9oTPqk4_Y7KjZ-sL5ABruAId5Ug.xfKrmXsajKdnzHkUNdPqLHJnIDOKEGbMoGN5fMKO7Rsg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AD%ED%8F%AC.jpeg?type=w1600" alt="생명장" /></div>
+      <div class="ac-body">
+        <div class="art-cat">생명장</div>
+        <div class="art-title">生命場 — 살아있는 에너지의 장</div>
+        <p class="art-lead">모든 생명을 감싸는 에너지 장. 이 장이 강하고 맑을수록 건강하고 밝은 삶이 펼쳐집니다.</p>
+        <div class="art-meta">생명장수련 프로그램</div>
+      </div>
+    </div>
+    <div class="art-card">
+      <div class="ac-img"><img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMjI4/MDAxNTk4NTEyNDk2MDEx.J3Q_U1w_GEKIP_XvmwmbgVxqkwPuSV77pX1jaPkUKGQg.0h6tVJ13kA4-tFIBhyEUsrUGno44hvjyd14fvuZfyiUg.JPEG/1.jpg?type=w1600" alt="수련1" /></div>
+      <div class="ac-body">
+        <div class="art-cat">지기문화답사</div>
+        <div class="art-title">땅의 기운을 따라 걷는 여정</div>
+        <p class="art-lead">우주의 기운이 살아있는 땅을 직접 걷고 느끼며 한울의 도리를 체험하는 답사 프로그램.</p>
+        <div class="art-meta">연 3회 진행</div>
+      </div>
+    </div>
+    <div class="art-card">
+      <div class="ac-img"><img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMTE2/MDAxNTk4NTEyNDg1ODY4.CeSwedtGPRZ7UkAy69aAT30cq9sYQIlkOPmXR1iXgVIg.QnwGi48OyhM3BcWw-ixRQ4SmMHd9Yyp5kkB5uCJVB0gg.JPEG/2.jpg?type=w1600" alt="수련2" /></div>
+      <div class="ac-body">
+        <div class="art-cat">공동체</div>
+        <div class="art-title">함께 하는 삶의 실천</div>
+        <p class="art-lead">한울사상의 가르침을 일상 속에서 실천하는 공동체 문화 활동. 도반들과 함께 성장합니다.</p>
+        <div class="art-meta">공동체활동</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /articles -->
+
+<!-- 풀블리드 인용구 -->
+<div class="fullquote">
+  <div class="fq-mark">&ldquo;</div>
+  <p class="fq-text">나비가 될 번데기는 무엇인가를 단단하게 붙잡지 않고서는 허물을 벗고 나올 수 없다</p>
+  <div class="fq-line"></div>
+  <span class="fq-source">한울영성계발원 법문 아카이브</span>
+</div>
+
+<!-- 수련 프로그램 -->
+<section class="prog-section" id="programs">
+  <div class="ps-header">
+    <div class="ps-title">수련 프로그램</div>
+    <div class="ps-sub">여의명상센터 한울영성계발원</div>
+  </div>
+  <div class="prog-grid">
+    <div class="prog-item"><span class="prog-num">01</span><div class="prog-icon"></div><div class="prog-name">집중수련</div><p class="prog-desc">한울사상의 깊이를 몸과 마음으로 체험하는 몰입 수련. 일상을 떠나 온전히 수련에 집중하는 특별한 시간.</p></div>
+    <div class="prog-item"><span class="prog-num">02</span><div class="prog-icon"></div><div class="prog-name">생명장수련</div><p class="prog-desc">몸을 감싸는 에너지 장을 강화하고 정화하는 수련. 건강하고 밝은 삶의 근본을 단계별로 다집니다.</p></div>
+    <div class="prog-item"><span class="prog-num">03</span><div class="prog-icon"></div><div class="prog-name">기운영</div><p class="prog-desc">우주의 기운을 바르게 운용하는 실천적 수련. 천지인 삼재의 조화를 몸으로 익히는 과정.</p></div>
+    <div class="prog-item"><span class="prog-num">04</span><div class="prog-icon"></div><div class="prog-name">토요법문</div><p class="prog-desc">매주 토요일 한울사상 법문 청취 및 공동 수련. 현재적 의미를 함께 탐구하고 나눕니다.</p></div>
+    <div class="prog-item"><span class="prog-num">05</span><div class="prog-icon"></div><div class="prog-name">지기문화답사</div><p class="prog-desc">우주도리를 자연 속에서 체험하는 답사 여정. 땅의 기운과 교감하며 수행을 심화합니다.</p></div>
+    <div class="prog-item"><span class="prog-num">06</span><div class="prog-icon"></div><div class="prog-name">공동체활동</div><p class="prog-desc">함께하는 삶 속에서 한울사상의 가르침을 실천하는 공동체 문화 활동.</p></div>
+  </div>
+</section>
+
+<!-- 아카이브 CTA -->
+<section class="archive-spread" id="archive">
+  <div class="as-left">
+    <div class="asl-label">법문 아카이브</div>
+    <div class="asl-num">10,313</div>
+    <div class="asl-sub">법문</div>
+  </div>
+  <div class="as-right">
+    <div class="asr-label">Archive</div>
+    <div class="asr-h">수십 년의 가르침이<br>한 곳에 모였습니다</div>
+    <p class="asr-p">한울영성계발원의 법문 전체를 아카이빙했습니다. 검색하고, 읽고, 당신만의 방식으로 한울사상을 만나보세요. 지금 바로 시작할 수 있습니다.</p>
+    <a class="asr-btn" href="http://211.104.37.65:4200" target="_blank">법문 아카이브 열기</a>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-grid">
+    <div>
+      <div class="ft-brand">한울사상</div>
+      <div class="ft-tagline">하늘의 뜻으로 사는 삶<br>여의명상센터 한울영성계발원</div>
+    </div>
+    <div>
+      <div class="ft-brand" style="font-size:13px;margin-bottom:14px;">바로가기</div>
+      <div class="ft-menu">
+        <a href="#top">처음으로</a>
+        <a href="#about">한울이란</a>
+        <a href="#programs">수련 프로그램</a>
+        <a href="#archive">법문 아카이브</a>
+      </div>
+    </div>
+    <div>
+      <div class="ft-brand" style="font-size:13px;margin-bottom:14px;">말씀</div>
+      <p style="font-size:13px;color:var(--gray);line-height:1.85;">"우주의 모든 것은 돈다.<br>자전하고 공전하는 것이 우주의 도리."</p>
+    </div>
+    <div class="ft-copy">&copy; 한울사상 여의명상센터 영성계발원</div>
+  </div>
+</footer>
+
+</body>
+</html>

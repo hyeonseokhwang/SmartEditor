@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — L7 포털원형관문 · 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Crimson Night',   bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C94848', accentLt:'#E36B6B', accentDk:'#8A2E2E', text:'#F5E8E8', text2:'#D6BEBE', gray:'#AA7A7A', footerBg:'#080408', border:'rgba(201,72,72,0.18)' },
+      3:  { name:'Pearl White',     bg:'#F8F6F2', deep:'#EDEBE5', mid:'#E2DED8', card:'#FFFFFF', accent:'#8B6914', accentLt:'#B08A2A', accentDk:'#5C4408', text:'#1A1814', text2:'#3D3A32', gray:'#8A8478', footerBg:'#D4D0C8', border:'rgba(139,105,20,0.18)' },
+      4:  { name:'Forest Deep',     bg:'#061410', deep:'#0A1E18', mid:'#102820', card:'#0C2018', accent:'#4CAC7C', accentLt:'#6BC49C', accentDk:'#2E7A54', text:'#E8F5EE', text2:'#BEDBCA', gray:'#7AAA90', footerBg:'#030A08', border:'rgba(76,172,124,0.18)' },
+      5:  { name:'Sky Mist',        bg:'#F0F4F8', deep:'#E4EAF2', mid:'#D8E0EC', card:'#FFFFFF', accent:'#3A6E9C', accentLt:'#5A90BC', accentDk:'#1C4E7A', text:'#0E1C2C', text2:'#2A3C50', gray:'#7A90A8', footerBg:'#C8D4E0', border:'rgba(58,110,156,0.18)' },
+      6:  { name:'Ember Dark',      bg:'#160C04', deep:'#221408', mid:'#301C0C', card:'#281808', accent:'#D47830', accentLt:'#EC9848', accentDk:'#9A5418', text:'#F5EADC', text2:'#D8C4A8', gray:'#AA8A68', footerBg:'#080402', border:'rgba(212,120,48,0.18)' },
+      7:  { name:'Lavender Field',  bg:'#F4F0F8', deep:'#EAE4F4', mid:'#DED6EC', card:'#FFFFFF', accent:'#7848AC', accentLt:'#9868CC', accentDk:'#54288A', text:'#140C1E', text2:'#30204A', gray:'#8A78A8', footerBg:'#D4C8E8', border:'rgba(120,72,172,0.18)' },
+      8:  { name:'Midnight Teal',   bg:'#04100E', deep:'#081A18', mid:'#0C2422', card:'#0A1E1C', accent:'#38B4A0', accentLt:'#58D4C0', accentDk:'#187860', text:'#E0F4F2', text2:'#B4D8D4', gray:'#6AA8A0', footerBg:'#020808', border:'rgba(56,180,160,0.18)' },
+      9:  { name:'Rust Iron',       bg:'#120C04', deep:'#1C1408', mid:'#28180C', card:'#1E1408', accent:'#B86828', accentLt:'#D48840', accentDk:'#844414', text:'#F4EAD8', text2:'#D4C0A0', gray:'#A08468', footerBg:'#080402', border:'rgba(184,104,40,0.18)' },
+      10: { name:'Arctic Blue',     bg:'#080E14', deep:'#0C1620', mid:'#10202E', card:'#0C1C28', accent:'#48A0D4', accentLt:'#68C0EC', accentDk:'#2878A8', text:'#E8F2F8', text2:'#C0D4E4', gray:'#7AA0B8', footerBg:'#040810', border:'rgba(72,160,212,0.18)' },
+      11: { name:'Sakura Dark',     bg:'#140810', deep:'#1E1018', mid:'#2A1824', card:'#1E1020', accent:'#C85894', accentLt:'#E478B4', accentDk:'#8C3464', text:'#F8E8F4', text2:'#D8C0D0', gray:'#A87898', footerBg:'#080408', border:'rgba(200,88,148,0.18)' },
+      12: { name:'Sand Dune',       bg:'#F8F4EC', deep:'#EEE8DC', mid:'#E4DCD0', card:'#FFFFFF', accent:'#9C7840', accentLt:'#BC9858', accentDk:'#6C5020', text:'#1C1610', text2:'#3C3024', gray:'#9C9080', footerBg:'#D8D0C0', border:'rgba(156,120,64,0.18)' },
+      13: { name:'Cobalt Night',    bg:'#060A16', deep:'#0A1020', mid:'#10182E', card:'#0C1428', accent:'#4860CC', accentLt:'#6880E8', accentDk:'#2840A0', text:'#E8ECF8', text2:'#C0C8E4', gray:'#7880B0', footerBg:'#030510', border:'rgba(72,96,204,0.18)' },
+      14: { name:'Jade Shadow',     bg:'#061210', deep:'#0A1C18', mid:'#102820', card:'#0C2018', accent:'#4C9C7C', accentLt:'#6CBC9C', accentDk:'#2C7054', text:'#E8F4F0', text2:'#B8D8CC', gray:'#78A898', footerBg:'#030A08', border:'rgba(76,156,124,0.18)' },
+      15: { name:'Cream Linen',     bg:'#F8F4EE', deep:'#EEE8DF', mid:'#E5DDD4', card:'#FFFCF8', accent:'#7C5830', accentLt:'#9C7848', accentDk:'#503818', text:'#1A140C', text2:'#3A3024', gray:'#9C8C7C', footerBg:'#D8CFC4', border:'rgba(124,88,48,0.18)' },
+      16: { name:'Volcanic',        bg:'#100808', deep:'#1A1010', mid:'#281818', card:'#1E1010', accent:'#E04830', accentLt:'#F86848', accentDk:'#A02818', text:'#F8ECEC', text2:'#D8C4C4', gray:'#A88888', footerBg:'#080404', border:'rgba(224,72,48,0.18)' },
+      17: { name:'Galaxy Purple',   bg:'#0C0414', deep:'#140820', mid:'#1E1030', card:'#180C28', accent:'#9050D8', accentLt:'#B070F8', accentDk:'#6030A8', text:'#F0E8FC', text2:'#D0C0EC', gray:'#9880C0', footerBg:'#060210', border:'rgba(144,80,216,0.18)' },
+      18: { name:'Obsidian',        bg:'#080808', deep:'#101010', mid:'#181818', card:'#101010', accent:'#A0A0A0', accentLt:'#C8C8C8', accentDk:'#686868', text:'#F0F0F0', text2:'#D0D0D0', gray:'#888888', footerBg:'#040404', border:'rgba(160,160,160,0.18)' },
+      19: { name:'Morning Fog',     bg:'#F4F4F2', deep:'#EAEAE6', mid:'#E0E0DA', card:'#FFFFFF', accent:'#5C7868', accentLt:'#7C9888', accentDk:'#3C5848', text:'#161814', text2:'#343830', gray:'#8C9890', footerBg:'#D0D4CE', border:'rgba(92,120,104,0.18)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    const IMG1 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjNfMjMy/MDAxNTk4MTgwNTg5MDYy.uA1NHCj3WWGQ4N4X2lBJBLv9kXIyDFNXXBP5QO0SoNIg.FBHqHZmPTrNcD7HpCaqvJX1gUV5ZllRAuMxL9h5Y3wcg.JPEG/KakaoTalk_20200823_195242797.jpg?type=w1600';
+    const IMG2 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTA0/MDAxNTk4MjM4Mjc1ODE3.0k2BaE4ogtlYVBvHyVmHRkQb8dIvqD8i2ULhVKcVEDIg.mH8dOqWbFVT3yJPPHgtnIU8KSzP_vf2YbhLe27F7PfMg.JPEG/%ED%91%9C%EC%99%80_%ED%8F%AC.jpg?type=w1600';
+    const IMG3 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTMx/MDAxNTk4MjQwMjI3NjQ2.hLSA_5kfuWxPRUPy2d3l9Xu6G1t7QFJNw9kXb2mS8AMg.5eZKYCnLCfuPcwJX3HQoEh3k3WHGDsMfI4V0VPK5rZEg.JPEG/%EC%9D%98%EB%A1%9C%EC%9B%80.jpg?type=w1600';
+    const IMG4 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzE3NjgyMTQ4.j8kFmmQFLoFT5PLxTPmYW6T0Tx9BjvDX_pPtY8XvzLYg.7b8L0Uj3lBf6Dh2lGj8LxMHwFlKbdOsT4AaYQ6aHPGYg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AD%ED%8F%AC.jpeg?type=w1600';
+    const IMG5 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMjI4/MDAxNTk4NTA5OTI4NDU2.mh8WzPbnjU9WBrHi-Gq8F2FRitnzLDMpPcC38w4U1Pcg.R6T4a3m4U8yVqFQlYZHpOqT3J0oKW_-2yEIQh_GZ8Pkg.JPEG/1.jpg?type=w1600';
+    const IMG6 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMTE2/MDAxNTk4NTEwMDE1OTU3.hVOK14ZImOyDTiH_nrJCTlKN3U7JgQDrVsw_jCjQ5H8g.tKV1w5uifEyRuvNIf1k_6CDzRHBQw7VPxEJAy2hA0osg.JPEG/2.jpg?type=w1600';
+    %>
+    :root {
+      --bg: <%= t.bg %>;
+      --deep: <%= t.deep %>;
+      --mid: <%= t.mid %>;
+      --card: <%= t.card %>;
+      --accent: <%= t.accent %>;
+      --accentLt: <%= t.accentLt %>;
+      --accentDk: <%= t.accentDk %>;
+      --text: <%= t.text %>;
+      --text2: <%= t.text2 %>;
+      --gray: <%= t.gray %>;
+      --footerBg: <%= t.footerBg %>;
+      --border: <%= t.border %>;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; overflow-x: hidden; }
+
+    /* ── PORTAL HEADER ── */
+    .portal-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 68px;
+      background: linear-gradient(to bottom, var(--deep) 0%, transparent 100%);
+      backdrop-filter: blur(8px);
+    }
+    .portal-logo { font-family: 'Noto Serif KR', serif; font-size: 1.3rem; font-weight: 600; color: var(--accent); letter-spacing: 0.08em; text-decoration: none; }
+    .portal-nav { display: flex; gap: 32px; list-style: none; }
+    .portal-nav a { color: var(--text2); text-decoration: none; font-size: 0.88rem; font-weight: 300; letter-spacing: 0.04em; transition: color 0.2s; }
+    .portal-nav a:hover { color: var(--accent); }
+    .portal-cta { background: var(--accent); color: var(--bg); padding: 8px 22px; border-radius: 100px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.2s, transform 0.2s; }
+    .portal-cta:hover { background: var(--accentLt); transform: translateY(-1px); }
+
+    /* ── MANDALA HERO ── */
+    .mandala-hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; background: var(--bg);
+    }
+
+    /* concentric rings */
+    .rings-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .ring {
+      position: absolute; border-radius: 50%; border-style: solid; border-color: var(--accent);
+      animation: ringPulse 6s ease-in-out infinite;
+    }
+    .ring:nth-child(1)  { width: 130px;  height: 130px;  border-width: 1.5px; opacity: 0.55; animation-delay: 0s; }
+    .ring:nth-child(2)  { width: 220px;  height: 220px;  border-width: 1px;   opacity: 0.42; animation-delay: 0.4s; }
+    .ring:nth-child(3)  { width: 330px;  height: 330px;  border-width: 1px;   opacity: 0.30; animation-delay: 0.8s; }
+    .ring:nth-child(4)  { width: 460px;  height: 460px;  border-width: 0.8px; opacity: 0.22; animation-delay: 1.2s; }
+    .ring:nth-child(5)  { width: 610px;  height: 610px;  border-width: 0.6px; opacity: 0.16; animation-delay: 1.6s; }
+    .ring:nth-child(6)  { width: 780px;  height: 780px;  border-width: 0.5px; opacity: 0.10; animation-delay: 2.0s; }
+    .ring:nth-child(7)  { width: 980px;  height: 980px;  border-width: 0.4px; opacity: 0.07; animation-delay: 2.4s; }
+    .ring:nth-child(8)  { width: 1200px; height: 1200px; border-width: 0.3px; opacity: 0.04; animation-delay: 2.8s; }
+    @keyframes ringPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.03);} }
+
+    /* radial petals (mandala) */
+    .petals-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .petal-ring { position: absolute; width: 260px; height: 260px; }
+    .petal {
+      position: absolute; top: 50%; left: 50%;
+      width: 28px; height: 68px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      transform-origin: 50% 100%;
+      opacity: 0.22;
+    }
+    .petal:nth-child(1)  { transform: translate(-50%, -100%) rotate(0deg);   }
+    .petal:nth-child(2)  { transform: translate(-50%, -100%) rotate(30deg);  }
+    .petal:nth-child(3)  { transform: translate(-50%, -100%) rotate(60deg);  }
+    .petal:nth-child(4)  { transform: translate(-50%, -100%) rotate(90deg);  }
+    .petal:nth-child(5)  { transform: translate(-50%, -100%) rotate(120deg); }
+    .petal:nth-child(6)  { transform: translate(-50%, -100%) rotate(150deg); }
+    .petal:nth-child(7)  { transform: translate(-50%, -100%) rotate(180deg); }
+    .petal:nth-child(8)  { transform: translate(-50%, -100%) rotate(210deg); }
+    .petal:nth-child(9)  { transform: translate(-50%, -100%) rotate(240deg); }
+    .petal:nth-child(10) { transform: translate(-50%, -100%) rotate(270deg); }
+    .petal:nth-child(11) { transform: translate(-50%, -100%) rotate(300deg); }
+    .petal:nth-child(12) { transform: translate(-50%, -100%) rotate(330deg); }
+
+    /* inner petal ring */
+    .petal-ring-inner { position: absolute; width: 160px; height: 160px; }
+    .petal-inner {
+      position: absolute; top: 50%; left: 50%;
+      width: 16px; height: 44px;
+      background: linear-gradient(to bottom, var(--accentLt), transparent);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      transform-origin: 50% 100%;
+      opacity: 0.30;
+      animation: petalRotate 20s linear infinite;
+    }
+    .petal-inner:nth-child(1)  { transform: translate(-50%, -100%) rotate(0deg);   }
+    .petal-inner:nth-child(2)  { transform: translate(-50%, -100%) rotate(45deg);  }
+    .petal-inner:nth-child(3)  { transform: translate(-50%, -100%) rotate(90deg);  }
+    .petal-inner:nth-child(4)  { transform: translate(-50%, -100%) rotate(135deg); }
+    .petal-inner:nth-child(5)  { transform: translate(-50%, -100%) rotate(180deg); }
+    .petal-inner:nth-child(6)  { transform: translate(-50%, -100%) rotate(225deg); }
+    .petal-inner:nth-child(7)  { transform: translate(-50%, -100%) rotate(270deg); }
+    .petal-inner:nth-child(8)  { transform: translate(-50%, -100%) rotate(315deg); }
+    @keyframes petalRotate { from{transform:translate(-50%,-100%) rotate(var(--r, 0deg));} to{transform:translate(-50%,-100%) rotate(calc(var(--r, 0deg) + 360deg));} }
+
+    /* central dot */
+    .mandala-center {
+      position: absolute;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accentLt) 0%, var(--accent) 50%, transparent 100%);
+      opacity: 0.6;
+      animation: centerPulse 3s ease-in-out infinite;
+    }
+    @keyframes centerPulse { 0%,100%{opacity:0.6;transform:scale(1);} 50%{opacity:0.9;transform:scale(1.08);} }
+
+    /* hero content */
+    .hero-content {
+      position: relative; z-index: 10;
+      text-align: center; padding: 140px 20px 80px;
+      max-width: 700px; margin: 0 auto;
+    }
+    .hero-eyebrow { font-size: 0.78rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); font-weight: 400; margin-bottom: 24px; }
+    .hero-title { font-family: 'Noto Serif KR', serif; font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 300; line-height: 1.3; color: var(--text); margin-bottom: 20px; }
+    .hero-title strong { font-weight: 600; color: var(--accent); }
+    .hero-subtitle { font-size: 1.05rem; font-weight: 300; color: var(--text2); line-height: 1.8; margin-bottom: 40px; }
+    .hero-gates { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .gate-btn {
+      padding: 13px 28px; border: 1px solid var(--border); border-radius: 100px;
+      color: var(--text2); font-size: 0.88rem; font-weight: 400; text-decoration: none;
+      transition: all 0.25s; background: var(--card);
+    }
+    .gate-btn:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); transform: translateY(-2px); }
+    .gate-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .gate-btn.primary:hover { background: var(--accentLt); }
+
+    /* scroll indicator */
+    .scroll-indicator {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10;
+      opacity: 0.5;
+    }
+    .scroll-indicator span { font-size: 0.72rem; letter-spacing: 0.18em; color: var(--gray); }
+    .scroll-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--accent), transparent); animation: scrollDrop 1.8s ease-in-out infinite; }
+    @keyframes scrollDrop { 0%{transform:scaleY(0);transform-origin:top;} 50%{transform:scaleY(1);transform-origin:top;} 51%{transform:scaleY(1);transform-origin:bottom;} 100%{transform:scaleY(0);transform-origin:bottom;} }
+
+    /* ── CIRCULAR NAV SECTION ── */
+    .circle-nav-section {
+      padding: 120px 40px;
+      background: var(--deep);
+      position: relative; overflow: hidden;
+    }
+    .circle-nav-section::before {
+      content: '한울';
+      position: absolute; right: -60px; top: 50%; transform: translateY(-50%);
+      font-family: 'Noto Serif KR', serif; font-size: 280px; font-weight: 700;
+      color: var(--accent); opacity: 0.03; line-height: 1; pointer-events: none;
+    }
+    .section-label { font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); font-weight: 400; margin-bottom: 16px; }
+    .section-heading { font-family: 'Noto Serif KR', serif; font-size: clamp(1.6rem, 3.5vw, 2.6rem); font-weight: 400; color: var(--text); margin-bottom: 64px; line-height: 1.4; }
+
+    .circ-nav-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 80px;
+      align-items: center;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .circ-diagram { position: relative; width: 360px; height: 360px; }
+    .circ-outer {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1px solid var(--border);
+    }
+    .circ-mid {
+      position: absolute; inset: 60px; border-radius: 50%;
+      border: 1px solid var(--border);
+    }
+    .circ-inner {
+      position: absolute; inset: 120px; border-radius: 50%;
+      background: var(--mid); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .circ-inner-text { font-family: 'Noto Serif KR', serif; font-size: 1.2rem; font-weight: 600; color: var(--accent); text-align: center; line-height: 1.5; }
+
+    .circ-node {
+      position: absolute; width: 56px; height: 56px;
+      border-radius: 50%; background: var(--card); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 500; color: var(--text2); text-align: center;
+      line-height: 1.3; cursor: default;
+      transition: all 0.25s;
+    }
+    .circ-node:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .circ-node.n1 { top: -28px; left: 50%; transform: translateX(-50%); }
+    .circ-node.n2 { top: 50px; right: -28px; }
+    .circ-node.n3 { bottom: 50px; right: -28px; }
+    .circ-node.n4 { bottom: -28px; left: 50%; transform: translateX(-50%); }
+    .circ-node.n5 { bottom: 50px; left: -28px; }
+    .circ-node.n6 { top: 50px; left: -28px; }
+    .circ-connector { position: absolute; inset: 0; pointer-events: none; }
+
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+    .nav-list li { position: relative; padding-left: 28px; }
+    .nav-list li::before {
+      content: '';
+      position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      width: 10px; height: 1px; background: var(--accent);
+    }
+    .nav-list a { color: var(--text2); text-decoration: none; font-size: 1rem; font-weight: 300; letter-spacing: 0.04em; transition: color 0.2s; }
+    .nav-list a:hover { color: var(--accent); }
+    .nav-list .nav-desc { font-size: 0.8rem; color: var(--gray); margin-top: 4px; line-height: 1.5; }
+
+    /* ── IMAGE GATEWAY SECTION ── */
+    .gateway-section {
+      padding: 100px 40px;
+      background: var(--bg);
+    }
+    .gateway-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 280px 280px;
+      gap: 4px;
+      max-width: 1200px; margin: 0 auto 80px;
+    }
+    .gw-cell {
+      position: relative; overflow: hidden;
+      background: var(--card);
+      cursor: pointer;
+    }
+    .gw-cell img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; display: block; }
+    .gw-cell:hover img { transform: scale(1.06); }
+    .gw-cell-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+      display: flex; align-items: flex-end; padding: 24px;
+      opacity: 0.85; transition: opacity 0.25s;
+    }
+    .gw-cell:hover .gw-cell-overlay { opacity: 1; }
+    .gw-cell-title { font-family: 'Noto Serif KR', serif; font-size: 1rem; font-weight: 500; color: #fff; line-height: 1.4; }
+    .gw-cell.wide { grid-column: span 2; }
+    .gw-cell.tall { grid-row: span 2; grid-column: 3; grid-row: 1 / 3; }
+
+    /* ── GATEWAY INTRO ── */
+    .gw-intro { max-width: 700px; margin: 0 auto 60px; text-align: center; }
+    .gw-intro p { font-size: 1.1rem; font-weight: 300; color: var(--text2); line-height: 1.9; }
+
+    /* ── TEACHING PORTALS ── */
+    .teaching-section {
+      padding: 100px 40px;
+      background: var(--mid);
+    }
+    .teaching-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      max-width: 1100px; margin: 60px auto 0;
+    }
+    .teach-portal {
+      position: relative; overflow: hidden;
+      background: var(--card); padding: 48px 36px;
+      transition: background 0.25s;
+    }
+    .teach-portal:hover { background: var(--deep); }
+    .teach-num {
+      font-family: 'Noto Serif KR', serif; font-size: 3.5rem; font-weight: 700;
+      color: var(--accent); opacity: 0.2; line-height: 1;
+      position: absolute; top: 24px; right: 28px;
+    }
+    .teach-title { font-family: 'Noto Serif KR', serif; font-size: 1.22rem; font-weight: 500; color: var(--text); margin-bottom: 16px; line-height: 1.4; }
+    .teach-body { font-size: 0.88rem; font-weight: 300; color: var(--text2); line-height: 1.8; margin-bottom: 24px; }
+    .teach-link { font-size: 0.78rem; color: var(--accent); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
+    .teach-link::after { content: ' →'; }
+    .teach-link:hover { color: var(--accentLt); }
+    .teach-bar { position: absolute; bottom: 0; left: 0; height: 2px; background: var(--accent); width: 0; transition: width 0.4s; }
+    .teach-portal:hover .teach-bar { width: 100%; }
+
+    /* ── RADIAL QUOTE ── */
+    .radial-quote {
+      padding: 120px 40px;
+      background: var(--deep);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .radial-quote::before, .radial-quote::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      pointer-events: none;
+    }
+    .radial-quote::before { width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+    .radial-quote::after  { width: 800px; height: 800px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+    .quote-inner { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
+    .quote-mark { font-family: 'Noto Serif KR', serif; font-size: 6rem; line-height: 0; color: var(--accent); opacity: 0.3; margin-bottom: 32px; display: block; }
+    .quote-text { font-family: 'Noto Serif KR', serif; font-size: clamp(1.3rem, 2.8vw, 1.9rem); font-weight: 300; color: var(--text); line-height: 1.8; margin-bottom: 24px; }
+    .quote-source { font-size: 0.82rem; color: var(--gray); letter-spacing: 0.1em; }
+
+    /* ── CONNECT SECTION ── */
+    .connect-section {
+      padding: 100px 40px;
+      background: var(--bg);
+    }
+    .connect-wrap { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .connect-img-stack { position: relative; height: 480px; }
+    .conn-img-back {
+      position: absolute; top: 0; left: 30px; right: 0; bottom: 40px;
+      background: var(--card); overflow: hidden;
+    }
+    .conn-img-back img { width: 100%; height: 100%; object-fit: cover; }
+    .conn-img-front {
+      position: absolute; bottom: 0; left: 0; width: 66%;
+      background: var(--deep); overflow: hidden;
+      border: 3px solid var(--bg);
+    }
+    .conn-img-front img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+    .conn-badge {
+      position: absolute; top: 24px; left: 0;
+      background: var(--accent); color: var(--bg);
+      padding: 10px 20px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.06em;
+    }
+
+    .connect-text .section-label { margin-bottom: 16px; }
+    .connect-text h2 { font-family: 'Noto Serif KR', serif; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 400; color: var(--text); margin-bottom: 28px; line-height: 1.5; }
+    .connect-text p { font-size: 0.93rem; font-weight: 300; color: var(--text2); line-height: 1.9; margin-bottom: 24px; }
+    .connect-info { display: flex; flex-direction: column; gap: 12px; margin-bottom: 36px; }
+    .connect-info-row { display: flex; gap: 16px; align-items: flex-start; }
+    .conn-key { font-size: 0.78rem; color: var(--gray); font-weight: 400; min-width: 80px; padding-top: 2px; }
+    .conn-val { font-size: 0.88rem; color: var(--text2); font-weight: 300; line-height: 1.6; }
+
+    /* ── ARCHIVE PORTAL ── */
+    .archive-section {
+      padding: 80px 40px;
+      background: var(--card); border-top: 1px solid var(--border);
+    }
+    .archive-row {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 40px;
+    }
+    .arch-item { text-align: center; padding: 32px 20px; border: 1px solid var(--border); position: relative; overflow: hidden; transition: border-color 0.2s; }
+    .arch-item::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0; height: 2px; width: 0;
+      background: var(--accent); transition: width 0.35s;
+    }
+    .arch-item:hover { border-color: var(--accent); }
+    .arch-item:hover::before { width: 100%; }
+    .arch-num { font-family: 'Noto Serif KR', serif; font-size: 2.8rem; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 8px; }
+    .arch-unit { font-size: 0.75rem; color: var(--gray); letter-spacing: 0.08em; display: block; margin-bottom: 12px; }
+    .arch-desc { font-size: 0.84rem; color: var(--text2); font-weight: 300; line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      background: var(--footerBg);
+      border-top: 1px solid var(--border);
+      padding: 60px 48px 40px;
+    }
+    .footer-inner { max-width: 1100px; margin: 0 auto; }
+    .footer-top { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand .logo { font-family: 'Noto Serif KR', serif; font-size: 1.3rem; font-weight: 600; color: var(--accent); margin-bottom: 16px; display: block; }
+    .footer-brand p { font-size: 0.82rem; font-weight: 300; color: var(--gray); line-height: 1.7; }
+    .footer-col h4 { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; font-weight: 500; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col li a { color: var(--gray); font-size: 0.84rem; font-weight: 300; text-decoration: none; transition: color 0.2s; }
+    .footer-col li a:hover { color: var(--text); }
+    .footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { font-size: 0.78rem; color: var(--gray); font-weight: 300; }
+
+    /* ── SIANN BADGE ── */
+    .siann-badge {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: rgba(0,0,0,0.82); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; padding: 10px 14px;
+      font-size: 0.72rem; color: rgba(255,255,255,0.7);
+      font-family: 'Noto Sans KR', sans-serif;
+      max-width: 300px; line-height: 1.5;
+    }
+    .b-row1 { margin-bottom: 6px; }
+    .b-row1 span { color: var(--accent); font-weight: 600; }
+    .b-row2 { display: flex; flex-wrap: wrap; gap: 3px; }
+    .b-row2 a {
+      display: inline-block; width: 20px; height: 20px; line-height: 20px;
+      text-align: center; border-radius: 4px; text-decoration: none;
+      font-size: 0.66rem; color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.06); transition: all 0.15s;
+    }
+    .b-row2 a:hover { background: var(--accent); color: #000; }
+    .b-row2 a.cur { background: var(--accent); color: #000; font-weight: 700; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .portal-nav { display: none; }
+      .circ-nav-grid { grid-template-columns: 1fr; }
+      .circ-diagram { margin: 0 auto; }
+      .gateway-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .gw-cell.wide { grid-column: span 2; }
+      .gw-cell.tall { grid-column: auto; grid-row: auto; }
+      .teaching-grid { grid-template-columns: 1fr; }
+      .connect-wrap { grid-template-columns: 1fr; }
+      .archive-row { grid-template-columns: repeat(2,1fr); }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .portal-header { padding: 0 20px; }
+      .hero-content { padding: 120px 20px 60px; }
+      .gateway-grid { grid-template-columns: 1fr; }
+      .gw-cell.wide { grid-column: auto; }
+      .archive-row { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="portal-header">
+    <a class="portal-logo" href="#">한울사상</a>
+    <nav><ul class="portal-nav">
+      <li><a href="#">한울이란</a></li>
+      <li><a href="#">가르침</a></li>
+      <li><a href="#">수련</a></li>
+      <li><a href="#">말씀</a></li>
+      <li><a href="#">아카이브</a></li>
+    </ul></nav>
+    <a class="portal-cta" href="#">입문 안내</a>
+  </header>
+
+  <!-- MANDALA HERO -->
+  <section class="mandala-hero">
+    <div class="rings-wrap">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    </div>
+    <div class="petals-wrap">
+      <div class="petal-ring">
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+      </div>
+      <div class="petal-ring-inner">
+        <div class="petal-inner"></div><div class="petal-inner"></div>
+        <div class="petal-inner"></div><div class="petal-inner"></div>
+        <div class="petal-inner"></div><div class="petal-inner"></div>
+        <div class="petal-inner"></div><div class="petal-inner"></div>
+      </div>
+      <div class="mandala-center"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">Portal · Gateway · 한울의 문</div>
+      <h1 class="hero-title">하늘과 땅의 원리,<br><strong>한울</strong>의 세계로</h1>
+      <p class="hero-subtitle">천지 자연의 이치를 깨닫고 참된 삶의 길을 찾아가는<br>한울사상의 열린 문에 오신 것을 환영합니다.</p>
+      <div class="hero-gates">
+        <a class="gate-btn primary" href="#">입문하기</a>
+        <a class="gate-btn" href="#">한울이란</a>
+        <a class="gate-btn" href="#">말씀 보기</a>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <span>SCROLL</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- CIRCULAR NAV SECTION -->
+  <section class="circle-nav-section">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div class="section-label">Navigation · 탐색</div>
+      <h2 class="section-heading">한울사상의 여섯 문</h2>
+      <div class="circ-nav-grid">
+        <div class="circ-diagram">
+          <div class="circ-outer"></div>
+          <div class="circ-mid"></div>
+          <div class="circ-inner"><div class="circ-inner-text">한울<br>사상</div></div>
+          <div class="circ-node n1">한울<br>이란</div>
+          <div class="circ-node n2">가르<br>침</div>
+          <div class="circ-node n3">말씀</div>
+          <div class="circ-node n4">수련</div>
+          <div class="circ-node n5">공동<br>체</div>
+          <div class="circ-node n6">아카<br>이브</div>
+        </div>
+        <ul class="nav-list">
+          <li>
+            <a href="#">한울이란</a>
+            <div class="nav-desc">천지 자연의 섭리와 한울의 근본 의미를 탐구합니다. 우주 만물의 연결과 순환 원리를 이해하는 첫걸음입니다.</div>
+          </li>
+          <li>
+            <a href="#">가르침</a>
+            <div class="nav-desc">한울사상의 핵심 교리와 삶의 지혜를 담은 가르침을 전합니다. 일상 속에서 실천할 수 있는 원칙들을 안내합니다.</div>
+          </li>
+          <li>
+            <a href="#">말씀</a>
+            <div class="nav-desc">선생님의 말씀과 경전 구절을 통해 한울의 뜻을 깊이 새깁니다. 성찰과 명상의 글들이 모여 있습니다.</div>
+          </li>
+          <li>
+            <a href="#">수련원</a>
+            <div class="nav-desc">마음과 몸을 가다듬는 수련 과정을 안내합니다. 초급부터 심화까지 단계적인 수련 프로그램을 제공합니다.</div>
+          </li>
+          <li>
+            <a href="#">공동체</a>
+            <div class="nav-desc">한울사상을 함께 나누는 사람들의 모임과 활동 소식을 전합니다. 서로를 격려하는 따뜻한 커뮤니티입니다.</div>
+          </li>
+          <li>
+            <a href="#">아카이브</a>
+            <div class="nav-desc">오랜 세월 쌓아온 자료와 기록들을 디지털로 보존합니다. 연구와 학습을 위한 풍부한 자료실입니다.</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- GATEWAY IMAGE SECTION -->
+  <section class="gateway-section">
+    <div style="max-width:700px;margin:0 auto 60px;text-align:center;">
+      <div class="section-label">Gallery · 사진으로 만나는 한울</div>
+      <h2 style="font-family:'Noto Serif KR',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:400;color:var(--text);margin-bottom:20px;line-height:1.5;">자연 속에서 피어나는<br>한울의 숨결</h2>
+      <p style="font-size:0.95rem;font-weight:300;color:var(--text2);line-height:1.9;">산과 들, 하늘과 땅의 경계에서 한울의 이치는 조용히 흐릅니다.<br>사진 한 장 한 장에 그 숨결이 담겨 있습니다.</p>
+    </div>
+    <div class="gateway-grid">
+      <div class="gw-cell wide">
+        <img src="<%= IMG1 %>" alt="한울의 자연" />
+        <div class="gw-cell-overlay">
+          <div class="gw-cell-title">하늘과 땅이 하나 되는 순간<br><span style="font-size:0.8rem;opacity:0.8;font-weight:300;">천지자연의 원리</span></div>
+        </div>
+      </div>
+      <div class="gw-cell tall">
+        <img src="<%= IMG4 %>" alt="천지연폭포" />
+        <div class="gw-cell-overlay">
+          <div class="gw-cell-title">천지연의 힘<br><span style="font-size:0.8rem;opacity:0.8;font-weight:300;">생명의 근원</span></div>
+        </div>
+      </div>
+      <div class="gw-cell">
+        <img src="<%= IMG2 %>" alt="표와 포" />
+        <div class="gw-cell-overlay">
+          <div class="gw-cell-title">표와 포<br><span style="font-size:0.8rem;opacity:0.8;font-weight:300;">상징의 의미</span></div>
+        </div>
+      </div>
+      <div class="gw-cell">
+        <img src="<%= IMG3 %>" alt="의로움" />
+        <div class="gw-cell-overlay">
+          <div class="gw-cell-title">의로움의 길<br><span style="font-size:0.8rem;opacity:0.8;font-weight:300;">바른 삶의 실천</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACHING PORTALS -->
+  <section class="teaching-section">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div class="section-label">Teaching · 핵심 가르침</div>
+      <h2 class="section-heading">세 가지 근본 가르침</h2>
+      <div class="teaching-grid">
+        <div class="teach-portal">
+          <div class="teach-num">一</div>
+          <h3 class="teach-title">천지 자연의 이치</h3>
+          <p class="teach-body">하늘과 땅의 원리를 바르게 이해하는 것이 한울사상의 출발점입니다. 자연의 섭리 속에 모든 존재가 서로 연결되어 있음을 깨닫습니다. 봄이 오면 꽃이 피듯, 이치에 따라 삶도 순환합니다.</p>
+          <a class="teach-link" href="#">자세히 보기</a>
+          <div class="teach-bar"></div>
+        </div>
+        <div class="teach-portal">
+          <div class="teach-num">二</div>
+          <h3 class="teach-title">참된 마음의 수련</h3>
+          <p class="teach-body">마음을 닦아 맑게 하는 것이 한울사상의 핵심 수련입니다. 욕심과 집착을 내려놓고 본래의 맑고 순수한 마음 상태를 회복합니다. 일상 속 작은 실천들이 쌓여 큰 변화를 이룹니다.</p>
+          <a class="teach-link" href="#">자세히 보기</a>
+          <div class="teach-bar"></div>
+        </div>
+        <div class="teach-portal">
+          <div class="teach-num">三</div>
+          <h3 class="teach-title">더불어 사는 삶</h3>
+          <p class="teach-body">혼자가 아닌 함께 살아가는 공동체의 가치를 중시합니다. 이웃을 내 몸처럼 여기고, 자연을 가족처럼 돌보는 마음이 한울사상의 실천입니다. 나눔과 섬김이 참된 행복의 길입니다.</p>
+          <a class="teach-link" href="#">자세히 보기</a>
+          <div class="teach-bar"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RADIAL QUOTE -->
+  <section class="radial-quote">
+    <div class="quote-inner">
+      <span class="quote-mark">"</span>
+      <p class="quote-text">하늘은 스스로 돕는 자를 돕는다고 하지 않았는가.<br>한울의 뜻은 바로 그대 안에 있으니, 고요히 앉아 귀 기울이라.</p>
+      <div class="quote-source">한울사상 경전 · 제3장 마음의 문</div>
+    </div>
+  </section>
+
+  <!-- CONNECT SECTION -->
+  <section class="connect-section">
+    <div class="connect-wrap">
+      <div class="connect-img-stack">
+        <div class="conn-img-back"><img src="<%= IMG5 %>" alt="한울 모임" /></div>
+        <div class="conn-img-front"><img src="<%= IMG6 %>" alt="한울 공동체" /></div>
+        <div class="conn-badge">한울사상 수련원</div>
+      </div>
+      <div class="connect-text">
+        <div class="section-label">Contact · 찾아오시는 길</div>
+        <h2>한울의 문은<br>항상 열려 있습니다</h2>
+        <p>처음 접하시는 분도, 오래 공부하신 분도 모두 환영합니다. 한울사상에 대해 궁금한 점이 있으시면 언제든지 연락 주시기 바랍니다.</p>
+        <div class="connect-info">
+          <div class="connect-info-row">
+            <span class="conn-key">수련원</span>
+            <span class="conn-val">서울특별시 은평구 진관로 123<br>한울사상 중앙수련원</span>
+          </div>
+          <div class="connect-info-row">
+            <span class="conn-key">전화</span>
+            <span class="conn-val">02-123-4567</span>
+          </div>
+          <div class="connect-info-row">
+            <span class="conn-key">이메일</span>
+            <span class="conn-val">contact@hanul.org</span>
+          </div>
+          <div class="connect-info-row">
+            <span class="conn-key">수련 시간</span>
+            <span class="conn-val">매주 토요일 오전 10시 · 일요일 오전 9시<br>평일 저녁 수련반 별도 문의</span>
+          </div>
+        </div>
+        <a class="gate-btn primary" href="#" style="display:inline-block;">방문 신청하기</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHIVE PORTAL -->
+  <section class="archive-section">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div class="section-label" style="text-align:center;margin-bottom:8px;">Archive · 기록</div>
+      <h2 style="font-family:'Noto Serif KR',serif;font-size:1.8rem;font-weight:400;color:var(--text);text-align:center;margin-bottom:48px;">한울사상의 발자취</h2>
+      <div class="archive-row">
+        <div class="arch-item">
+          <div class="arch-num">38</div>
+          <span class="arch-unit">년의 역사</span>
+          <div class="arch-desc">1986년 창립 이래 한 세대를 넘어 이어져 온 한울사상의 깊은 전통</div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-num">1,240</div>
+          <span class="arch-unit">편의 말씀</span>
+          <div class="arch-desc">선생님의 가르침과 법문이 디지털로 보존되어 언제든 열람 가능</div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-num">47</div>
+          <span class="arch-unit">개 수련 과정</span>
+          <div class="arch-desc">초급 입문부터 지도자 양성까지 체계적인 수련 프로그램 운영</div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-num">3,800+</div>
+          <span class="arch-unit">명의 회원</span>
+          <div class="arch-desc">전국 각지에서 한울의 가르침을 실천하며 살아가는 든든한 공동체</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="logo">한울사상</span>
+          <p>천지 자연의 이치를 바탕으로<br>참된 삶의 길을 찾아가는<br>한울사상의 공식 홈페이지입니다.</p>
+        </div>
+        <div class="footer-col">
+          <h4>한울이란</h4>
+          <ul>
+            <li><a href="#">기원과 역사</a></li>
+            <li><a href="#">창립자 소개</a></li>
+            <li><a href="#">핵심 가치관</a></li>
+            <li><a href="#">세계관</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>수련</h4>
+          <ul>
+            <li><a href="#">입문 수련</a></li>
+            <li><a href="#">심화 과정</a></li>
+            <li><a href="#">지도자 과정</a></li>
+            <li><a href="#">수련 일정</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>자료실</h4>
+          <ul>
+            <li><a href="#">경전 자료</a></li>
+            <li><a href="#">법문 모음</a></li>
+            <li><a href="#">사진 갤러리</a></li>
+            <li><a href="#">공지사항</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">© 2024 한울사상 중앙수련원. All rights reserved.</span>
+        <span class="footer-copy">테마 <%= themeId %> · <%= t.name %></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SIANN BADGE -->
+  <div class="siann-badge">
+    <div class="b-row1">L<span>7</span> 포털원형관문 &middot; 테마 <span><%= themeId %>/20 &mdash; <%= themes[themeId] ? themes[themeId].name : '' %></span></div>
+    <div class="b-row2"><% for(let i=1;i<=20;i++){ %><a href="/siann-7/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a><% } %></div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen',      bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', footerBg:'#030D07', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White',      bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', footerBg:'#1A1A1A', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', footerBg:'#0E0905', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist',       bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', footerBg:'#2A3547', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple',   bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', footerBg:'#080410', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo',          bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', footerBg:'#1A2010', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain',  bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', footerBg:'#080808', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal',       bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', footerBg:'#030B0D', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber',      bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', footerBg:'#0D0700', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night',     bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', footerBg:'#01060E', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand',       bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', footerBg:'#1C1408', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green',      bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', footerBg:'#050804', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', footerBg:'#03040F', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment',       bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', footerBg:'#1A1005', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz',     bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', footerBg:'#0D0608', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian',        bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', footerBg:'#020202', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon',         bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', footerBg:'#05080A', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White',    bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', footerBg:'#1A2440', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    %>

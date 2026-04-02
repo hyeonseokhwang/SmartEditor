@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>여의명상센터 — 한울사상 | 고요 속으로</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const palettes = {
+      1:  { bg:'#FAFAF7', text:'#2A2A2A', text2:'#666', accent:'#8B6840', line:'rgba(0,0,0,0.1)' },
+      2:  { bg:'#F7FAF5', text:'#1E2C1E', text2:'#5A705A', accent:'#4A8047', line:'rgba(0,0,0,0.1)' },
+      3:  { bg:'#FAF8F4', text:'#2C2418', text2:'#706050', accent:'#9A7040', line:'rgba(0,0,0,0.1)' },
+      4:  { bg:'#F8FAFA', text:'#1A2A2C', text2:'#4A6068', accent:'#3A7A88', line:'rgba(0,0,0,0.1)' },
+      5:  { bg:'#FAFAF7', text:'#2A2A2A', text2:'#666', accent:'#7A7060', line:'rgba(0,0,0,0.1)' },
+    };
+    const p = palettes[((themeId-1)%5)+1];
+    %>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: <%= p.bg %>;
+      --text: <%= p.text %>;
+      --text2: <%= p.text2 %>;
+      --accent: <%= p.accent %>;
+      --line: <%= p.line %>;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Serif KR', serif; background: var(--bg); color: var(--text); line-height: 1.9; overflow-x: hidden; }
+    img { display: block; width: 100%; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw; height: 68px;
+      background: transparent;
+      transition: background 0.5s ease, box-shadow 0.5s ease;
+    }
+    .nav.scrolled {
+      background: rgba(250,250,247,0.97);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.07);
+    }
+    .nav-logo {
+      font-family: 'Noto Serif KR', serif; font-size: 1rem; font-weight: 400;
+      color: rgba(255,255,255,0.95); letter-spacing: 0.12em; text-decoration: none;
+      transition: color 0.5s ease;
+    }
+    .nav.scrolled .nav-logo { color: var(--text); }
+    .nav-links { display: flex; gap: 2.4rem; }
+    .nav-links a {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.75rem; font-weight: 300;
+      color: rgba(255,255,255,0.8); text-decoration: none; letter-spacing: 0.06em;
+      transition: color 0.5s ease;
+    }
+    .nav.scrolled .nav-links a { color: var(--text2); }
+    .nav.scrolled .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+    .hero-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      transform: scale(1.04);
+      animation: heroZoom 8s ease-out forwards;
+    }
+    @keyframes heroZoom { to { transform: scale(1); } }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.08) 0%,
+        rgba(0,0,0,0.38) 45%,
+        rgba(0,0,0,0.62) 100%
+      );
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 0 24px;
+    }
+    .hero-kicker {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.68rem; font-weight: 300;
+      color: rgba(255,255,255,0.7); letter-spacing: 0.4em; margin-bottom: 28px;
+      animation: fadeUp 1.2s 0.4s both;
+    }
+    .hero-h1 {
+      font-family: 'Noto Serif KR', serif; font-weight: 300;
+      font-size: clamp(3rem, 6.5vw, 5.5rem);
+      color: #fff; letter-spacing: 0.04em; line-height: 1.15;
+      margin-bottom: 22px;
+      animation: fadeUp 1.2s 0.65s both;
+    }
+    .hero-sub {
+      font-family: 'Noto Serif KR', serif; font-weight: 300;
+      font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+      color: rgba(255,255,255,0.78); line-height: 2; letter-spacing: 0.08em;
+      animation: fadeUp 1.2s 0.9s both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+    .hero-scroll-hint {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      animation: fadeUp 1s 1.5s both;
+    }
+    .hero-scroll-hint span {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.6rem;
+      color: rgba(255,255,255,0.5); letter-spacing: 0.25em;
+    }
+    .scroll-line { width: 1px; height: 44px; background: rgba(255,255,255,0.35); animation: scrollPulse 2s 2s infinite; }
+    @keyframes scrollPulse {
+      0%,100%{opacity:0;transform:scaleY(0);transform-origin:top}
+      50%{opacity:1;transform:scaleY(1);transform-origin:top}
+    }
+
+    /* ── INTRO QUOTE (bright section) ── */
+    .intro-wrap { background: var(--bg); padding: 96px 5vw; }
+    .intro-quote { max-width: 760px; margin: 0 auto; text-align: center; }
+    .intro-quote blockquote {
+      font-family: 'Noto Serif KR', serif; font-weight: 300;
+      font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+      color: var(--text); line-height: 2.1; letter-spacing: 0.04em;
+    }
+    .intro-quote cite {
+      display: block; margin-top: 28px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.72rem;
+      color: var(--text2); letter-spacing: 0.18em;
+    }
+
+    /* ── ABOUT SPLIT ── */
+    .about-split { display: grid; grid-template-columns: 55% 45%; min-height: 620px; }
+    .about-img-wrap { position: relative; overflow: hidden; }
+    .about-img-wrap img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+    }
+    .about-text {
+      padding: 80px 7vw; display: flex; flex-direction: column; justify-content: center;
+      background: var(--bg);
+    }
+    .eyebrow {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.68rem; font-weight: 300;
+      color: var(--accent); letter-spacing: 0.32em; margin-bottom: 24px;
+    }
+    .section-h2 {
+      font-family: 'Noto Serif KR', serif; font-weight: 300;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      color: var(--text); line-height: 1.6; margin-bottom: 24px;
+    }
+    .body-text {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.94rem; font-weight: 300;
+      color: var(--text2); line-height: 2; max-width: 420px;
+    }
+    .accent-line { width: 36px; height: 1px; background: var(--accent); margin-top: 32px; opacity: 0.6; }
+
+    /* ── PHILOSOPHY 3-PANEL ── */
+    .phil-section-header { background: var(--bg); padding: 72px 5vw 48px; text-align: center; }
+    .phil-section-header .section-h2 { margin-bottom: 0; }
+
+    .philosophy-panels { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .phil-panel { position: relative; height: 68vh; overflow: hidden; }
+    .phil-panel img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      transition: transform 0.7s ease;
+    }
+    .phil-panel:hover img { transform: scale(1.04); }
+    .phil-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.82) 0%,
+        rgba(0,0,0,0.25) 55%,
+        rgba(0,0,0,0.05) 100%
+      );
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding: 48px 28px; text-align: center;
+    }
+    .phil-chn {
+      font-family: 'Noto Serif KR', serif; font-weight: 300;
+      font-size: 3.8rem; color: rgba(255,255,255,0.92); line-height: 1; margin-bottom: 10px;
+    }
+    .phil-kor {
+      font-family: 'Noto Serif KR', serif; font-weight: 300;
+      font-size: 1.05rem; color: rgba(255,255,255,0.8); letter-spacing: 0.18em; margin-bottom: 12px;
+    }
+    .phil-desc {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; font-weight: 300;
+      color: rgba(255,255,255,0.62); line-height: 1.75;
+    }
+
+    /* ── PROGRAMS ── */
+    .programs-section { background: var(--bg); padding: 80px 5vw; }
+    .programs-header { text-align: center; margin-bottom: 48px; }
+    .prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; max-width: 1200px; margin: 0 auto; }
+    .prog-card { overflow: hidden; }
+    .prog-img-wrap { position: relative; overflow: hidden; }
+    .prog-img-wrap img {
+      aspect-ratio: 4/3; object-fit: cover;
+      transition: transform 0.55s ease;
+    }
+    .prog-card:hover .prog-img-wrap img { transform: scale(1.04); }
+    .prog-caption { padding: 20px 2px 8px; }
+    .prog-name {
+      font-family: 'Noto Serif KR', serif; font-weight: 400;
+      font-size: 1.05rem; color: var(--text); margin-bottom: 7px;
+    }
+    .prog-desc {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; font-weight: 300;
+      color: var(--text2); line-height: 1.75;
+    }
+    .prog-tag {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.68rem; font-weight: 300;
+      color: var(--accent); letter-spacing: 0.1em; margin-top: 9px;
+    }
+
+    /* ── GALLERY STRIP ── */
+    .gallery-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; background: #eee; }
+    .gallery-strip img {
+      aspect-ratio: 1; object-fit: cover;
+      transition: opacity 0.3s ease;
+    }
+    .gallery-strip img:hover { opacity: 0.87; }
+
+    /* ── SCHEDULE ── */
+    .schedule-section { background: var(--bg); padding: 80px 5vw; }
+    .schedule-header { text-align: center; margin-bottom: 52px; }
+    .sch-list { max-width: 780px; margin: 0 auto; }
+    .sch-item {
+      display: grid; grid-template-columns: 130px 1fr;
+      padding: 24px 0; border-top: 1px solid var(--line); gap: 24px; align-items: start;
+    }
+    .sch-item:last-child { border-bottom: 1px solid var(--line); }
+    .sch-date {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; font-weight: 300;
+      color: var(--text2); letter-spacing: 0.04em; padding-top: 2px;
+    }
+    .sch-name {
+      font-family: 'Noto Serif KR', serif; font-weight: 400;
+      font-size: 1rem; color: var(--text); margin-bottom: 4px;
+    }
+    .sch-place {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.76rem; font-weight: 300;
+      color: var(--text2);
+    }
+
+    /* ── QUOTE CTA (fullscreen) ── */
+    .quote-cta { position: relative; height: 72vh; overflow: hidden; }
+    .quote-cta img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+    }
+    .quote-cta-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.52);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 40px 24px;
+    }
+    .quote-cta blockquote {
+      font-family: 'Noto Serif KR', serif; font-weight: 300;
+      font-size: clamp(1.1rem, 2.2vw, 1.65rem);
+      color: #fff; line-height: 2; max-width: 680px; margin-bottom: 44px;
+      letter-spacing: 0.04em;
+    }
+    .btn-archive {
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.65);
+      color: rgba(255,255,255,0.9); padding: 13px 44px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.78rem; font-weight: 300;
+      text-decoration: none; letter-spacing: 0.18em;
+      transition: all 0.35s ease;
+    }
+    .btn-archive:hover { background: rgba(255,255,255,0.15); border-color: white; color: white; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg); border-top: 1px solid var(--line);
+      padding: 56px 5vw 40px;
+    }
+    .footer-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px;
+    }
+    .footer-brand h3 {
+      font-family: 'Noto Serif KR', serif; font-weight: 400;
+      font-size: 1.05rem; color: var(--text); letter-spacing: 0.1em; margin-bottom: 12px;
+    }
+    .footer-brand p {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.76rem; font-weight: 300;
+      color: var(--text2); line-height: 2;
+    }
+    .footer-col h4 {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.65rem; font-weight: 400;
+      color: var(--accent); letter-spacing: 0.24em; margin-bottom: 18px;
+    }
+    .footer-col a {
+      display: block; font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.76rem; font-weight: 300;
+      color: var(--text2); text-decoration: none; margin-bottom: 10px;
+      transition: color 0.25s;
+    }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom {
+      max-width: 1100px; margin: 40px auto 0; padding-top: 24px;
+      border-top: 1px solid var(--line); text-align: center;
+    }
+    .footer-bottom p {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.68rem; font-weight: 300;
+      color: var(--text2);
+    }
+
+    /* ── SIANN BADGE ── */
+    .siann-badge {
+      position: fixed; bottom: 12px; right: 12px; z-index: 9999;
+      display: flex; flex-wrap: wrap; gap: 3px; max-width: 280px; justify-content: flex-end;
+    }
+    .siann-badge a {
+      display: inline-block; padding: 2px 6px; font-size: 9px; border-radius: 2px;
+      background: rgba(0,0,0,0.55); color: rgba(255,255,255,0.75); text-decoration: none;
+      font-family: 'Noto Sans KR', sans-serif; transition: background 0.2s;
+    }
+    .siann-badge a.active, .siann-badge a:hover { background: var(--accent); color: white; }
+
+    /* ── REVEAL ANIMATION ── */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.75s ease, transform 0.75s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .about-split { grid-template-columns: 1fr; }
+      .about-img-wrap { min-height: 55vw; position: relative; }
+      .about-img-wrap img { position: relative; height: 55vw; object-fit: cover; }
+      .philosophy-panels { grid-template-columns: 1fr; }
+      .phil-panel { height: 60vw; min-height: 280px; }
+      .prog-grid { grid-template-columns: 1fr 1fr; }
+      .gallery-strip { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      .prog-grid { grid-template-columns: 1fr; }
+      .sch-item { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- THEME BADGE -->
+<nav class="siann-badge">
+  <% for(let i=1;i<=20;i++){ %><a href="/siann-21/<%= i %>" class="<%= themeId==i?'active':'' %>">T<%= i %></a><% } %>
+</nav>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <a href="#" class="nav-logo">여의명상센터</a>
+  <div class="nav-links">
+    <a href="#about">센터소개</a>
+    <a href="#philosophy">한울사상</a>
+    <a href="#programs">수련프로그램</a>
+    <a href="#schedule">일정</a>
+    <a href="http://211.104.37.65:4200" target="_blank">법문 아카이브</a>
+  </div>
+</nav>
+
+<!-- ①  HERO — fullscreen 100vh, 명상법1 이미지 -->
+<section class="hero">
+  <img
+    class="hero-img"
+    src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDJfNjkg/MDAxNjU2NzE5Njg4ODgx.sJkuR4fh-81kXE1283hPZnFYLloC1EkDMODBUTC0TIkg.ktevv0k3zgPEO84m94hxXXlKOkytcGLtUFsTzLWMay4g.JPEG/20220702085225.jpg?type=w1600"
+    alt="자연 속 여의명상센터"
+  >
+  <div class="hero-overlay">
+    <div class="hero-kicker">YEOUIMYEONGSAN CENTER · 韓蔚思想</div>
+    <h1 class="hero-h1">고요 속으로</h1>
+    <p class="hero-sub">하늘의 뜻으로 사는 삶<br>여의명상센터에서 시작하세요</p>
+  </div>
+  <div class="hero-scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ②  INTRO QUOTE -->
+<div class="intro-wrap" id="about">
+  <div class="intro-quote reveal">
+    <blockquote>
+      "나비가 될 번데기는 오늘도 껍질을 깨는 중이다"
+    </blockquote>
+    <cite>— 한울사상 법문</cite>
+  </div>
+</div>
+
+<!-- ③  ABOUT SPLIT (이미지 55% + 텍스트 45%) -->
+<section class="about-split">
+  <div class="about-img-wrap">
+    <img
+      src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDJfNjkg/MDAxNjU2NzE5Njg4ODgx.sJkuR4fh-81kXE1283hPZnFYLloC1EkDMODBUTC0TIkg.ktevv0k3zgPEO84m94hxXXlKOkytcGLtUFsTzLWMay4g.JPEG/20220702085225.jpg?type=w1600"
+      alt="자연 속 명상"
+    >
+  </div>
+  <div class="about-text reveal">
+    <div class="eyebrow">CENTER STORY</div>
+    <h2 class="section-h2">침묵이 말하는<br>자리로 오세요</h2>
+    <p class="body-text">
+      여의명상센터는 한울사상을 바탕으로 내면의 고요함을 찾는 이들이 모이는 공간입니다.
+      우주의 근본 원리를 배우고, 생명의 에너지를 느끼며, 더 나은 자신을 향해 나아가는 여정을 함께합니다.
+    </p>
+    <div class="accent-line"></div>
+  </div>
+</section>
+
+<!-- ④  PHILOSOPHY 3-PANEL -->
+<div class="phil-section-header reveal" id="philosophy">
+  <div class="eyebrow">PHILOSOPHY</div>
+  <h2 class="section-h2">한울사상의 세 기둥</h2>
+</div>
+
+<section class="philosophy-panels">
+  <div class="phil-panel">
+    <img
+      src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzYwMTcxNjE3.CNxv2Stxzrvath9zJ9oTPqk4_Y7KjZ-sL5ABruAId5Ug.xfKrmXsajKdnzHkUNdPqLHJnIDOKEGbMoGN5fMKO7Rsg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AC%ED%8F%AC.jpeg?type=w1600"
+      alt="천지연폭포"
+    >
+    <div class="phil-overlay">
+      <div class="phil-chn">道</div>
+      <div class="phil-kor">우주도리</div>
+      <div class="phil-desc">우주의 근본 원리와 질서를 깨닫고<br>그에 따라 사는 삶</div>
+    </div>
+  </div>
+  <div class="phil-panel">
+    <img
+      src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDhfNzgg/MDAxNjU3MjM2NjExMDA3.MFCBBVZq2taTNOkSS1lbzZ14uQGwSIsrF8brAlu5GOYg.f1Yj1mQuCmYrOc7NRXA0lnfr4sxC46Dujwc2PFtuNUQg.JPEG/20220708082615.jpg?type=w1600"
+      alt="명상 수련"
+    >
+    <div class="phil-overlay">
+      <div class="phil-chn">靈</div>
+      <div class="phil-kor">영적진화</div>
+      <div class="phil-desc">인간 의식의 끊임없는 진화와<br>영적 성장의 여정</div>
+    </div>
+  </div>
+  <div class="phil-panel">
+    <img
+      src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDFfMTIx/MDAxNjU2NjM3Nzg1ODg5.pdNyn4eQj2Qirg4RkWNCq2npQE5xqc45NJndpWPIK8Qg.SbGxT0le-sLJnGNB0InLFBkNNUiVWwLHSyo5lKAv1gIg.JPEG/IMG_20220701_0001.jpg?type=w1600"
+      alt="자연 소풍"
+    >
+    <div class="phil-overlay">
+      <div class="phil-chn">責</div>
+      <div class="phil-kor">세상책임</div>
+      <div class="phil-desc">깨달음을 바탕으로 세상과<br>공동체에 헌신하는 실천</div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤  PROGRAMS -->
+<section class="programs-section" id="programs">
+  <div class="programs-header reveal">
+    <div class="eyebrow">PROGRAMS</div>
+    <h2 class="section-h2">수련 프로그램</h2>
+  </div>
+  <div class="prog-grid">
+    <div class="prog-card reveal">
+      <div class="prog-img-wrap">
+        <img
+          src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDJfNjkg/MDAxNjU2NzE5Njg4ODgx.sJkuR4fh-81kXE1283hPZnFYLloC1EkDMODBUTC0TIkg.ktevv0k3zgPEO84m94hxXXlKOkytcGLtUFsTzLWMay4g.JPEG/20220702085225.jpg?type=w1600"
+          alt="집중수련"
+        >
+      </div>
+      <div class="prog-caption">
+        <div class="prog-name">집중수련</div>
+        <div class="prog-desc">일상을 벗어나 깊은 내면의 침묵 속으로. 제도·생명장 통합 심화 과정.</div>
+        <div class="prog-tag">정기 개설 · 여의명상센터</div>
+      </div>
+    </div>
+    <div class="prog-card reveal">
+      <div class="prog-img-wrap">
+        <img
+          src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDhfNzgg/MDAxNjU3MjM2NjExMDA3.MFCBBVZq2taTNOkSS1lbzZ14uQGwSIsrF8brAlu5GOYg.f1Yj1mQuCmYrOc7NRXA0lnfr4sxC46Dujwc2PFtuNUQg.JPEG/20220708082615.jpg?type=w1600"
+          alt="생명장수련"
+        >
+      </div>
+      <div class="prog-caption">
+        <div class="prog-name">생명장수련</div>
+        <div class="prog-desc">우주 생명 에너지와 공명하는 수련. 생명장의 본질을 체험적으로 이해하는 과정.</div>
+        <div class="prog-tag">정기 진행</div>
+      </div>
+    </div>
+    <div class="prog-card reveal">
+      <div class="prog-img-wrap">
+        <img
+          src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMjYw/MDAxNjU3MTc5MTE0NjU5.9n-1yQWgi-NDKcI0P5Q_0NUP-NtaPLN-2JIyVt2_i-Ig.z70qTq869TlfC7FZPJSDhWHiJL5JeYJz_nPXENj3ly8g.JPEG/1656217586620.jpg?type=w1600"
+          alt="토요법문"
+        >
+      </div>
+      <div class="prog-caption">
+        <div class="prog-name">토요법문</div>
+        <div class="prog-desc">매주 토요일, 한울사상의 핵심 가르침을 나누는 법문. 10,313편 아카이브와 연계.</div>
+        <div class="prog-tag">매주 토요일</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥  GALLERY STRIP (4열 이미지) -->
+<div class="gallery-strip">
+  <img
+    src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjNfMjMy/MDAxNTk4MTgwMzU0NjYx.cEjHaZRf_VD6Qc-CbtnuNM5Az-6A36APGLo0_w3U7bAg.G3TeB5xBBChkHr7EvEK-kgmWHzO0jJW_mZdN9F26lf8g.JPEG/KakaoTalk_20200823_195242797.jpg?type=w1600"
+    alt="한울1"
+  >
+  <img
+    src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDhfNzgg/MDAxNjU3MjM2NjExMDA3.MFCBBVZq2taTNOkSS1lbzZ14uQGwSIsrF8brAlu5GOYg.f1Yj1mQuCmYrOc7NRXA0lnfr4sxC46Dujwc2PFtuNUQg.JPEG/20220708082615.jpg?type=w1600"
+    alt="자연"
+  >
+  <img
+    src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMjYw/MDAxNjU3MTc5MTE0NjU5.9n-1yQWgi-NDKcI0P5Q_0NUP-NtaPLN-2JIyVt2_i-Ig.z70qTq869TlfC7FZPJSDhWHiJL5JeYJz_nPXENj3ly8g.JPEG/1656217586620.jpg?type=w1600"
+    alt="자연 풍경"
+  >
+  <img
+    src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMTUz/MDAxNjU3MTgyMTA5ODM4.90bTQlcbFf0TJa2tAFw3CHGuxZE712IEBaOarIBCtOAg.LrLqEkFhjbpKpZQxmjgZs7wDWqRBUkdVoHgkOL6ZirQg.JPEG/Screenshot_20220707-100803_Photo_Editor.jpg?type=w1600"
+    alt="소풍"
+  >
+</div>
+
+<!-- ⑦  SCHEDULE -->
+<section class="schedule-section" id="schedule">
+  <div class="schedule-header reveal">
+    <div class="eyebrow">SCHEDULE</div>
+    <h2 class="section-h2">2026년 4월 수련 일정</h2>
+  </div>
+  <div class="sch-list">
+    <div class="sch-item reveal">
+      <div class="sch-date">4월 5일 (토)</div>
+      <div>
+        <div class="sch-name">토요법문 — 우주도리의 이해</div>
+        <div class="sch-place">여의명상센터 강당</div>
+      </div>
+    </div>
+    <div class="sch-item reveal">
+      <div class="sch-date">4월 12일 (토)</div>
+      <div>
+        <div class="sch-name">집중수련 (1박 2일)</div>
+        <div class="sch-place">여의명상센터 수련관</div>
+      </div>
+    </div>
+    <div class="sch-item reveal">
+      <div class="sch-date">4월 19일 (토)</div>
+      <div>
+        <div class="sch-name">토요법문 — 생명장과 기운영</div>
+        <div class="sch-place">여의명상센터 강당</div>
+      </div>
+    </div>
+    <div class="sch-item reveal">
+      <div class="sch-date">4월 26일 (토)</div>
+      <div>
+        <div class="sch-name">지기문화답사 — 봄 자연 소풍</div>
+        <div class="sch-place">한울 지정 자연 공간</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑧  FULLSCREEN QUOTE + CTA -->
+<section class="quote-cta">
+  <img
+    src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMjQx/MDAxNjU3MTc4NDg2MjYz.KqVW_fwVuyeEgEDQrYak1JAk6NewrCfzgY2MYD6nBNsg.zpZkcyq5kJtwbvqpqHv9iwkdJlDDWTj9tERPxRmrimEg.JPEG/Screenshot_20220624-152445_Gallery.jpg?type=w1600"
+    alt="자연 배경"
+  >
+  <div class="quote-cta-overlay">
+    <blockquote>
+      "죄는 조이는 것이다<br>
+      스스로를 締約하지 말라<br>
+      우주의 모든 것은 돈다"
+    </blockquote>
+    <a href="http://211.104.37.65:4200" target="_blank" class="btn-archive">법문 아카이브 열기</a>
+  </div>
+</section>
+
+<!-- ⑨  FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h3>여의명상센터</h3>
+      <p>
+        한울사상 — 하늘의 뜻으로 사는 삶<br>
+        서울특별시 영등포구 여의도동<br>
+        매주 토요일 법문 · 수련 상시 참여
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>PROGRAMS</h4>
+      <a href="#">집중수련</a>
+      <a href="#">생명장수련</a>
+      <a href="#">기운영</a>
+      <a href="#">토요법문</a>
+      <a href="#">지기문화답사</a>
+    </div>
+    <div class="footer-col">
+      <h4>RESOURCES</h4>
+      <a href="http://211.104.37.65:4200" target="_blank">법문 아카이브 (10,313편)</a>
+      <a href="#">한울사상이란</a>
+      <a href="#">찾아오는 길</a>
+      <a href="#">문의하기</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 여의명상센터 · 한울사상 · B팀 시안 L21 · 테마 <%= themeId %></p>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  // Scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => revealObs.observe(el));
+</script>
+
+</body>
+</html>

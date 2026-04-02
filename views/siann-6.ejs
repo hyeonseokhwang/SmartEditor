@@ -1,0 +1,507 @@
+<%
+// ============================================================
+// 한울사랑 여의명상센터 — A팀 대표 시안 L6 (전면 재작업)
+// 디자이너: 하나 (Hana) | 아틀리에 알파
+// ref: Plum Village + Isha Sadhguru + Art of Living
+// 발주서 v3 기준: 이미지 중심 구조 / 텍스트 극소화
+// ============================================================
+
+const P = '/api/img-proxy?url=';
+
+const imgs = {
+  hero:    P + 'https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDlfMTA1/MDAxNjU3MzIxNTI2NDQ3.GiigfbpXlX4rw84WiTlbPsLTuXXB14yDa5EFFLR1Ts4g.-Q5x0GbEpDKynUBvz21qefbgnfadyaChRMEtk3tpD5Eg.JPEG/20220709080237.jpg?type=w1600',
+  med1:    P + 'https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMTg0/MDAxNjU3MTc5MDQ1Njk5.IM54J4aogS-VOaLLblRPIjRecwk5qBBZNUWoVL7DjWEg.vIbGdFSxVzGzvMAORQRG88Jc3HVUklLBz18WE8Gr_vIg.JPEG/20220626_111145.jpg?type=w1600',
+  med2:    P + 'https://cafeptthumb-phinf.pstatic.net/MjAyMDExMDJfMjEg/MDAxNjA0MzI0MjEwNzU4.1OtZZywYfLSYVryWLmesuyVPsUUGDwMxlFiydhoRMzEg.nDpKq5lKHpC7ubBEou9tEi3bWlSU86YxDnBtamdHtnAg.JPEG/2.jpg?type=w1600',
+  nature1: P + 'https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDhfNzgg/MDAxNjU3MjM2NjExMDA3.MFCBBVZq2taTNOkSS1lbzZ14uQGwSIsrF8brAlu5GOYg.f1Yj1mQuCmYrOc7NRXA0lnfr4sxC46Dujwc2PFtuNUQg.JPEG/20220708082615.jpg?type=w1600',
+  outing1:  P + 'https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDFfMTIx/MDAxNjU2NjM3Nzg1ODg5.pdNyn4eQj2Qirg4RkWNCq2npQE5xqc45NJndpWPIK8Qg.SbGxT0le-sLJnGNB0InLFBkNNUiVWwLHSyo5lKAv1gIg.JPEG/IMG_20220701_0001.jpg?type=w1600',
+  daily:    P + 'https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDJfNjkg/MDAxNjU2NzE5Njg4ODgx.sJkuR4fh-81kXE1283hPZnFYLloC1EkDMODBUTC0TIkg.ktevv0k3zgPEO84m94hxXXlKOkytcGLtUFsTzLWMay4g.JPEG/20220702085225.jpg?type=w1600',
+  retreat1: P + 'https://cafeptthumb-phinf.pstatic.net/MjAyMjA2MDdfMjQz/MDAxNjU0NTk2MTE1MTg1.kTeD_ABAp7m2imFKm-3WxCqL-xZnoN9pZ6g3jyhExAgg.alM4y6rmabQwzojPpVH8oj9Rq4QphavnDRKVx0pCx8wg.JPEG/KakaoTalk_20220607_173341238_02.jpg?type=w1600',
+  retreat2: P + 'https://cafeptthumb-phinf.pstatic.net/MjAyMDExMDJfMTY2/MDAxNjA0MzI0MjAwMzgz.fS3CvfbkwHDm0wpylXTRNewQw4iwCLmLLy7FGnGGnngg.LGWzpODH2yqdG5Zx7NyHizK2_7_PT4XL4ZMyrpCVy_cg.JPEG/1.jpg?type=w1600'
+};
+%><!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>여의명상센터 한울사랑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Serif KR',serif;background:#faf6ef;color:#2c2418;overflow-x:hidden}
+
+/* NAV — transparent overlay, solid on scroll */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:28px 56px;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .45s,padding .45s,box-shadow .45s;
+}
+nav.scrolled{
+  background:rgba(250,246,239,.95);
+  backdrop-filter:blur(10px);
+  padding:18px 56px;
+  box-shadow:0 1px 0 rgba(44,36,24,.07);
+}
+.nav-logo{
+  font-size:.88rem;letter-spacing:.2em;
+  color:#fff;font-weight:300;
+  transition:color .45s;
+  white-space:nowrap;
+}
+nav.scrolled .nav-logo{color:#2c2418}
+.nav-links{display:flex;gap:40px;list-style:none}
+.nav-links a{
+  font-size:.72rem;letter-spacing:.16em;
+  color:rgba(255,255,255,.78);
+  text-decoration:none;
+  font-family:'Noto Sans KR',sans-serif;font-weight:300;
+  transition:color .45s;
+}
+nav.scrolled .nav-links a{color:#7a6b58}
+.nav-links a:hover{color:#fff}
+nav.scrolled .nav-links a:hover{color:#2c2418}
+
+/* HERO — 100vw × 100vh, zero margin */
+.hero{
+  position:relative;
+  width:100vw;height:100vh;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero > img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;object-position:center;
+}
+.hero-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    180deg,
+    rgba(0,0,0,.16) 0%,
+    rgba(0,0,0,.03) 38%,
+    rgba(0,0,0,.52) 100%
+  );
+}
+.hero-body{
+  position:relative;z-index:1;
+  text-align:center;color:#fff;
+  padding:0 32px;
+}
+.hero-kicker{
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.68rem;letter-spacing:.36em;
+  color:rgba(255,255,255,.65);
+  margin-bottom:32px;font-weight:300;
+}
+.hero-h1{
+  font-size:clamp(3rem,6.5vw,5.6rem);
+  font-weight:300;letter-spacing:.08em;
+  line-height:1.18;margin-bottom:18px;
+}
+.hero-sub{
+  font-size:clamp(1rem,2vw,1.5rem);
+  font-weight:300;letter-spacing:.18em;
+  color:rgba(255,255,255,.72);
+}
+.hero-arrow{
+  position:absolute;bottom:44px;left:50%;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;
+  gap:6px;
+  color:rgba(255,255,255,.48);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.62rem;letter-spacing:.24em;
+  animation:drift 2.6s ease-in-out infinite;
+}
+.hero-arrow::after{
+  content:'';display:block;
+  width:1px;height:44px;
+  background:rgba(255,255,255,.28);
+}
+@keyframes drift{
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(10px)}
+}
+
+/* QUOTE — fullwidth image + overlay text */
+.s-quote{
+  position:relative;
+  width:100vw;height:58vh;min-height:360px;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.s-quote > img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;object-position:center 35%;
+}
+.s-quote-overlay{
+  position:absolute;inset:0;
+  background:rgba(12,9,5,.54);
+}
+.s-quote-body{
+  position:relative;z-index:1;
+  text-align:center;color:#fff;
+  padding:0 48px;max-width:820px;
+}
+.q-open{font-size:5rem;line-height:.5;opacity:.22;font-family:Georgia,serif}
+.q-text{
+  font-size:clamp(1.5rem,3vw,2.4rem);
+  font-weight:300;line-height:1.65;
+  letter-spacing:.05em;
+  margin:22px 0 18px;
+}
+.q-attr{
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.68rem;letter-spacing:.24em;
+  color:rgba(255,255,255,.45);font-weight:300;
+}
+
+/* INTRO SPLIT */
+.s-intro{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  min-height:72vh;
+}
+.s-intro-img{
+  position:relative;overflow:hidden;
+}
+.s-intro-img img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+  transition:transform 7s ease;
+}
+.s-intro-img:hover img{transform:scale(1.05)}
+.s-intro-text{
+  display:flex;flex-direction:column;
+  justify-content:center;
+  padding:108px 96px;
+  background:#faf6ef;
+}
+.lbl{
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.62rem;letter-spacing:.3em;
+  color:#a8967e;margin-bottom:28px;font-weight:300;
+}
+.s-intro-h2{
+  font-size:clamp(1.9rem,3vw,2.7rem);
+  font-weight:300;line-height:1.38;
+  letter-spacing:.04em;
+  color:#2c2418;margin-bottom:28px;
+}
+.s-intro-p{
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.85rem;line-height:2.0;
+  color:#8a7a66;font-weight:300;
+  max-width:360px;margin-bottom:44px;
+}
+.btn-ln{
+  display:inline-flex;align-items:center;gap:10px;
+  border:1px solid #b09a7e;
+  color:#7a6b58;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.68rem;letter-spacing:.2em;
+  padding:14px 30px;text-decoration:none;
+  transition:all .32s;font-weight:300;width:fit-content;
+}
+.btn-ln:hover{background:#b09a7e;color:#fff}
+.btn-ln::after{content:'→';margin-left:4px}
+
+/* PROGRAMS */
+.s-prog{background:#f0ebe0;padding:128px 0}
+.s-prog-hd{
+  text-align:center;padding:0 48px 80px;
+}
+.s-prog-h2{
+  font-size:clamp(1.8rem,3.2vw,2.9rem);
+  font-weight:300;letter-spacing:.06em;color:#2c2418;
+  margin-top:18px;
+}
+.prog-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:3px;
+}
+.prog-item{
+  position:relative;overflow:hidden;
+  aspect-ratio:2/3;cursor:pointer;
+}
+.prog-item img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+  transition:transform .9s ease;
+}
+.prog-item:hover img{transform:scale(1.07)}
+.prog-mask{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(12,9,5,.82) 0%,
+    rgba(12,9,5,.08) 52%,
+    transparent 100%
+  );
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:36px 30px;
+}
+.prog-n{
+  font-size:.6rem;letter-spacing:.26em;
+  color:rgba(255,255,255,.38);
+  font-family:'Noto Sans KR',sans-serif;
+  margin-bottom:10px;font-weight:300;
+}
+.prog-title{
+  font-size:1.2rem;font-weight:300;
+  letter-spacing:.08em;color:#fff;margin-bottom:8px;
+}
+.prog-time{
+  font-size:.68rem;color:rgba(255,255,255,.52);
+  font-family:'Noto Sans KR',sans-serif;
+  font-weight:300;letter-spacing:.04em;
+}
+
+/* GALLERY — 2분할 풀스크린 */
+.s-gallery{line-height:0;background:#fff}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:420px 420px;
+  gap:3px;
+}
+.g-item{overflow:hidden;position:relative}
+.g-item img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+  transition:transform .85s ease;
+}
+.g-item:hover img{transform:scale(1.04)}
+
+/* CTA FULLSCREEN */
+.s-cta{
+  position:relative;
+  width:100vw;height:72vh;min-height:480px;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.s-cta > img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;object-position:center;
+}
+.s-cta-overlay{
+  position:absolute;inset:0;
+  background:rgba(10,8,4,.48);
+}
+.s-cta-body{
+  position:relative;z-index:1;
+  text-align:center;color:#fff;
+  padding:0 48px;
+}
+.s-cta-body .lbl{color:rgba(255,255,255,.42)}
+.s-cta-h2{
+  font-size:clamp(2.2rem,4.5vw,3.8rem);
+  font-weight:300;letter-spacing:.07em;
+  line-height:1.28;margin:0 0 44px;
+}
+.btn-cta{
+  display:inline-block;
+  border:1px solid rgba(255,255,255,.5);
+  color:#fff;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.76rem;letter-spacing:.22em;
+  padding:18px 52px;text-decoration:none;
+  transition:all .35s;font-weight:300;
+  background:rgba(255,255,255,.08);
+}
+.btn-cta:hover{
+  background:rgba(255,255,255,.2);
+  border-color:rgba(255,255,255,.85);
+}
+
+/* FOOTER */
+footer{
+  background:#18140e;
+  padding:80px 56px 52px;
+  display:grid;
+  grid-template-columns:1.5fr 1fr 1fr;
+  gap:52px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.75rem;line-height:2.0;font-weight:300;
+  color:rgba(255,255,255,.38);
+}
+.ft-brand-name{
+  font-family:'Noto Serif KR',serif;
+  font-size:1.05rem;font-weight:300;
+  letter-spacing:.12em;
+  color:rgba(255,255,255,.76);margin-bottom:18px;
+}
+.ft-col h4{
+  font-size:.6rem;letter-spacing:.28em;
+  color:rgba(255,255,255,.26);
+  margin-bottom:16px;font-weight:300;
+}
+.ft-bottom{
+  grid-column:1/-1;
+  border-top:1px solid rgba(255,255,255,.07);
+  padding-top:32px;
+  display:flex;justify-content:space-between;
+  font-size:.65rem;color:rgba(255,255,255,.18);
+}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  nav,nav.scrolled{padding:20px 28px}
+  .nav-links{gap:24px}
+  .s-intro{grid-template-columns:1fr}
+  .s-intro-img{height:52vw}
+  .s-intro-text{padding:60px 36px}
+  .prog-grid{grid-template-columns:1fr 1fr}
+  .prog-grid .prog-item:last-child{display:none}
+  .gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .g-item:first-child{grid-row:auto}
+  footer{grid-template-columns:1fr;gap:36px}
+  .ft-bottom{flex-direction:column;gap:10px}
+}
+@media(max-width:600px){
+  nav,nav.scrolled{padding:16px 20px}
+  .nav-links li:nth-child(n+3){display:none}
+  .prog-grid{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:1fr;grid-template-rows:auto}
+  .s-intro-text{padding:48px 24px}
+  footer{padding:52px 24px 36px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <span class="nav-logo">여의명상센터 한울사랑</span>
+  <ul class="nav-links">
+    <li><a href="#intro">센터소개</a></li>
+    <li><a href="#programs">수련프로그램</a></li>
+    <li><a href="#gallery">갤러리</a></li>
+    <li><a href="#contact">오시는길</a></li>
+  </ul>
+</nav>
+
+<!-- HERO — 100vw × 100vh, no margin -->
+<section class="hero">
+  <img src="<%- imgs.hero %>" alt="여의명상센터 한울사랑 — 자연 속 고요함">
+  <div class="hero-grad"></div>
+  <div class="hero-body">
+    <p class="hero-kicker">YEOUIDO · MEDITATION CENTER</p>
+    <h1 class="hero-h1">한울사랑</h1>
+    <p class="hero-sub">고요함 속에서 자신을 만나다</p>
+  </div>
+  <div class="hero-arrow">SCROLL</div>
+</section>
+
+<!-- QUOTE — fullscreen 이미지 위 인용구 -->
+<section class="s-quote">
+  <img src="<%- imgs.med1 %>" alt="">
+  <div class="s-quote-overlay"></div>
+  <div class="s-quote-body">
+    <div class="q-open">"</div>
+    <p class="q-text">한울이 그대 안에 있습니다<br>잠시 멈추어 귀 기울여 보십시오</p>
+    <p class="q-attr">— 여의명상센터 한울사랑</p>
+  </div>
+</section>
+
+<!-- INTRO SPLIT -->
+<section class="s-intro" id="intro">
+  <div class="s-intro-img">
+    <img src="<%- imgs.nature1 %>" alt="명상 수련 현장">
+  </div>
+  <div class="s-intro-text">
+    <span class="lbl">ABOUT US</span>
+    <h2 class="s-intro-h2">자연과 함께하는<br>깊은 명상의 공간</h2>
+    <p class="s-intro-p">여의도 한강변, 누구나 찾아올 수 있는<br>명상과 수련의 공간입니다.</p>
+    <a href="#programs" class="btn-ln">프로그램 보기</a>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section class="s-prog" id="programs">
+  <div class="s-prog-hd">
+    <span class="lbl">PROGRAMS</span>
+    <h2 class="s-prog-h2">수련 프로그램</h2>
+  </div>
+  <div class="prog-grid">
+    <div class="prog-item">
+      <img src="<%- imgs.med1 %>" alt="마음챙김 명상">
+      <div class="prog-mask">
+        <p class="prog-n">01</p>
+        <p class="prog-title">마음챙김 명상</p>
+        <p class="prog-time">매주 토요일 오전 10시</p>
+      </div>
+    </div>
+    <div class="prog-item">
+      <img src="<%- imgs.med2 %>" alt="자연 호흡 수련">
+      <div class="prog-mask">
+        <p class="prog-n">02</p>
+        <p class="prog-title">자연 호흡 수련</p>
+        <p class="prog-time">매주 일요일 오전 7시</p>
+      </div>
+    </div>
+    <div class="prog-item">
+      <img src="<%- imgs.daily %>" alt="일상 속 명상">
+      <div class="prog-mask">
+        <p class="prog-n">03</p>
+        <p class="prog-title">일상 속 명상</p>
+        <p class="prog-time">화·목 저녁 7시 30분</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY — 4장 실사 2×2 -->
+<section class="s-gallery" id="gallery">
+  <div class="gallery-grid">
+    <div class="g-item"><img src="<%- imgs.outing1 %>" alt="수련 현장"></div>
+    <div class="g-item"><img src="<%- imgs.retreat1 %>" alt="집중 수련"></div>
+    <div class="g-item"><img src="<%- imgs.daily %>" alt="일상 수련"></div>
+    <div class="g-item"><img src="<%- imgs.retreat2 %>" alt="수련 모임"></div>
+  </div>
+</section>
+
+<!-- CTA FULLSCREEN -->
+<section class="s-cta" id="contact">
+  <img src="<%- imgs.nature1 %>" alt="">
+  <div class="s-cta-overlay"></div>
+  <div class="s-cta-body">
+    <span class="lbl">JOIN US</span>
+    <h2 class="s-cta-h2">함께 걷는 명상 여정</h2>
+    <a href="tel:02-0000-0000" class="btn-cta">참여 문의하기</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="ft-brand-name">여의명상센터 한울사랑</div>
+    <p>서울특별시 영등포구 여의도동<br>여의명상센터 한울사랑</p>
+  </div>
+  <div class="ft-col">
+    <h4>PROGRAMS</h4>
+    <p>마음챙김 명상<br>자연 호흡 수련<br>일상 속 명상</p>
+  </div>
+  <div class="ft-col">
+    <h4>CONTACT</h4>
+    <p>Tel. 02-0000-0000<br>매일 07:00–21:00</p>
+  </div>
+  <div class="ft-bottom">
+    <span>© 2024 여의명상센터 한울사랑</span>
+    <span>YEOUIDO MEDITATION CENTER</span>
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+const onScroll = () => nav.classList.toggle('scrolled', scrollY > 70);
+addEventListener('scroll', onScroll, {passive:true});
+</script>
+</body>
+</html>

@@ -13,14 +13,13 @@ import pg from 'pg';
 import OpenAI from 'openai';
 
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env') });
-// Load from Lucas-Initiative root .env for OPENAI_API_KEY
 dotenv.config({ path: 'G:\\Lucas-Initiative\\.env', override: false });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT_B || 8081;
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -39,7 +38,7 @@ const pool = new pg.Pool({
   password: 'postgres',
 });
 
-// ── OpenAI (lazy init — key loaded at request time) ────────────
+// ── OpenAI (lazy init) ─────────────────────────────────────────
 let _openai = null;
 function getOpenAI() {
   if (!_openai) {
@@ -95,27 +94,10 @@ if (hasCloudinary) {
 //  PAGES
 // ════════════════════════════════════════════════════════════════
 
-// / → A팀(siann-22) 메인
+// / → B팀(siann-17) 메인
 app.get('/', (req, res) => {
   const theme = parseInt(req.query.theme) || 1;
-  res.render('siann-22', { themeId: theme, layoutId: 22, showNav: false });
-});
-
-// /v2 → B팀(siann-17) 메인
-app.get('/v2', (req, res) => {
-  const theme = parseInt(req.query.theme) || 1;
   res.render('siann-17', { themeId: theme, layoutId: 17, showNav: false });
-});
-
-// 시안 레이아웃별 라우트 (기존 유지)
-app.get('/siann/:n', (req, res) => {
-  const n = parseInt(req.params.n) || 1;
-  res.render('siann', { themeId: n });
-});
-app.get('/siann-:layout(\\d+)/:theme(\\d+)?', (req, res) => {
-  const layout = Math.min(Math.max(parseInt(req.params.layout) || 1, 1), 99);
-  const theme  = Math.min(Math.max(parseInt(req.params.theme)  || 1, 1), 30);
-  res.render(`siann-${layout}`, { themeId: theme, layoutId: layout, showNav: false });
 });
 
 // /archive → 아카이브 페이지
@@ -128,7 +110,7 @@ app.get('/chat', (req, res) => res.render('chat'));
 app.get('/editor', (req, res) => res.render('editor'));
 
 // ════════════════════════════════════════════════════════════════
-//  ARCHIVE API  (from hanul-board)
+//  ARCHIVE API
 // ════════════════════════════════════════════════════════════════
 
 app.get('/api/boards', async (req, res) => {
@@ -211,10 +193,9 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════════
-//  AI CHATBOT API  (OpenAI embedding + pgvector)
+//  AI CHATBOT API
 // ════════════════════════════════════════════════════════════════
 
-// ── AI 챗봇: OpenAI 임베딩 + pgvector RAG (즉시 응답) ──────────
 app.post('/api/chat', async (req, res) => {
   try {
     const { question } = req.body;
@@ -230,7 +211,7 @@ app.post('/api/chat', async (req, res) => {
     const vecStr = '[' + embRes.data[0].embedding.join(',') + ']';
 
     // 2) 키워드 추출 — 단어 단위 접미사 제거 (개별 글자 제거 금지)
-    const suffixRe = /(이란|란|이란\?|이란요|이에요|입니까|합니까|인가요|이죠|이냐|이며|이고|이지|이다|이에|에서|으로|이란|이요|가요|까요|이가|이는|이를|은요|는요|을까|이란말|이뭔|무엇|어떤|어떻게|란게|란말|이란말)$/;
+    const suffixRe = /(이란말|이란요|이에요|입니까|합니까|인가요|어떻게|이란\?|이란|란게|란말|이죠|이냐|이며|이고|이지|이다|이에|에서|으로|이요|가요|까요|이가|이는|이를|은요|는요|을까|무엇|어떤|란)$/;
     const keywords = question
       .replace(/[?？！!.,。、]/g, '')
       .split(/\s+/)
@@ -240,7 +221,7 @@ app.post('/api/chat', async (req, res) => {
       .slice(0, 3);
     const mainKeyword = keywords[0] || question.replace(/[?？！!.,。、\s]/g,'').slice(0, 6);
 
-    // 3) pgvector 유사도 검색 (top 10) + posts 키워드 검색 병행 (하이브리드)
+    // 3) pgvector + posts 하이브리드 검색
     const postWhere = keywords.length > 1
       ? keywords.map((_,i) => `content ILIKE $${i+1}`).join(' OR ')
       : `content ILIKE $1`;
@@ -264,12 +245,12 @@ app.post('/api/chat', async (req, res) => {
       ).catch(() => ({ rows: [] })),
     ]);
 
-    // 유사도 0.28 이상 청크 우선, 미달 시 상위 5개 유지
-    const goodChunks = chunks.rows.filter(r => r.similarity >= 0.28);
-    const useChunks  = goodChunks.length >= 3 ? goodChunks : chunks.rows.slice(0, 5);
+    // 유사도 0.25 이상 청크 우선, 미달 시 상위 5개 유지
+    const goodChunks = chunks.rows.filter(r => r.similarity >= 0.25);
+    const useChunks  = goodChunks.length >= 2 ? goodChunks : chunks.rows.slice(0, 5);
 
-    const chunkCtx  = useChunks.map((r,i) => `[경전${i+1}] (${r.book_name})\n${r.chunk_text}`).join('\n\n');
-    const postCtx   = postResults.rows.length
+    const chunkCtx = useChunks.map((r,i) => `[경전${i+1}] (${r.book_name})\n${r.chunk_text}`).join('\n\n');
+    const postCtx  = postResults.rows.length
       ? '\n\n[카페 게시글]\n' + postResults.rows.map((r,i) =>
           `[게시글${i+1}] (${r.board} · ${r.title})\n${r.excerpt}`
         ).join('\n\n')
@@ -277,7 +258,7 @@ app.post('/api/chat', async (req, res) => {
 
     const context = chunkCtx + postCtx;
 
-    // 3) GPT 답변 — 적극적 답변 유도
+    // 4) GPT 답변
     const chat = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
@@ -286,10 +267,9 @@ app.post('/api/chat', async (req, res) => {
           content: [
             '당신은 여의선원 한울사상 전문 안내자입니다.',
             '아래 원문 자료(경전 구절·카페 게시글)를 최대한 활용하여 구체적이고 친절하게 답변하세요.',
-            '자료에 관련 내용이 있으면 원문을 직접 인용하며 상세히 설명하세요.',
-            '한울사상 관련 질문에는 반드시 설명을 제공하세요. "자료에서 확인하기 어렵습니다"는 자료에 전혀 없을 때만 사용하세요.',
-            '자료가 부족하면 한울사상의 핵심 개념(수도·생명장·성멸제도·성멸오통·각성·제도·기운)을 기반으로 설명을 보완하세요.',
-            '동학·시천주·인내천·천도교는 언급하지 마세요.',
+            '자료에 관련 내용이 있으면 원문을 직접 인용하며 설명하세요.',
+            '자료에 전혀 없는 내용일 때만 "자료에서 확인하기 어렵습니다"라고 하세요.',
+            '동학·시천주·한울님·인내천·천도교는 한울사상과 별개이니 언급하지 마세요.',
             '답변 끝에 출처(경전N / 게시글N)를 밝혀주세요.',
           ].join(' '),
         },
@@ -304,42 +284,11 @@ app.post('/api/chat', async (req, res) => {
     ).catch(() => {});
 
     const answer = chat.choices[0].message.content;
-    res.json({
-      answer,
-      sources: useChunks.map(r => ({ book: r.book_name, similarity: r.similarity })),
-    });
+    res.json({ answer, sources: useChunks.map(r => ({ book: r.book_name, similarity: r.similarity })) });
   } catch (e) {
     console.error('[chat]', e.message);
     res.status(500).json({ error: e.message });
   }
-});
-
-// ── 담당관 답변 저장 (hanul-aide가 호출) ──
-app.post('/api/chat/answers', async (req, res) => {
-  try {
-    const { questionId, answer, agentId } = req.body;
-    if (!questionId || !answer) return res.status(400).json({ error: 'questionId and answer required' });
-    await pool.query(
-      'INSERT INTO yeouiseonwon.chat_answers (question_id, answer, agent_id) VALUES ($1, $2, $3)',
-      [questionId, answer, agentId || 'hanul-aide']
-    );
-    await pool.query('UPDATE yeouiseonwon.chat_questions SET answered=TRUE WHERE id=$1', [questionId]);
-    res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// ── 답변 폴링 ──
-app.get('/api/chat/answers', async (req, res) => {
-  try {
-    const { questionId } = req.query;
-    if (!questionId) return res.status(400).json({ error: 'questionId required' });
-    const r = await pool.query(
-      'SELECT * FROM yeouiseonwon.chat_answers WHERE question_id=$1 ORDER BY answered_at DESC LIMIT 1',
-      [questionId]
-    );
-    if (!r.rows.length) return res.json({ pending: true });
-    res.json({ pending: false, answer: r.rows[0].answer, agentId: r.rows[0].agent_id, answeredAt: r.rows[0].answered_at });
-  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ════════════════════════════════════════════════════════════════
@@ -397,9 +346,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`한울사상 통합 서버 http://0.0.0.0:${PORT}`);
-  console.log('  /        — A팀 홈페이지 (siann-22)');
-  console.log('  /v2      — B팀 홈페이지 (siann-17)');
+  console.log(`한울사상 B안 서버 http://0.0.0.0:${PORT}`);
+  console.log('  /        — B팀 홈페이지 (siann-17)');
   console.log('  /archive — 아카이브');
   console.log('  /chat    — AI 챗봇');
   console.log('  /editor  — 스마트에디터');

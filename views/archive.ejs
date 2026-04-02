@@ -46,14 +46,46 @@
     .modal{background:#fff;width:100%;max-width:820px;border-radius:10px;overflow:hidden}
     .modal-header{padding:18px 24px;background:#2A1E10;color:#E8DCC8;display:flex;justify-content:space-between;align-items:center}
     .modal-header h2{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:400}
-    .modal-close{background:none;border:none;color:#E8DCC8;font-size:22px;cursor:pointer;line-height:1}
-    .modal-meta{padding:12px 24px;background:#F8F6F0;font-size:12px;color:#7A6048;display:flex;gap:16px;border-bottom:1px solid #DDD8C8}
+    .modal-close{background:none;border:none;color:#E8DCC8;font-size:22px;cursor:pointer;line-height:1;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
+    .modal-meta{padding:12px 24px;background:#F8F6F0;font-size:12px;color:#7A6048;display:flex;gap:16px;border-bottom:1px solid #DDD8C8;flex-wrap:wrap}
     .modal-body{padding:24px;font-size:14px;line-height:1.9;max-height:60vh;overflow-y:auto}
     .modal-body img{max-width:100%;height:auto;border-radius:4px;margin:8px 0}
     .comments{padding:16px 24px;border-top:1px solid #DDD8C8}
     .comments h4{font-size:13px;font-weight:500;margin-bottom:10px;color:#5A4028}
     .comment{padding:8px 12px;background:#F8F6F0;border-radius:4px;margin-bottom:6px;font-size:12px}
     .comment .cmeta{color:#9A8870;font-size:11px;margin-bottom:3px}
+    /* Mobile toggle */
+    .sidebar-toggle{display:none;width:100%;padding:11px 16px;background:#2A1E10;color:#E8DCC8;border:none;border-radius:6px;font-size:13px;cursor:pointer;text-align:left;min-height:44px;font-family:'Noto Sans KR',sans-serif;margin-bottom:8px}
+    /* Post card (mobile) */
+    .post-card{display:none;background:#fff;border:1px solid #DDD8C8;border-radius:8px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:background .15s}
+    .post-card:hover,.post-card:active{background:#FBF7EE}
+    .post-card-title{font-size:14px;color:#2A1E10;line-height:1.5;margin-bottom:6px}
+    .post-card-meta{font-size:11px;color:#9A8870;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .post-card-meta .badge-board{font-size:11px;background:#F0E8D4;color:#7A5020;padding:2px 7px;border-radius:10px}
+    /* Responsive */
+    @media(max-width:768px){
+      .layout{flex-direction:column;gap:12px}
+      .sidebar{width:100%}
+      .sidebar-toggle{display:flex;align-items:center;justify-content:space-between}
+      .board-list{display:none}
+      .board-list.open{display:block}
+      .board-item{min-height:44px;display:flex;align-items:center;justify-content:space-between}
+      .search-bar input{font-size:16px}
+      .search-bar button{min-height:44px;padding:0 20px}
+      .stats-bar{flex-wrap:wrap;gap:8px}
+    }
+    @media(max-width:480px){
+      .page{padding:16px 12px}
+      h1{font-size:18px}
+      .post-table{display:none}
+      .post-card{display:block}
+      .pagination button{min-width:36px;min-height:36px;padding:0 8px}
+      .modal-bg{padding:0}
+      .modal{border-radius:0;min-height:100dvh}
+      .modal-body{max-height:calc(100dvh - 140px)}
+      .site-nav{overflow-x:auto;white-space:nowrap;gap:0;padding:0 12px}
+      .site-nav a{padding:0 10px;font-size:12px}
+    }
   </style>
 </head>
 <body>
@@ -74,7 +106,10 @@
 
   <div class="layout">
     <div class="sidebar">
-      <h3>게시판</h3>
+      <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">
+        <span>📋 게시판 선택</span><span id="sidebar-arrow">▼</span>
+      </button>
+      <h3 style="display:none" id="sidebar-heading">게시판</h3>
       <div class="board-list" id="board-list">
         <div class="board-item active" data-board="">전체 <span class="cnt"></span></div>
       </div>
@@ -91,6 +126,7 @@
         </thead>
         <tbody id="post-tbody"></tbody>
       </table>
+      <div id="post-cards"></div>
       <div class="pagination" id="pagination"></div>
     </div>
   </div>
@@ -150,6 +186,7 @@ async function loadPosts() {
       <td style="color:#9A8870;font-size:11px">${p.created_at?new Date(p.created_at).toLocaleDateString('ko'):''}</td>
       <td style="color:#7A6048;font-size:12px;text-align:center">${p.comment_count||0}</td>
     </tr>`).join('');
+  renderCards(data.posts);
   renderPaging(data.totalPages, data.page);
 }
 
@@ -189,10 +226,35 @@ async function openPost(postId) {
     : '';
 
   document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-function closeModal() { document.getElementById('modal-bg').classList.remove('open'); }
+function closeModal() { document.getElementById('modal-bg').classList.remove('open'); document.body.style.overflow=''; }
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toggleSidebar() {
+  const bl = document.getElementById('board-list');
+  const arrow = document.getElementById('sidebar-arrow');
+  const open = bl.classList.toggle('open');
+  arrow.textContent = open ? '▲' : '▼';
+}
+
+// Re-render cards for mobile
+function renderCards(posts) {
+  const el = document.getElementById('post-cards');
+  if (!posts?.length) { el.innerHTML=''; return; }
+  el.innerHTML = posts.map((p,i) => `
+    <div class="post-card" onclick="openPost('${p.post_id}')">
+      <div class="post-card-title">${escHtml(p.title||'(제목없음)')}</div>
+      <div class="post-card-meta">
+        <span class="badge-board">${escHtml(p.board||'')}</span>
+        <span>${escHtml(p.author||'')}</span>
+        <span>${p.created_at?new Date(p.created_at).toLocaleDateString('ko'):''}</span>
+        ${p.comment_count ? `<span>💬 ${p.comment_count}</span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
 
 loadStats();
 loadBoards();

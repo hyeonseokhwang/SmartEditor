@@ -3,60 +3,25 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>한울사상 여의명상센터 — <%= themeId %>번 테마</title>
+  <title>한울사랑 여의명상센터 — 1번 테마</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    <%
-    const themes={
-      1: {n:'Ivory Sage',    ac:'#7A6845', aL:'#9A8860', bg:'#FAF7F0', tx:'#2A1E10', gr:'#8A7860', dark:'#3A2E18', mid:'#F0EBD8', lite:'#FBF9F2', hl:'#C8B870'},
-      2: {n:'Forest Still',  ac:'#4A7A3A', aL:'#6A9A58', bg:'#F0F8EE', tx:'#141E10', gr:'#6A8860', dark:'#1E3818', mid:'#DCF0D8', lite:'#F4FAF2', hl:'#78B858'},
-      3: {n:'Cream Temple',  ac:'#5A5040', aL:'#7A7058', bg:'#F8F6F0', tx:'#1E1A14', gr:'#8A8070', dark:'#2A2418', mid:'#EAE6D8', lite:'#FAF8F4', hl:'#A89870'},
-      4: {n:'Amber Dawn',    ac:'#C07028', aL:'#E09048', bg:'#FCF6EC', tx:'#221408', gr:'#907850', dark:'#5A3010', mid:'#F0D8B8', lite:'#FEF8F0', hl:'#E09848'},
-      5: {n:'Lotus Blue',    ac:'#4A7898', aL:'#6A98B8', bg:'#F0F6FC', tx:'#0E1E2E', gr:'#6A8898', dark:'#1A3850', mid:'#C8DCF0', lite:'#F4F8FE', hl:'#6898C8'},
-      6: {n:'Sacred Violet', ac:'#7A5A90', aL:'#9A7AB0', bg:'#F6F0FA', tx:'#1A0E22', gr:'#8A7098', dark:'#3A1A50', mid:'#DCC8F0', lite:'#FAF4FE', hl:'#9A68C0'},
-      7: {n:'Bamboo Morning',ac:'#6A7840', aL:'#8A9860', bg:'#F6F8EC', tx:'#161E0A', gr:'#7A8868', dark:'#283010', mid:'#D8E0C0', lite:'#F8FAF0', hl:'#8AA858'},
-      8: {n:'Stone Silence', ac:'#606870', aL:'#808890', bg:'#F4F4F2', tx:'#141618', gr:'#7A8088', dark:'#282A2E', mid:'#D0D4D8', lite:'#F8F8F6', hl:'#889098'},
-      9: {n:'Teal Shrine',   ac:'#2A8888', aL:'#48A8A8', bg:'#EEF8F8', tx:'#0A1A1A', gr:'#5A8888', dark:'#0E3838', mid:'#B8E0E0', lite:'#F2FAFA', hl:'#48A8A8'},
-      10:{n:'Amber Monk',    ac:'#C88020', aL:'#E8A040', bg:'#FCF8EE', tx:'#1E1604', gr:'#9A8040', dark:'#583010', mid:'#F0D898', lite:'#FEF9F0', hl:'#E0A030'},
-      11:{n:'Ocean Deep',    ac:'#3A6898', aL:'#5A88B8', bg:'#ECF4FC', tx:'#0A1828', gr:'#5A7898', dark:'#102840', mid:'#BDD4EE', lite:'#F0F6FE', hl:'#5A88C0'},
-      12:{n:'Warm Linen',    ac:'#8A6038', aL:'#AA8050', bg:'#FAF4E8', tx:'#221608', gr:'#8A7860', dark:'#3C2010', mid:'#EDD8B8', lite:'#FDF8F0', hl:'#B88040'},
-      13:{n:'Moss Green',    ac:'#6A9840', aL:'#88B858', bg:'#EEF8E8', tx:'#121E08', gr:'#6A8850', dark:'#203010', mid:'#C8E8B8', lite:'#F2FAF0', hl:'#80B848'},
-      14:{n:'Midnight Blue', ac:'#5A70C8', aL:'#7A90E8', bg:'#ECEEFC', tx:'#0A0E28', gr:'#5A6898', dark:'#141830', mid:'#C0C8F0', lite:'#F0F2FE', hl:'#7080E0'},
-      15:{n:'Parchment',     ac:'#7A5020', aL:'#9A7038', bg:'#F8F2E4', tx:'#1E1408', gr:'#8A7060', dark:'#3A2008', mid:'#E8D8B8', lite:'#FBF7EE', hl:'#A87838'},
-      16:{n:'Rose Dusk',     ac:'#C07080', aL:'#E090A0', bg:'#FCF0F4', tx:'#221018', gr:'#907080', dark:'#502030', mid:'#F0C8D4', lite:'#FEF4F8', hl:'#D080A0'},
-      17:{n:'Gold Obsidian', ac:'#C8A030', aL:'#E8C050', bg:'#FCF8EA', tx:'#1E1A04', gr:'#887840', dark:'#503800', mid:'#F0D880', lite:'#FEFAF0', hl:'#E0B840'},
-      18:{n:'Jade Calm',     ac:'#5A9898', aL:'#7AB8B8', bg:'#ECF8F8', tx:'#0E1A1A', gr:'#5A8888', dark:'#163030', mid:'#B8E0E0', lite:'#F2FAFA', hl:'#70B0B0'},
-      19:{n:'Winter Pure',   ac:'#3A5888', aL:'#5A78A8', bg:'#F0F4FC', tx:'#0C1428', gr:'#6A7898', dark:'#142040', mid:'#C0CEEC', lite:'#F4F8FE', hl:'#5878B0'},
-      20:{n:'Copper Dusk',   ac:'#B07040', aL:'#D09060', bg:'#FAF2EA', tx:'#1E1008', gr:'#887060', dark:'#482010', mid:'#E8C8A0', lite:'#FDF7F0', hl:'#C88050'}
-    };
-    const t = themes[themeId] || themes[1];
-    // color-mix() 대체 — 구형 브라우저 호환
-    function mh(h1,h2,w){
-      const p=s=>parseInt(s,16);
-      const r1=p(h1.slice(1,3)),g1=p(h1.slice(3,5)),b1=p(h1.slice(5,7));
-      const r2=p(h2.slice(1,3)),g2=p(h2.slice(3,5)),b2=p(h2.slice(5,7));
-      return '#'+[r1*w+r2*(1-w),g1*w+g2*(1-w),b1*w+b2*(1-w)].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
-    }
-    const heroMid = mh(t.dark, t.ac, 0.7);
-    const heroEnd = mh(t.ac, '#1a1a0a', 0.6);
-    const quoteBg = mh(t.dark, t.ac, 0.8);
-    const ctaEnd  = mh(t.ac, t.dark, 0.7);
-    %>
+    
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --ac: <%= t.ac %>;
-      --aL: <%= t.aL %>;
-      --bg: <%= t.bg %>;
-      --tx: <%= t.tx %>;
-      --gr: <%= t.gr %>;
-      --dk: <%= t.dark %>;
-      --md: <%= t.mid %>;
-      --lt: <%= t.lite %>;
-      --hl: <%= t.hl %>;
+      --ac: #7A6845;
+      --aL: #9A8860;
+      --bg: #FAF7F0;
+      --tx: #2A1E10;
+      --gr: #8A7860;
+      --dk: #3A2E18;
+      --md: #F0EBD8;
+      --lt: #FBF9F2;
+      --hl: #C8B870;
       --serif: 'Noto Serif KR', serif;
       --sans: 'Noto Sans KR', sans-serif;
     }
@@ -101,10 +66,6 @@
     }
     .nav.solid .nav-links a { color: var(--gr); }
     .nav-links a:hover { color: var(--aL); }
-    .nav-sep { color: rgba(255,255,255,0.2); font-size:10px; user-select:none; }
-    .nav.solid .nav-sep { color: var(--gr); opacity:0.3; }
-    .nav-page { border-bottom: 1px solid transparent; transition: color 0.3s, border-color 0.3s !important; }
-    .nav-page:hover { border-bottom-color: var(--aL) !important; }
     .nav-cta {
       font-size: 12px; font-weight: 500; letter-spacing: 0.1em;
       padding: 8px 22px; border-radius: 2px;
@@ -118,16 +79,10 @@
 
     /* ── HERO ── */
     .hero {
-      position: relative; min-height: 80vh; max-height: 88vh;
-      display: flex; align-items: center; justify-content: flex-start;
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
       overflow: hidden;
-      background: linear-gradient(155deg, <%= t.dark %> 0%, <%= heroMid %> 45%, <%= heroEnd %> 100%);
-    }
-    .hero::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0; height: 120px;
-      background: linear-gradient(to bottom, transparent, var(--bg));
-      pointer-events: none; z-index: 3;
+      background: linear-gradient(155deg, #3A2E18 0%, #4d3f26 45%, #54492d 100%);
     }
     .hero-bg-glyph {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
@@ -138,30 +93,29 @@
       pointer-events: none; user-select: none;
       white-space: nowrap;
     }
-    /* 한울 심볼 — 하늘(○)·땅(□)·사람(△) 삼재 */
     .hero-lines {
-      position: absolute; right: 8vw; top: 50%; transform: translateY(-50%);
-      width: clamp(240px, 35vw, 480px); height: clamp(240px, 35vw, 480px);
-      pointer-events: none; z-index: 1;
+      position: absolute; inset: 0; pointer-events: none;
     }
     .hero-lines::before {
       content: '';
-      position: absolute; top: 10%; left: 10%;
-      width: 80%; height: 80%;
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(560px, 80vw); height: min(560px, 80vw);
       border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.06);
     }
     .hero-lines::after {
-      content: '한울';
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      font-family: var(--serif); font-size: clamp(80px, 14vw, 160px);
-      font-weight: 200; color: rgba(255,255,255,0.07);
-      letter-spacing: -0.02em; white-space: nowrap;
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(360px, 55vw); height: min(360px, 55vw);
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.09);
     }
     .hero-inner {
       position: relative; z-index: 2;
-      text-align: left; padding: 100px 72px 100px;
-      max-width: 860px;
+      text-align: center; padding: 120px 24px 80px;
+      max-width: 840px;
     }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 10px;
@@ -186,27 +140,15 @@
     }
     .hero-sub-hanja {
       font-family: var(--serif); font-size: 16px;
-      color: rgba(255,255,255,0.55); letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.35); letter-spacing: 0.4em;
       margin-bottom: 28px;
     }
     .hero-desc {
       font-size: 16px; font-weight: 300;
       color: rgba(255,255,255,0.65);
-      line-height: 1.9; max-width: 540px; margin: 0 0 48px;
+      line-height: 1.9; max-width: 540px; margin: 0 auto 48px;
       letter-spacing: 0.02em;
     }
-    .hero-cta-wrap { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-    .hero-btn-sub {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 12px; font-weight: 300; letter-spacing: 0.18em;
-      padding: 15px 30px;
-      background: transparent; color: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,255,255,0.28); border-radius: 2px;
-      cursor: pointer; text-decoration: none;
-      transition: all 0.3s;
-    }
-    .hero-btn-sub::after { content: '→'; font-size: 14px; opacity: 0.6; }
-    .hero-btn-sub:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.55); color: rgba(255,255,255,0.9); }
     .hero-btn {
       display: inline-block;
       font-size: 13px; font-weight: 500; letter-spacing: 0.14em;
@@ -294,50 +236,6 @@
     }
 
     /* ── DIVIDER ── */
-    /* ── HERO RHYTHM BRIDGE ── */
-    .rhythm-bridge {
-      display: flex; align-items: center; gap: 24px;
-      padding: 40px 72px 32px;
-      background: var(--bg);
-    }
-    .rhythm-line {
-      flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--ac), transparent);
-      opacity: 0.3;
-    }
-    .rhythm-label {
-      font-size: 10px; letter-spacing: 0.28em; color: var(--gr);
-      white-space: nowrap; text-transform: uppercase;
-    }
-
-    /* ── DARK QUOTE SECTION ── */
-    .dark-quote {
-      background: var(--dk);
-      padding: 96px 48px;
-      text-align: center;
-    }
-    .dark-quote-inner { max-width: 720px; margin: 0 auto; }
-    .dark-quote-label {
-      font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
-      color: var(--ac); margin-bottom: 40px; opacity: 0.8;
-    }
-    .dark-quote-text {
-      font-family: var(--serif); font-size: clamp(20px, 3.5vw, 32px);
-      font-weight: 300; line-height: 1.8; color: rgba(255,255,255,0.9);
-      margin-bottom: 28px; font-style: normal;
-    }
-    .dark-quote-sub {
-      font-size: 14px; color: rgba(255,255,255,0.5);
-      letter-spacing: 0.06em; margin-bottom: 40px;
-    }
-    .dark-quote-tags {
-      display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-    }
-    .dark-quote-tags span {
-      font-family: var(--serif); font-size: 13px;
-      color: var(--hl); letter-spacing: 0.14em;
-      padding: 6px 18px; border: 1px solid rgba(255,255,255,0.12);
-    }
-
     .divider {
       height: 1px; background: linear-gradient(to right, transparent, var(--ac), transparent);
       opacity: 0.2; margin: 0;
@@ -396,7 +294,7 @@
 
     /* ── QUOTE ── */
     .quote-sec {
-      background: linear-gradient(160deg, <%= t.dark %> 0%, <%= quoteBg %> 100%);
+      background: linear-gradient(160deg, #3A2E18 0%, #473a21 100%);
       padding: 120px 0;
     }
     .quote-inner {
@@ -473,7 +371,7 @@
 
     /* ── CTA ── */
     .cta-sec {
-      background: linear-gradient(135deg, <%= t.ac %> 0%, <%= ctaEnd %> 100%);
+      background: linear-gradient(135deg, #7A6845 0%, #675738 100%);
       padding: 100px 0;
     }
     .cta-inner { text-align: center; padding: 0 48px; }
@@ -552,15 +450,12 @@
 
   <!-- NAV -->
   <nav class="nav" id="nav">
-    <a href="#" class="nav-logo">한울사상</a>
+    <a href="#" class="nav-logo">한울사랑</a>
     <ul class="nav-links">
       <li><a href="#philosophy">사상</a></li>
       <li><a href="#programs">수련</a></li>
       <li><a href="#teachings">가르침</a></li>
-      <li class="nav-sep" aria-hidden="true">|</li>
-      <li><a href="/archive" class="nav-page">아카이브</a></li>
-      <li><a href="/chat" class="nav-page">챗봇</a></li>
-      <li><a href="/editor" class="nav-page">에디터</a></li>
+      <li><a href="#contact">문의</a></li>
     </ul>
     <a href="#contact" class="nav-cta">수련 신청</a>
   </nav>
@@ -576,13 +471,10 @@
       </h1>
       <p class="hero-sub-hanja">天 · 地 · 人</p>
       <p class="hero-desc">
-        한울사상 여의명상센터는 한울사상의 뿌리 위에서<br>
+        한울사랑 여의명상센터는 한울사상의 뿌리 위에서<br>
         몸과 마음이 쉬고, 깨어나는 공간입니다.
       </p>
-      <div class="hero-cta-wrap">
-        <a href="#programs" class="hero-btn">수련 과정 보기</a>
-        <a href="/chat" class="hero-btn-sub">담당관 채팅하기</a>
-      </div>
+      <a href="#programs" class="hero-btn">수련 과정 보기</a>
     </div>
     <div class="hero-scroll">
       <div class="hero-scroll-line"></div>
@@ -590,50 +482,48 @@
     </div>
   </section>
 
-  <!-- HERO RHYTHM BRIDGE -->
-  <div class="rhythm-bridge">
-    <div class="rhythm-line"></div>
-    <span class="rhythm-label">한울사상 · 여의명상센터</span>
-    <div class="rhythm-line"></div>
-  </div>
-
   <!-- PHILOSOPHY -->
   <section class="philosophy" id="philosophy">
     <div class="container">
       <div class="sec-label">한울사상 · Philosophy</div>
-      <h2 class="sec-title">핵심 가르침</h2>
-      <p class="sec-desc">한울사상의 실천 — 수도·생명장·성멸제도·성멸오통.</p>
+      <h2 class="sec-title">네 가지 뿌리</h2>
+      <p class="sec-desc">한울사상은 도·손·장·책의 네 원리로 삶의 균형을 회복합니다.</p>
     </div>
     <div class="phil-grid" style="max-width:1140px;margin:0 auto;padding:0 48px;margin-top:0;">
-      <% const philData = [
-        {n:'01', name:'修道  수도', hanja:'닦아가는 길', text:'깊이 공부해서 수련과 수도를 겸해서 지도해줄 수 있어야 합니다. 수도는 스스로를 닦는 것을 넘어 세상을 함께 깨우는 길입니다. — 큰스승님 말씀'},
-        {n:'02', name:'生命場  생명장', hanja:'생명의 공명', text:'생명장을 통해 자기표현을 해야 상대와 충돌하지 않는다. 생명장에 의해 공명현상이 일어나고, 그 공명을 통해 서로 조화가 이루어져야 한다. — 한울기공 말씀'},
-        {n:'03', name:'性滅濟度  성멸제도', hanja:'사람 성을 비우다', text:'성멸제도일은 자신이 멸해야 할 성, 즉 사람 성·사람 정을 소멸하는 날입니다. 부질없고 쓸모없는 것들을 버리고 영격을 높여가는 수도의 과정입니다.'},
-        {n:'04', name:'性滅五通  성멸오통', hanja:'초월하여 통하다', text:'성(性)에 묶이지 않고 초월해야 전체와 통할 수 있다. 주계좌를 득한 이후 성멸오통에 이르는 것으로 끝나는 것이 아니라 반드시 더 깊이 나아가야 한다. — 큰스승님 말씀'}
-      ]; %>
-      <% philData.forEach(p => { %>
+      
+      
       <div class="phil-item">
-        <div class="phil-glyph"><%= p.name.split('  ')[0] %></div>
-        <div class="phil-num"><%= p.n %></div>
-        <div class="phil-name"><%= p.name %></div>
-        <div class="phil-hanja"><%= p.hanja %></div>
-        <p class="phil-text"><%= p.text %></p>
+        <div class="phil-glyph">道</div>
+        <div class="phil-num">01</div>
+        <div class="phil-name">道  도</div>
+        <div class="phil-hanja">길을 걷다</div>
+        <p class="phil-text">모든 존재는 저마다의 길이 있습니다. 한울의 도는 강요가 아닌 자연스러운 흐름을 따라가는 삶의 방식입니다. 길을 찾는 것이 아니라, 이미 길 위에 있음을 아는 것.</p>
       </div>
-      <% }); %>
-    </div>
-  </section>
-
-  <!-- DARK QUOTE SECTION — 영적 깊이감 -->
-  <section class="dark-quote" id="quote">
-    <div class="dark-quote-inner">
-      <p class="dark-quote-label">한울사상 · 핵심 가르침</p>
-      <blockquote class="dark-quote-text">
-        "수도자 1인은 세상자 만인이요,<br>중생자 억이라"
-      </blockquote>
-      <p class="dark-quote-sub">내 안에서 깨어난 한울의 빛이 세상을 밝힌다</p>
-      <div class="dark-quote-tags">
-        <span>戒 계</span><span>命 명</span><span>道 도</span><span>定 정</span><span>誠 성</span>
+      
+      <div class="phil-item">
+        <div class="phil-glyph">損</div>
+        <div class="phil-num">02</div>
+        <div class="phil-name">損  손</div>
+        <div class="phil-hanja">덜어내다</div>
+        <p class="phil-text">쌓는 것이 아닌 덜어냄의 지혜. 욕망과 집착을 내려놓을 때 비로소 진정한 자유가 시작됩니다. 비어있음이 곧 충만함입니다.</p>
       </div>
+      
+      <div class="phil-item">
+        <div class="phil-glyph">場</div>
+        <div class="phil-num">03</div>
+        <div class="phil-name">場  장</div>
+        <div class="phil-hanja">마당을 만들다</div>
+        <p class="phil-text">개인이 아닌 공동체. 한울사랑은 혼자가 아닌 함께 수련하는 장(場)입니다. 나의 깨어남이 주변을 깨우고, 공동의 장이 더 깊은 수련을 가능하게 합니다.</p>
+      </div>
+      
+      <div class="phil-item">
+        <div class="phil-glyph">責</div>
+        <div class="phil-num">04</div>
+        <div class="phil-name">責  책</div>
+        <div class="phil-hanja">책임지다</div>
+        <p class="phil-text">깨달음은 세상으로 향합니다. 내면의 성장은 사회적 책임으로 이어집니다. 한울사상은 수련의 결실이 더불어 사는 삶으로 표현되어야 한다고 가르칩니다.</p>
+      </div>
+      
     </div>
   </section>
 
@@ -653,24 +543,62 @@
         </div>
       </div>
       <div class="prog-grid">
-        <% const progs = [
-          {icon:'☽', title:'새벽 명상', sub:'Dawn Meditation', text:'하루의 시작을 고요 속에서. 새벽 5시, 가장 맑은 의식으로 내면을 만납니다.'},
-          {icon:'○', title:'기(氣) 수련', sub:'Qi Practice', text:'동양 전통 기수련으로 몸의 에너지 흐름을 조율하고 생명력을 회복합니다.'},
-          {icon:'◇', title:'한울 요가', sub:'Hanul Yoga', text:'한울사상과 요가 철학의 만남. 몸의 정렬을 통해 마음의 정렬을 경험합니다.'},
-          {icon:'∞', title:'집중 수련', sub:'Intensive Retreat', text:'3박 4일 침묵 수련. 디지털과 단절하고 진정한 자신과 대면합니다.'},
-          {icon:'◎', title:'걷기 명상', sub:'Walking Meditation', text:'한 걸음 한 걸음에 의식을 담아. 숲과 땅과 함께 하는 동적 명상.'},
-          {icon:'〇', title:'공동 수련', sub:'Community Practice', text:'함께하는 수련의 힘. 공동체 안에서 더 깊은 내면의 변화를 경험합니다.'}
-        ]; %>
-        <% progs.forEach((p, i) => { %>
+        
+        
         <div class="prog-card">
           <div class="prog-card-accent"></div>
-          <div class="prog-num">0<%= i+1 %></div>
-          <div class="prog-icon" style="font-size:28px; color:var(--ac);"><%= p.icon %></div>
-          <div class="prog-title"><%= p.title %></div>
-          <p class="prog-text"><%= p.text %></p>
+          <div class="prog-num">01</div>
+          <div class="prog-icon" style="font-size:28px; color:var(--ac);">☽</div>
+          <div class="prog-title">새벽 명상</div>
+          <p class="prog-text">하루의 시작을 고요 속에서. 새벽 5시, 가장 맑은 의식으로 내면을 만납니다.</p>
           <a href="#contact" class="prog-link">자세히 보기 →</a>
         </div>
-        <% }); %>
+        
+        <div class="prog-card">
+          <div class="prog-card-accent"></div>
+          <div class="prog-num">02</div>
+          <div class="prog-icon" style="font-size:28px; color:var(--ac);">○</div>
+          <div class="prog-title">기(氣) 수련</div>
+          <p class="prog-text">동양 전통 기수련으로 몸의 에너지 흐름을 조율하고 생명력을 회복합니다.</p>
+          <a href="#contact" class="prog-link">자세히 보기 →</a>
+        </div>
+        
+        <div class="prog-card">
+          <div class="prog-card-accent"></div>
+          <div class="prog-num">03</div>
+          <div class="prog-icon" style="font-size:28px; color:var(--ac);">◇</div>
+          <div class="prog-title">한울 요가</div>
+          <p class="prog-text">한울사상과 요가 철학의 만남. 몸의 정렬을 통해 마음의 정렬을 경험합니다.</p>
+          <a href="#contact" class="prog-link">자세히 보기 →</a>
+        </div>
+        
+        <div class="prog-card">
+          <div class="prog-card-accent"></div>
+          <div class="prog-num">04</div>
+          <div class="prog-icon" style="font-size:28px; color:var(--ac);">∞</div>
+          <div class="prog-title">집중 수련</div>
+          <p class="prog-text">3박 4일 침묵 수련. 디지털과 단절하고 진정한 자신과 대면합니다.</p>
+          <a href="#contact" class="prog-link">자세히 보기 →</a>
+        </div>
+        
+        <div class="prog-card">
+          <div class="prog-card-accent"></div>
+          <div class="prog-num">05</div>
+          <div class="prog-icon" style="font-size:28px; color:var(--ac);">◎</div>
+          <div class="prog-title">걷기 명상</div>
+          <p class="prog-text">한 걸음 한 걸음에 의식을 담아. 숲과 땅과 함께 하는 동적 명상.</p>
+          <a href="#contact" class="prog-link">자세히 보기 →</a>
+        </div>
+        
+        <div class="prog-card">
+          <div class="prog-card-accent"></div>
+          <div class="prog-num">06</div>
+          <div class="prog-icon" style="font-size:28px; color:var(--ac);">〇</div>
+          <div class="prog-title">공동 수련</div>
+          <p class="prog-text">함께하는 수련의 힘. 공동체 안에서 더 깊은 내면의 변화를 경험합니다.</p>
+          <a href="#contact" class="prog-link">자세히 보기 →</a>
+        </div>
+        
       </div>
     </div>
   </section>
@@ -693,22 +621,35 @@
         <div class="teach-sticky">
           <div class="sec-label">가르침 · Teachings</div>
           <h2 class="sec-title">삶이 곧<br>수련입니다</h2>
-          <p class="sec-desc" style="margin-top:16px;">한울사상의 가르침은 수련원 안에 머물지 않고 일상으로 흘러갑니다.</p>
+          <p class="sec-desc" style="margin-top:16px;">한울사랑의 가르침은 수련원 안에 머물지 않고 일상으로 흘러갑니다.</p>
         </div>
         <ul class="teach-list">
-          <% const teaches = [
-            {n:'01', title:'지금 이 순간', body:'과거의 기억도 미래의 불안도 아닌, 오직 지금 여기. 현재에 뿌리를 두는 것이 모든 수련의 출발입니다.'},
-            {n:'02', title:'몸이 스승이다', body:'몸은 가장 정직한 거울입니다. 긴장, 통증, 호흡의 리듬 — 몸이 보내는 신호에 귀를 기울이는 법을 배웁니다.'},
-            {n:'03', title:'침묵의 언어', body:'말이 멈출 때 비로소 들립니다. 규칙적인 침묵 수련으로 내면의 소리와 연결되는 능력을 키웁니다.'},
-            {n:'04', title:'관계가 수련이다', body:'나 혼자의 깨달음은 완전하지 않습니다. 타인과의 관계 속에서, 갈등과 용서 안에서 수련은 깊어집니다.'}
-          ]; %>
-          <% teaches.forEach(t2 => { %>
+          
+          
           <li class="teach-item">
-            <div class="teach-num"><%= t2.n %></div>
-            <div class="teach-title"><%= t2.title %></div>
-            <p class="teach-body"><%= t2.body %></p>
+            <div class="teach-num">01</div>
+            <div class="teach-title">지금 이 순간</div>
+            <p class="teach-body">과거의 기억도 미래의 불안도 아닌, 오직 지금 여기. 현재에 뿌리를 두는 것이 모든 수련의 출발입니다.</p>
           </li>
-          <% }); %>
+          
+          <li class="teach-item">
+            <div class="teach-num">02</div>
+            <div class="teach-title">몸이 스승이다</div>
+            <p class="teach-body">몸은 가장 정직한 거울입니다. 긴장, 통증, 호흡의 리듬 — 몸이 보내는 신호에 귀를 기울이는 법을 배웁니다.</p>
+          </li>
+          
+          <li class="teach-item">
+            <div class="teach-num">03</div>
+            <div class="teach-title">침묵의 언어</div>
+            <p class="teach-body">말이 멈출 때 비로소 들립니다. 규칙적인 침묵 수련으로 내면의 소리와 연결되는 능력을 키웁니다.</p>
+          </li>
+          
+          <li class="teach-item">
+            <div class="teach-num">04</div>
+            <div class="teach-title">관계가 수련이다</div>
+            <p class="teach-body">나 혼자의 깨달음은 완전하지 않습니다. 타인과의 관계 속에서, 갈등과 용서 안에서 수련은 깊어집니다.</p>
+          </li>
+          
         </ul>
       </div>
     </div>
@@ -756,9 +697,9 @@
       <h2 class="cta-title">지금, 여정을 시작하세요</h2>
       <p class="cta-sub">
         첫 발걸음이 가장 어렵습니다.<br>
-        한울사상 수련팀이 당신의 수련을 함께 설계합니다.
+        한울사랑 수련팀이 당신의 수련을 함께 설계합니다.
       </p>
-      <a href="#contact" class="cta-btn">수련 상담 신청하기</a>
+      <a href="tel:031-000-0000" class="cta-btn">수련 상담 신청하기</a>
     </div>
   </section>
 
@@ -767,7 +708,7 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand">
-          <div class="footer-logo">한울사상</div>
+          <div class="footer-logo">한울사랑</div>
           <p class="footer-tagline">
             한울사상의 정신 위에<br>
             몸과 마음이 만나는 공간.<br>
@@ -796,15 +737,16 @@
           <div>
             <div class="footer-col-title">연락처</div>
             <ul class="footer-col-list">
-              <li><a href="#">문의 전화 안내</a></li>
-              <li><a href="#">contact@yeouimyeongsan.kr</a></li>
-              <li><a href="#">서울특별시 영등포구 여의도</a></li>
+              <li><a href="#">031-000-0000</a></li>
+              <li><a href="#">hanul@hanulsarang.kr</a></li>
+              <li><a href="#">경기도 여주시</a></li>
             </ul>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <div class="footer-copy">© 2026 한울사상 여의명상센터. All rights reserved.</div>
+        <div class="footer-copy">© 2026 한울사랑 여의명상센터. All rights reserved.</div>
+        <div class="footer-theme">Theme 1 · Ivory Sage</div>
       </div>
     </div>
   </footer>

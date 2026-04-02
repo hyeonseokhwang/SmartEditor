@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>여의명상센터 — 한울사상</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&family=Noto+Sans+KR:wght@100;200;300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Serif KR', serif;
+      background: #F2EEE6;
+      color: #2A2218;
+      overflow-x: hidden;
+    }
+
+    /* ─── FULLSCREEN PHOTO HERO ──────────────────────── */
+    .fullhero {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .fullhero-bg {
+      position: absolute; inset: 0;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+    }
+    .fullhero-bg-col {
+      overflow: hidden;
+    }
+    .fullhero-bg-col img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: brightness(0.45) saturate(0.5);
+    }
+    .fullhero-bg-col:nth-child(2) img {
+      filter: brightness(0.5) saturate(0.6);
+      transform: scale(1.02);
+    }
+    .fullhero-overlay {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(18,14,10,0.3) 0%, transparent 30%, transparent 70%, rgba(18,14,10,0.5) 100%),
+        linear-gradient(to right, rgba(18,14,10,0.2) 0%, transparent 20%, transparent 80%, rgba(18,14,10,0.2) 100%);
+    }
+    /* 세로 구분선 */
+    .fullhero-divlines {
+      position: absolute; inset: 0;
+      pointer-events: none;
+    }
+    .fullhero-divlines::before {
+      content: '';
+      position: absolute; top: 0; bottom: 0; left: 33.33%;
+      width: 1px; background: rgba(255,255,255,0.06);
+    }
+    .fullhero-divlines::after {
+      content: '';
+      position: absolute; top: 0; bottom: 0; left: 66.66%;
+      width: 1px; background: rgba(255,255,255,0.06);
+    }
+
+    .fullhero-nav {
+      position: absolute; top: 0; left: 0; right: 0;
+      padding: 2.5rem 5vw;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 10;
+    }
+    .fullhero-nav-logo {
+      font-size: 0.85rem; font-weight: 300;
+      letter-spacing: 0.22em;
+      color: rgba(242,238,230,0.85);
+      text-decoration: none;
+    }
+    .fullhero-nav-links { display: flex; gap: 2.5rem; }
+    .fullhero-nav-links a {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.6rem; font-weight: 200;
+      letter-spacing: 0.15em;
+      color: rgba(242,238,230,0.55);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .fullhero-nav-links a:hover { color: rgba(242,238,230,0.9); }
+
+    .fullhero-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 5;
+      text-align: center;
+    }
+    .fh-tag {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.55rem; font-weight: 100;
+      letter-spacing: 0.5em;
+      color: rgba(200,180,140,0.7);
+      margin-bottom: 2.5rem;
+    }
+    .fh-title-hanja {
+      font-size: clamp(5rem, 12vw, 9rem);
+      font-weight: 200;
+      color: rgba(242,238,230,0.88);
+      letter-spacing: 0.08em;
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+    .fh-divline {
+      width: 40px; height: 1px;
+      background: rgba(200,180,140,0.5);
+      margin: 0 auto 1.5rem;
+    }
+    .fh-title-ko {
+      font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+      font-weight: 200;
+      color: rgba(242,238,230,0.65);
+      letter-spacing: 0.4em;
+    }
+    .fh-desc {
+      margin-top: 3rem;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.65rem; font-weight: 100;
+      letter-spacing: 0.2em; line-height: 2.2;
+      color: rgba(242,238,230,0.4);
+    }
+
+    .fullhero-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 2.5rem 5vw;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      z-index: 10;
+    }
+    .fh-caption {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.55rem; font-weight: 200;
+      letter-spacing: 0.15em;
+      color: rgba(242,238,230,0.3);
+    }
+    .fh-scroll-hint {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.5rem; font-weight: 100;
+      letter-spacing: 0.3em;
+      color: rgba(242,238,230,0.3);
+    }
+    .fh-scroll-bar {
+      width: 1px; height: 40px;
+      background: rgba(242,238,230,0.15);
+      position: relative; overflow: hidden;
+    }
+    .fh-scroll-bar::after {
+      content: '';
+      position: absolute; top: -100%; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(200,180,140,0.6);
+      animation: drop 2.4s 1s ease-in-out infinite;
+    }
+    @keyframes drop { 0%{top:-100%} 100%{top:200%} }
+
+    /* ─── THREE PHOTOS ROW ──────────────────────────── */
+    .three-photos {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      height: 50vh;
+    }
+    .three-photos-item {
+      overflow: hidden; position: relative;
+      cursor: pointer;
+    }
+    .three-photos-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 1s ease, filter 1s ease;
+      filter: grayscale(0.3) brightness(0.75);
+    }
+    .three-photos-item:hover img {
+      transform: scale(1.06);
+      filter: grayscale(0) brightness(0.85);
+    }
+    .three-photos-item .tp-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 3rem 2rem 1.8rem;
+      background: linear-gradient(to top, rgba(26,20,12,0.85) 0%, transparent 100%);
+    }
+    .tp-ko {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 1.05rem; font-weight: 300;
+      color: rgba(242,238,230,0.9);
+      letter-spacing: 0.08em;
+      display: block; margin-bottom: 0.3rem;
+    }
+    .tp-en {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.55rem; font-weight: 100;
+      letter-spacing: 0.25em;
+      color: rgba(200,180,140,0.65);
+    }
+
+    /* ─── PHILOSOPHY GRID ───────────────────────────── */
+    .phil-grid {
+      background: #F2EEE6;
+      padding: 14vh 5vw;
+    }
+    .pg-header {
+      text-align: center; margin-bottom: 8vh;
+    }
+    .pg-tag {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.55rem; font-weight: 200;
+      letter-spacing: 0.35em; color: #9A8F7A;
+      margin-bottom: 1.5rem;
+    }
+    .pg-title {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 300; letter-spacing: 0.1em;
+      color: #2A2218;
+    }
+    .pg-items {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .pg-item {
+      padding: 5vh 3vw;
+      border-right: 1px solid rgba(42,34,24,0.08);
+      text-align: center;
+    }
+    .pg-item:last-child { border-right: none; }
+    .pg-circle {
+      width: 80px; height: 80px;
+      border: 1px solid rgba(42,34,24,0.1);
+      border-radius: 50%;
+      margin: 0 auto 2rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; font-weight: 200;
+      color: #8B6A40;
+    }
+    .pg-ko {
+      font-size: 1rem; font-weight: 300;
+      letter-spacing: 0.12em; color: #2A2218;
+      margin-bottom: 1rem;
+    }
+    .pg-desc {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.68rem; font-weight: 200;
+      line-height: 1.9; color: #7A7268;
+    }
+
+    /* ─── FULL WIDTH PHOTO + TEXT ───────────────────── */
+    .wide-section {
+      position: relative; height: 70vh; overflow: hidden;
+    }
+    .wide-section img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: brightness(0.5) saturate(0.7);
+    }
+    .wide-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 0 8vw;
+    }
+    .wide-text {
+      max-width: 520px;
+      text-align: right;
+    }
+    .wide-eyebrow {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.55rem; font-weight: 200;
+      letter-spacing: 0.35em;
+      color: rgba(200,180,140,0.7);
+      margin-bottom: 1.5rem;
+    }
+    .wide-quote {
+      font-size: clamp(1.1rem, 2.2vw, 1.65rem);
+      font-weight: 200; line-height: 2.0;
+      letter-spacing: 0.05em;
+      color: rgba(242,238,230,0.85);
+      margin-bottom: 2rem;
+    }
+    .wide-source {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.6rem; font-weight: 200;
+      letter-spacing: 0.2em;
+      color: rgba(200,180,140,0.55);
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────── */
+    .footer {
+      background: #1E1810;
+      padding: 8vh 5vw;
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 6vw;
+    }
+    .foot-logo {
+      font-size: 1.1rem; font-weight: 200;
+      letter-spacing: 0.2em; color: rgba(242,238,230,0.55);
+      margin-bottom: 1.5rem;
+    }
+    .foot-tagline {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.65rem; font-weight: 200;
+      line-height: 2.0; color: rgba(242,238,230,0.28);
+    }
+    .foot-col-title {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.55rem; font-weight: 200;
+      letter-spacing: 0.3em; color: rgba(200,180,140,0.45);
+      margin-bottom: 1.5rem;
+    }
+    .foot-col-body {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.65rem; font-weight: 200;
+      line-height: 2.2; color: rgba(242,238,230,0.22);
+    }
+  </style>
+</head>
+<body>
+
+<!-- 풀스크린 히어로 (3분할 배경) -->
+<section class="fullhero">
+  <div class="fullhero-bg">
+    <div class="fullhero-bg-col">
+      <img src="/api/img-proxy?url=https%3A%2F%2Fcafeptthumb-phinf.pstatic.net%2FMjAyNDEwMTdfOTQg%2FMDAxNzI5MDk5MjQ3OTUw.NV6HuuzljMwmzWraMA2WXY7cSoeYetEglnn2SflszQcg.a6gNojQAJe9-5Dhfr-HbJ5y9q1HNo8cFBvs7JgWe49Eg.JPEG%2F20241013%EF%BC%BF153757.jpg%3Ftype%3Dw1600" alt="">
+    </div>
+    <div class="fullhero-bg-col">
+      <img src="/api/img-proxy?url=https%3A%2F%2Fcafeptthumb-phinf.pstatic.net%2FMjAyNDA4MTBfMjE0%2FMDAxNzIzMjk3NTUzMzY4.1qbz4B5bjM0YfcSxEP1RgMsP3KGZ2jAGcuunFzEQ3nUg.zjzmmi1fqgeecnxsf0IqmZ_2bhPQvcelYAA26CWZOjwg.JPEG%2F20240810%EF%BC%BF222724.jpg%3Ftype%3Dw1600" alt="">
+    </div>
+    <div class="fullhero-bg-col">
+      <img src="/api/img-proxy?url=https%3A%2F%2Fcafeptthumb-phinf.pstatic.net%2FMjAyMzExMDlfMTk2%2FMDAxNjk5NTI2MDExNDQ5.VYp2R73bemNcLZGDMJoPS49ZWIeiWEBTRetNkQe6gcEg.iWZ7MQIleuFMzTAkOABYBvYm-r4FrOW_5aIC5_Sd-C0g.JPEG%2F20231102_113534.jpg%3Ftype%3Dw1600" alt="">
+    </div>
+  </div>
+  <div class="fullhero-overlay"></div>
+  <div class="fullhero-divlines"></div>
+
+  <nav class="fullhero-nav">
+    <a class="fullhero-nav-logo" href="/">여의명상센터</a>
+    <div class="fullhero-nav-links">
+      <a href="#">한울사상</a>
+      <a href="#">수행 안내</a>
+      <a href="#">법회</a>
+      <a href="#">갤러리</a>
+    </div>
+  </nav>
+
+  <div class="fullhero-center">
+    <p class="fh-tag">YEOUIMYEONGSANG — HANUL THOUGHT</p>
+    <h1 class="fh-title-hanja">한울</h1>
+    <div class="fh-divline"></div>
+    <p class="fh-title-ko">여의명상센터의 사상</p>
+    <p class="fh-desc">하늘과 땅이 하나 · 생명의 근원으로 돌아가는 길<br>몸으로 하늘을 기억하는 수행</p>
+  </div>
+
+  <div class="fullhero-bottom">
+    <p class="fh-caption">게시글 10,313건 · 댓글 63,523건 · 한울 아카이브</p>
+    <div class="fh-scroll-hint">
+      <span>SCROLL</span>
+      <div class="fh-scroll-bar"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 사진 3열 -->
+<section class="three-photos">
+  <div class="three-photos-item">
+    <img src="/api/img-proxy?url=https%3A%2F%2Fcafeptthumb-phinf.pstatic.net%2FMjAyNDEwMTdfNTEg%2FMDAxNzI5MDk5MjQzOTA5.0SkIpLW56bh2MeWz4ECADciWjs4j-O7rojMrQjtJ5XYg.pHNYccP_2XO03LuLPv1gmmHmqoA9pVpykLtkyAvZ8Ycg.JPEG%2F20241013%EF%BC%BF153749.jpg%3Ftype%3Dw1600" alt="">
+    <div class="tp-label">
+      <span class="tp-ko">기운영 수행</span>
+      <span class="tp-en">ENERGY PRACTICE</span>
+    </div>
+  </div>
+  <div class="three-photos-item">
+    <img src="/api/img-proxy?url=https%3A%2F%2Fcafeptthumb-phinf.pstatic.net%2FMjAyNDA4MTFfMjgg%2FMDAxNzIzMzA2OTE1MjA3.CpQh7c_mN3RozGhJ4_zx0_bCQ_dkzs1BMyaEmrVJMrkg.2TGj_g2_OTMhwabwEGTBYq-ZIHh2ih2qC9cNeMGI4rog.JPEG%2FScreenshot%EF%BC%BF20240810%EF%BC%8D125727%EF%BC%BFKakaoTalk.jpg%3Ftype%3Dw1600" alt="">
+    <div class="tp-label">
+      <span class="tp-ko">한울 법회</span>
+      <span class="tp-en">DHARMA ASSEMBLY</span>
+    </div>
+  </div>
+  <div class="three-photos-item">
+    <img src="/api/img-proxy?url=https%3A%2F%2Fcafeptthumb-phinf.pstatic.net%2FMjAyMzExMDlfNiAg%2FMDAxNjk5NTI2MDE1MTk1.xMpS9sPiLAmHpe8Z2X6vqSq6d9z_RUCsVLxKS3_A5tEg.usmSPKSgbXWwKC3lGu11rvNH5ghYnMi8kj6HdZvppcUg.JPEG%2F20231102_113800.jpg%3Ftype%3Dw1600" alt="">
+    <div class="tp-label">
+      <span class="tp-ko">지기 문화 답사</span>
+      <span class="tp-en">SACRED JOURNEY</span>
+    </div>
+  </div>
+</section>
+
+<!-- 철학 그리드 -->
+<section class="phil-grid">
+  <div class="pg-header">
+    <p class="pg-tag">CORE PHILOSOPHY</p>
+    <h2 class="pg-title">한울사상의 네 기둥</h2>
+  </div>
+  <div class="pg-items">
+    <div class="pg-item">
+      <div class="pg-circle">天</div>
+      <p class="pg-ko">한울</p>
+      <p class="pg-desc">하늘의 근원<br>무한한 생명 에너지</p>
+    </div>
+    <div class="pg-item">
+      <div class="pg-circle">氣</div>
+      <p class="pg-ko">기운</p>
+      <p class="pg-desc">만물을 움직이는<br>보이지 않는 힘</p>
+    </div>
+    <div class="pg-item">
+      <div class="pg-circle">如</div>
+      <p class="pg-ko">여의</p>
+      <p class="pg-desc">뜻대로 됨<br>내면과 우주의 합일</p>
+    </div>
+    <div class="pg-item">
+      <div class="pg-circle">道</div>
+      <p class="pg-ko">수도</p>
+      <p class="pg-desc">일상이 수행<br>살아있는 실천의 길</p>
+    </div>
+  </div>
+</section>
+
+<!-- 와이드 사진 + 인용 -->
+<section class="wide-section">
+  <img src="/api/img-proxy?url=https%3A%2F%2Fcafeptthumb-phinf.pstatic.net%2FMjAyNDAxMTdfMTIy%2FMDAxNzA1NDM3Mzg0OTYy.1JxAjbgTnk4jqON0GHQydWIb5P2pPkjYp5NY-CNUbGkg.3QPhmxJcWx4eHSKiNV1PeiPcaV07JlfCoEnV9wq1pvog.JPEG%2FKakaoTalk_20240117_044003150.jpg%3Ftype%3Dw1600" alt="">
+  <div class="wide-overlay">
+    <div class="wide-text">
+      <p class="wide-eyebrow">HANUL SUDOBEOP</p>
+      <p class="wide-quote">하늘과 땅이 어울려 생긴<br>우리는 그 근원을 몸으로<br>기억해야 합니다</p>
+      <p class="wide-source">— 한울수도법 서문</p>
+    </div>
+  </div>
+</section>
+
+<!-- 푸터 -->
+<footer class="footer">
+  <div>
+    <p class="foot-logo">여의명상센터</p>
+    <p class="foot-tagline">한울사상을 바탕으로 몸과 마음의 깊은 치유와 성장을 돕는 수행 공동체입니다. 10,313건의 한울 아카이브가 살아있습니다.</p>
+  </div>
+  <div>
+    <p class="foot-col-title">PROGRAMS</p>
+    <p class="foot-col-body">여의명상 · 기운영<br>생명장 수련 · 지기 답사<br>한울 법회 · 수도 지도</p>
+  </div>
+  <div>
+    <p class="foot-col-title">CONTACT</p>
+    <p class="foot-col-body">cafe.naver.com/zerofield<br>한울 아카이브 10,313건<br>댓글 63,523건</p>
+  </div>
+</footer>
+
+</body>
+</html>

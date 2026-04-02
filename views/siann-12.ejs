@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — L12 SaaS 랜딩 · 테마 <%= themeId %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen',      bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', footerBg:'#030D07', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White',      bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', footerBg:'#1A1A1A', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', footerBg:'#0E0905', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist',       bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', footerBg:'#2A3547', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple',   bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', footerBg:'#080410', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo',          bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', footerBg:'#1A2010', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain',  bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', footerBg:'#080808', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal',       bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', footerBg:'#030B0D', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber',      bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', footerBg:'#0D0700', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night',     bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', footerBg:'#01060E', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand',       bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', footerBg:'#1C1408', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green',      bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', footerBg:'#050804', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', footerBg:'#03040F', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment',       bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', footerBg:'#1A1005', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz',     bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', footerBg:'#0D0608', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian',        bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', footerBg:'#020202', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon',         bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', footerBg:'#05080A', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White',    bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', footerBg:'#1A2440', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    %>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: <%= t.bg %>; --deep: <%= t.deep %>; --mid: <%= t.mid %>; --card: <%= t.card %>;
+      --accent: <%= t.accent %>; --accentLt: <%= t.accentLt %>; --accentDk: <%= t.accentDk %>;
+      --text: <%= t.text %>; --text2: <%= t.text2 %>; --gray: <%= t.gray %>;
+      --border: <%= t.border %>; --footerBg: <%= t.footerBg %>;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); }
+
+    /* 시안 배지 */
+    .siann-badge { position: fixed; top: 12px; right: 12px; z-index: 9999; display: flex; flex-wrap: wrap; gap: 4px; max-width: 420px; justify-content: flex-end; }
+    .siann-badge a { display: inline-block; padding: 3px 7px; font-size: 10px; border-radius: 3px; background: var(--card); color: var(--accent); border: 1px solid var(--border); text-decoration: none; transition: all 0.2s; }
+    .siann-badge a:hover, .siann-badge a.active { background: var(--accent); color: var(--bg); }
+
+    /* ── SAAS NAVBAR ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--deep);
+      border-bottom: 1px solid var(--border);
+      padding: 0 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .navbar-brand { font-family: 'Noto Serif KR', serif; font-size: 1.3rem; color: var(--accent); font-weight: 700; }
+    .navbar-links { display: flex; gap: 32px; }
+    .navbar-links a { font-size: 0.88rem; color: var(--text2); text-decoration: none; transition: color 0.2s; }
+    .navbar-links a:hover { color: var(--accent); }
+    .navbar-cta { background: var(--accent); color: var(--bg); padding: 8px 20px; border-radius: 6px; font-size: 0.88rem; font-weight: 600; text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero { padding: 100px 60px 80px; display: flex; align-items: center; gap: 80px; max-width: 1200px; margin: 0 auto; }
+    .hero-text { flex: 1; }
+    .hero-badge { display: inline-block; background: var(--mid); border: 1px solid var(--border); color: var(--accentLt); font-size: 0.78rem; padding: 4px 12px; border-radius: 20px; margin-bottom: 24px; letter-spacing: 1px; }
+    .hero h1 { font-family: 'Noto Serif KR', serif; font-size: clamp(2.5rem,5vw,4rem); font-weight: 700; line-height: 1.2; color: var(--text); margin-bottom: 20px; }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero p { font-size: 1.1rem; color: var(--text2); line-height: 1.8; margin-bottom: 36px; max-width: 520px; }
+    .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-primary { background: var(--accent); color: var(--bg); padding: 14px 32px; border-radius: 8px; font-size: 1rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; }
+    .btn-outline { background: transparent; color: var(--accent); padding: 14px 32px; border-radius: 8px; font-size: 1rem; font-weight: 600; text-decoration: none; border: 2px solid var(--accent); }
+    .hero-visual { flex: 1; max-width: 500px; }
+    .hero-visual img { width: 100%; border-radius: 12px; box-shadow: 0 40px 80px rgba(0,0,0,0.4); }
+
+    /* ── STATS BAR ── */
+    .stats-bar { background: var(--mid); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 32px 60px; }
+    .stats-row { display: flex; justify-content: space-around; max-width: 1000px; margin: 0 auto; }
+    .stat-item { text-align: center; }
+    .stat-item .n { font-size: 2rem; font-weight: 700; color: var(--accent); }
+    .stat-item .l { font-size: 0.82rem; color: var(--text2); margin-top: 4px; }
+
+    /* ── FEATURE ROWS ── */
+    .features { max-width: 1200px; margin: 0 auto; padding: 80px 60px; }
+    .feature-row { display: flex; align-items: center; gap: 80px; margin-bottom: 100px; }
+    .feature-row.reverse { flex-direction: row-reverse; }
+    .feature-content { flex: 1; }
+    .feature-tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accentLt); margin-bottom: 12px; }
+    .feature-content h2 { font-family: 'Noto Serif KR', serif; font-size: clamp(1.8rem,3vw,2.5rem); color: var(--text); margin-bottom: 16px; line-height: 1.3; }
+    .feature-content p { font-size: 1rem; color: var(--text2); line-height: 1.9; margin-bottom: 24px; }
+    .feature-list { list-style: none; }
+    .feature-list li { padding: 8px 0; color: var(--text2); font-size: 0.92rem; display: flex; align-items: flex-start; gap: 10px; }
+    .feature-list li::before { content: '✦'; color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+    .feature-img { flex: 1; max-width: 480px; }
+    .feature-img img { width: 100%; border-radius: 8px; }
+    .feature-img-box { background: var(--card); border-radius: 8px; padding: 40px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 16px; }
+    .teaching-card { background: var(--deep); border-radius: 6px; padding: 20px; border-left: 3px solid var(--accent); }
+    .teaching-card h4 { font-family: 'Noto Serif KR', serif; color: var(--accent); font-size: 1rem; margin-bottom: 6px; }
+    .teaching-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; }
+
+    /* ── TESTIMONIAL / QUOTE SECTION ── */
+    .quote-section { background: var(--deep); padding: 80px 60px; text-align: center; }
+    .quote-section .eyebrow { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 3px; color: var(--gray); margin-bottom: 40px; }
+    .quotes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+    .quote-card { background: var(--card); border-radius: 8px; padding: 32px; text-align: left; border-top: 3px solid var(--accent); }
+    .quote-card blockquote { font-family: 'Noto Serif KR', serif; font-size: 1rem; color: var(--text); line-height: 1.8; margin-bottom: 20px; }
+    .quote-card cite { font-size: 0.82rem; color: var(--gray); }
+
+    /* ── PROGRAM CTA SECTION ── */
+    .programs-section { padding: 80px 60px; max-width: 1200px; margin: 0 auto; }
+    .section-header { text-align: center; margin-bottom: 60px; }
+    .section-header .eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accentLt); margin-bottom: 12px; }
+    .section-header h2 { font-family: 'Noto Serif KR', serif; font-size: clamp(1.8rem,3vw,2.5rem); color: var(--text); }
+    .programs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .prog-card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; }
+    .prog-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .prog-card-head { background: var(--deep); padding: 24px; }
+    .prog-icon { width: 48px; height: 48px; background: var(--mid); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 12px; }
+    .prog-card-head h3 { font-family: 'Noto Serif KR', serif; font-size: 1.1rem; color: var(--accent); }
+    .prog-card-body { padding: 20px 24px 24px; }
+    .prog-card-body p { font-size: 0.88rem; color: var(--text2); line-height: 1.7; margin-bottom: 16px; }
+    .prog-badge { display: inline-block; background: var(--mid); color: var(--accentLt); font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; }
+
+    /* ── FINAL CTA ── */
+    .final-cta { background: linear-gradient(135deg, var(--deep), var(--mid)); padding: 100px 60px; text-align: center; }
+    .final-cta h2 { font-family: 'Noto Serif KR', serif; font-size: clamp(2rem,4vw,3rem); color: var(--text); margin-bottom: 20px; }
+    .final-cta p { font-size: 1.05rem; color: var(--text2); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .final-cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    /* 푸터 */
+    footer { background: var(--footerBg); padding: 60px; border-top: 1px solid var(--border); }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; }
+    .footer-brand h3 { font-family: 'Noto Serif KR', serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 12px; }
+    .footer-brand p { font-size: 0.85rem; color: var(--gray); line-height: 1.7; }
+    .footer-col h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accentLt); margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 0.85rem; color: var(--text2); text-decoration: none; margin-bottom: 8px; }
+    .footer-col a:hover { color: var(--accent); }
+    .footer-bottom { max-width: 1200px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--gray); }
+  </style>
+</head>
+<body>
+
+<nav class="siann-badge">
+  <% for(let i=1;i<=20;i++){ %>
+    <a href="/siann-12/<%= i %>" class="<%= themeId==i?'active':'' %>">T<%= i %></a>
+  <% } %>
+</nav>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-brand">한울사상</div>
+  <div class="navbar-links">
+    <a href="#">한울이란</a>
+    <a href="#">가르침</a>
+    <a href="#">수련 프로그램</a>
+    <a href="#">법문 아카이브</a>
+    <a href="#">여의명상센터</a>
+  </div>
+  <a href="#programs" class="navbar-cta">수련 신청</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge">✦ 영적진화의 여정 ✦</div>
+    <h1>하늘의 뜻으로<br><em>사는 삶</em>,<br>한울사상</h1>
+    <p>우주도리(道)를 깨닫고, 영적진화(靈)의 길을 걸으며, 세상에 대한 책임(責)을 다하는 삶. 여의명상센터에서 시작하십시오.</p>
+    <div class="hero-actions">
+      <a href="#programs" class="btn-primary">수련 프로그램 보기</a>
+      <a href="http://211.104.37.65:4200" class="btn-outline" target="_blank">법문 아카이브</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjNfMjMy/MDAxNTk4MTgwMzU0NjYx.cEjHaZRf_VD6Qc-CbtnuNM5Az-6A36APGLo0_w3U7bAg.G3TeB5xBBChkHr7EvEK-kgmWHzO0jJW_mZdN9F26lf8g.JPEG/KakaoTalk_20200823_195242797.jpg?type=w1600" alt="한울사상">
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-row">
+    <div class="stat-item"><div class="n">10,313</div><div class="l">법문 아카이브</div></div>
+    <div class="stat-item"><div class="n">6</div><div class="l">정기 수련 프로그램</div></div>
+    <div class="stat-item"><div class="n">3</div><div class="l">핵심 가르침</div></div>
+    <div class="stat-item"><div class="n">매주</div><div class="l">토요법문 진행</div></div>
+  </div>
+</div>
+
+<!-- FEATURE ROWS -->
+<section class="features">
+  <!-- Feature 1 -->
+  <div class="feature-row">
+    <div class="feature-content">
+      <div class="feature-tag">핵심 철학</div>
+      <h2>한울(韓蔚)이란<br>무엇인가</h2>
+      <p>한울은 단순히 하늘이 아닙니다. 우주의 근본 도리(道)이며, 모든 생명이 진화해가는 영적 여정이며, 세상에 대한 책임(責)입니다.</p>
+      <ul class="feature-list">
+        <li>우주도리(道) — 우주의 근본 원리와 질서를 깨달음</li>
+        <li>영적진화(靈) — 의식의 끊임없는 진화와 성장</li>
+        <li>세상책임(責) — 깨달음을 바탕으로 세상에 헌신</li>
+      </ul>
+    </div>
+    <div class="feature-img">
+      <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTA0/MDAxNTk4MjcxODc5NzI0.mXb9CIQbcw24UrkOVWnBlTWhahS8eMB-0dLFxeGsUPgg.q-aLd5qsW7stRiQYwjg7KgimuCDjWnKWp1pp8WRfIEcg.JPEG/%ED%91%9C%EC%99%80_%ED%8F%AC.jpg?type=w1600" alt="표와 포">
+    </div>
+  </div>
+
+  <!-- Feature 2 -->
+  <div class="feature-row reverse">
+    <div class="feature-content">
+      <div class="feature-tag">핵심 가르침</div>
+      <h2>세 가지<br>수련의 길</h2>
+      <p>한울사상은 제도(制道), 생명장(生命場), 손지손지심(損之損之心)의 세 가지 실천적 가르침을 중심으로 합니다.</p>
+      <div class="feature-list">
+        <li>제도(制道) — 자기 자신을 다스리는 규율의 도</li>
+        <li>생명장(生命場) — 우주 생명 에너지와 공명하는 수련</li>
+        <li>손지손지심 — 끊임없이 비워나가는 마음의 수련</li>
+      </ul>
+    </div>
+    <div class="feature-img">
+      <div class="feature-img-box">
+        <div class="teaching-card">
+          <h4>제도(制道)</h4>
+          <p>자기 자신을 다스리는 규율의 도. 한울사상의 첫 번째 관문이자 수련의 기초.</p>
+        </div>
+        <div class="teaching-card">
+          <h4>생명장(生命場)</h4>
+          <p>생명의 에너지장. 우주의 생명력과 공명하는 수련법.</p>
+        </div>
+        <div class="teaching-card">
+          <h4>손지손지심(損之損之心)</h4>
+          <p>끊임없이 비워나가는 마음. 노자의 지혜를 실천적으로 체현.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 3 -->
+  <div class="feature-row">
+    <div class="feature-content">
+      <div class="feature-tag">법문 아카이브</div>
+      <h2>10,313편의<br>가르침</h2>
+      <p>수십 년에 걸쳐 쌓아온 방대한 법문 아카이브. 한울사상의 모든 가르침이 담겨 있습니다. 언제 어디서나 접근하여 지혜를 탐구하십시오.</p>
+      <a href="http://211.104.37.65:4200" class="btn-primary" target="_blank">아카이브 열기</a>
+    </div>
+    <div class="feature-img">
+      <img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzYwMTcxNjE3.CNxv2Stxzrvath9zJ9oTPqk4_Y7KjZ-sL5ABruAId5Ug.xfKrmXsajKdnzHkUNdPqLHJnIDOKEGbMoGN5fMKO7Rsg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AC%ED%8F%AC.jpeg?type=w1600" alt="천지연폭포">
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE SECTION -->
+<section class="quote-section">
+  <div class="eyebrow">한울사상의 지혜</div>
+  <div class="quotes-grid">
+    <div class="quote-card">
+      <blockquote>"나비가 될 번데기는 오늘도 껍질을 깨는 중이다"</blockquote>
+      <cite>— 한울사상 법문</cite>
+    </div>
+    <div class="quote-card">
+      <blockquote>"죄는 조이는 것이다. 스스로를 締約하지 말고, 우주의 흐름 속에 열린 존재로 살아가라"</blockquote>
+      <cite>— 한울사상 법문</cite>
+    </div>
+    <div class="quote-card">
+      <blockquote>"우주의 모든 것은 돈다. 그 회전 속에서 나는 어디에 있는가"</blockquote>
+      <cite>— 한울사상 법문</cite>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section id="programs" class="programs-section">
+  <div class="section-header">
+    <div class="eyebrow">여의명상센터</div>
+    <h2>수련 프로그램</h2>
+  </div>
+  <div class="programs-grid">
+    <div class="prog-card">
+      <div class="prog-card-head">
+        <div class="prog-icon">🏔</div>
+        <h3>집중수련</h3>
+      </div>
+      <div class="prog-card-body">
+        <p>일상을 벗어나 깊은 내면의 침묵 속으로. 제도와 생명장 수련이 통합적으로 진행됩니다.</p>
+        <span class="prog-badge">정기 개설</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-head">
+        <div class="prog-icon">🌊</div>
+        <h3>생명장수련</h3>
+      </div>
+      <div class="prog-card-body">
+        <p>우주 생명 에너지와 공명하는 수련. 생명장의 본질을 체험적으로 이해합니다.</p>
+        <span class="prog-badge">정기 진행</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-head">
+        <div class="prog-icon">☯</div>
+        <h3>기운영</h3>
+      </div>
+      <div class="prog-card-body">
+        <p>우주 기운을 운영하는 심화 수련. 생명장 에너지의 실천적 적용.</p>
+        <span class="prog-badge">정기 진행</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-head">
+        <div class="prog-icon">📿</div>
+        <h3>토요법문</h3>
+      </div>
+      <div class="prog-card-body">
+        <p>매주 토요일, 한울사상의 핵심 가르침을 나누는 법문 강의.</p>
+        <span class="prog-badge">매주 토요일</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-head">
+        <div class="prog-icon">🗺</div>
+        <h3>지기문화답사</h3>
+      </div>
+      <div class="prog-card-body">
+        <p>자연 속에서 한울의 기운을 느끼는 탐방. 지기(地氣)와의 소통.</p>
+        <span class="prog-badge">월 1회</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-head">
+        <div class="prog-icon">🤝</div>
+        <h3>공동체활동</h3>
+      </div>
+      <div class="prog-card-body">
+        <p>함께 실천하는 한울사상. 깨달음을 세상과 나누는 공동체 활동.</p>
+        <span class="prog-badge">상시 참여</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <h2>여의명상센터와 함께<br>한울의 길을 걸으십시오</h2>
+  <p>하늘의 뜻으로 사는 삶은 특별한 사람들만의 것이 아닙니다. 지금 이 순간, 당신도 시작할 수 있습니다.</p>
+  <div class="final-cta-actions">
+    <a href="#programs" class="btn-primary">수련 신청하기</a>
+    <a href="http://211.104.37.65:4200" class="btn-outline" target="_blank">법문 아카이브 탐구</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h3>한울사상</h3>
+      <p>하늘의 뜻으로 사는 삶을 탐구하는<br>수련 공동체. 여의명상센터.</p>
+    </div>
+    <div class="footer-col">
+      <h4>한울사상</h4>
+      <a href="#">우주도리(道)</a>
+      <a href="#">영적진화(靈)</a>
+      <a href="#">세상책임(責)</a>
+    </div>
+    <div class="footer-col">
+      <h4>프로그램</h4>
+      <a href="#">집중수련</a>
+      <a href="#">생명장수련</a>
+      <a href="#">토요법문</a>
+      <a href="#">지기문화답사</a>
+    </div>
+    <div class="footer-col">
+      <h4>아카이브</h4>
+      <a href="http://211.104.37.65:4200" target="_blank">법문 아카이브</a>
+      <a href="#">가르침 자료</a>
+      <a href="#">공동체 소식</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 한울사상 여의명상센터</span>
+    <span>테마 <%= themeId %> (<%= t.name %>) · 레이아웃 12 — SaaS 모던 랜딩</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>여의명상센터 — 한울사상 | 고요 속으로</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;600&family=Noto+Sans+KR:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const palettes = {
+      1: { bg:'#F7F5F0', text:'#1E1C18', text2:'#7A7268', accent:'#8B6840', hero:'#1A1712', heroText:'rgba(247,245,240,0.95)' },
+      2: { bg:'#F5F7F4', text:'#1A221A', text2:'#5A6E5A', accent:'#4A7A47', hero:'#111A11', heroText:'rgba(245,247,244,0.95)' },
+      3: { bg:'#F8F4EF', text:'#221A10', text2:'#7A6A54', accent:'#9A7040', hero:'#18120A', heroText:'rgba(248,244,239,0.95)' },
+      4: { bg:'#F4F7F8', text:'#101E22', text2:'#486068', accent:'#3A7A88', hero:'#0A1416', heroText:'rgba(244,247,248,0.95)' },
+      5: { bg:'#F7F5F0', text:'#1E1C18', text2:'#7A7268', accent:'#6A6050', hero:'#1A1712', heroText:'rgba(247,245,240,0.95)' },
+    };
+    const p = palettes[((themeId-1)%5)+1];
+    %>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: <%= p.bg %>;
+      --text: <%= p.text %>;
+      --text2: <%= p.text2 %>;
+      --accent: <%= p.accent %>;
+      --hero: <%= p.hero %>;
+      --hero-text: <%= p.heroText %>;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Serif KR', serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── FIXED NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 6vw; height: 72px;
+      background: transparent;
+      transition: background 0.6s ease, border-bottom 0.6s ease;
+    }
+    .nav.solid {
+      background: rgba(247,245,240,0.97);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .nav-logo {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 0.9rem; font-weight: 300;
+      letter-spacing: 0.18em;
+      color: var(--hero-text);
+      text-decoration: none;
+      transition: color 0.6s;
+    }
+    .nav.solid .nav-logo { color: var(--text); }
+    .nav-links { display: flex; gap: 2.8rem; }
+    .nav-links a {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.7rem; font-weight: 300;
+      letter-spacing: 0.1em;
+      color: rgba(247,245,240,0.7);
+      text-decoration: none;
+      transition: color 0.6s;
+    }
+    .nav.solid .nav-links a { color: var(--text2); }
+    .nav.solid .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      width: 100vw; height: 100vh;
+      background: var(--hero);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    /* 배경: 방사형 그라디언트 — 중심 약간 밝음 */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(
+        ellipse 120% 80% at 50% 60%,
+        rgba(139,104,64,0.18) 0%,
+        rgba(0,0,0,0) 70%
+      );
+      pointer-events: none;
+    }
+    /* 하단 페이드 */
+    .hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 280px;
+      background: linear-gradient(to bottom, transparent, var(--hero));
+      pointer-events: none;
+    }
+    .hero-inner {
+      position: relative; z-index: 2;
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0;
+    }
+    /* 대형 한자 — 배경 장식 */
+    .hero-hanja-bg {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(14rem, 28vw, 22rem);
+      font-weight: 200;
+      color: rgba(255,255,255,0.04);
+      line-height: 1;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -52%);
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -0.05em;
+    }
+    /* 메인 한자 */
+    .hero-hanja {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(4.5rem, 9vw, 7rem);
+      font-weight: 200;
+      color: var(--hero-text);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      animation: fadeUp 1.8s 0.4s ease-out forwards;
+    }
+    .hero-line {
+      width: 1px; height: 60px;
+      background: rgba(247,245,240,0.25);
+      margin: 2.4rem 0;
+      opacity: 0;
+      animation: fadeUp 1.8s 0.8s ease-out forwards;
+    }
+    .hero-ko {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+      font-weight: 300;
+      color: var(--hero-text);
+      letter-spacing: 0.35em;
+      opacity: 0;
+      animation: fadeUp 1.8s 1.0s ease-out forwards;
+    }
+    .hero-sub {
+      margin-top: 1.6rem;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.72rem; font-weight: 200;
+      color: rgba(247,245,240,0.55);
+      letter-spacing: 0.12em;
+      line-height: 2;
+      opacity: 0;
+      animation: fadeUp 1.8s 1.3s ease-out forwards;
+    }
+    .hero-scroll {
+      position: absolute; bottom: 5vh; left: 50%; transform: translateX(-50%);
+      z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      opacity: 0;
+      animation: fadeUp 1.8s 1.8s ease-out forwards;
+    }
+    .hero-scroll span {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.6rem; font-weight: 200;
+      letter-spacing: 0.22em;
+      color: rgba(247,245,240,0.4);
+    }
+    .scroll-bar {
+      width: 1px; height: 52px;
+      background: rgba(247,245,240,0.2);
+      position: relative; overflow: hidden;
+    }
+    .scroll-bar::after {
+      content: '';
+      position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
+      background: rgba(247,245,240,0.7);
+      animation: scrollDrop 2.2s 2s ease-in-out infinite;
+    }
+    @keyframes scrollDrop { 0%{top:-100%} 100%{top:200%} }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(20px); }
+      to   { opacity:1; transform: none; }
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      width: 1px; height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+      margin: 0 auto;
+    }
+
+    /* ── INTRO ── */
+    .intro {
+      padding: 14vh 6vw 14vh;
+      text-align: center;
+      max-width: 760px; margin: 0 auto;
+    }
+    .intro-quote {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(1.15rem, 2.5vw, 1.75rem);
+      font-weight: 300;
+      line-height: 2.2;
+      color: var(--text);
+      letter-spacing: 0.06em;
+    }
+    .intro-cite {
+      display: block;
+      margin-top: 2.4rem;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.7rem; font-weight: 200;
+      color: var(--text2);
+      letter-spacing: 0.18em;
+    }
+
+    /* ── PHILOSOPHY ── */
+    .phil-section {
+      padding: 12vh 0;
+      background: var(--hero);
+    }
+    .phil-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 6vw;
+      gap: 0;
+    }
+    .phil-item {
+      padding: 8vh 4vw;
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+    }
+    .phil-item:last-child { border-right: none; }
+    .phil-hanja {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(3.5rem, 6vw, 5rem);
+      font-weight: 200;
+      color: rgba(255,255,255,0.9);
+      line-height: 1;
+      display: block;
+    }
+    .phil-divider {
+      width: 28px; height: 1px;
+      background: var(--accent);
+      margin: 2rem auto;
+      opacity: 0.7;
+    }
+    .phil-ko {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 0.85rem; font-weight: 300;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.18em;
+    }
+
+    /* ── SPACER SECTION (여백 섹션) ── */
+    .spacer-section {
+      padding: 18vh 6vw;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .spacer-number {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(6rem, 15vw, 12rem);
+      font-weight: 200;
+      color: rgba(30,28,24,0.05);
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* ── ABOUT ── */
+    .about {
+      max-width: 900px; margin: 0 auto;
+      padding: 14vh 6vw;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 8vw;
+      align-items: start;
+    }
+    .about-label {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.65rem; font-weight: 200;
+      letter-spacing: 0.22em;
+      color: var(--text2);
+      padding-top: 6px;
+    }
+    .about-body {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(1rem, 1.8vw, 1.25rem);
+      font-weight: 300;
+      line-height: 2.4;
+      color: var(--text);
+      letter-spacing: 0.04em;
+    }
+    .about-accent {
+      display: block; margin-top: 3rem;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.7rem; font-weight: 200;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+    }
+
+    /* ── PROGRAMS ── */
+    .programs {
+      padding: 14vh 6vw;
+      background: var(--hero);
+    }
+    .programs-header {
+      text-align: center;
+      margin-bottom: 10vh;
+    }
+    .programs-eyebrow {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.65rem; font-weight: 200;
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 2rem;
+    }
+    .programs-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      font-weight: 200;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.12em;
+    }
+    .prog-list {
+      max-width: 900px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+    .prog-item {
+      padding: 6vh 3.5vw;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      text-align: center;
+    }
+    .prog-item:last-child { border-right: none; }
+    .prog-num {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 0.65rem; font-weight: 200;
+      color: var(--accent);
+      letter-spacing: 0.3em;
+      display: block; margin-bottom: 1.8rem;
+    }
+    .prog-name {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 0.1em;
+      line-height: 1.7;
+    }
+    .prog-desc {
+      margin-top: 1.4rem;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.7rem; font-weight: 200;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.06em;
+      line-height: 1.9;
+    }
+
+    /* ── SCHEDULE ── */
+    .schedule {
+      max-width: 780px; margin: 0 auto;
+      padding: 14vh 6vw;
+    }
+    .sch-header {
+      text-align: center; margin-bottom: 8vh;
+    }
+    .sch-eyebrow {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.65rem; font-weight: 200;
+      letter-spacing: 0.3em;
+      color: var(--text2);
+      margin-bottom: 2rem;
+    }
+    .sch-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      font-weight: 200;
+      color: var(--text);
+      letter-spacing: 0.12em;
+    }
+    .sch-list { display: flex; flex-direction: column; gap: 0; }
+    .sch-item {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      padding: 2.8vh 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      align-items: baseline;
+    }
+    .sch-date {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.72rem; font-weight: 200;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+    }
+    .sch-name {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 0.92rem; font-weight: 300;
+      color: var(--text);
+      letter-spacing: 0.06em;
+    }
+    .sch-place {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.68rem; font-weight: 200;
+      color: var(--text2);
+      margin-top: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── FULLSCREEN QUOTE ── */
+    .quote-full {
+      min-height: 78vh;
+      background: var(--hero);
+      display: flex; align-items: center; justify-content: center;
+      padding: 12vh 8vw;
+      text-align: center;
+    }
+    .quote-full-inner {
+      max-width: 720px;
+    }
+    .qf-mark {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 4rem; font-weight: 200;
+      color: var(--accent);
+      line-height: 0.5;
+      opacity: 0.6;
+      display: block; margin-bottom: 3rem;
+    }
+    .qf-text {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+      font-weight: 300;
+      color: rgba(247,245,240,0.88);
+      line-height: 2.2;
+      letter-spacing: 0.07em;
+    }
+    .qf-cta {
+      display: inline-block;
+      margin-top: 5rem;
+      padding: 1rem 3.5rem;
+      border: 1px solid rgba(247,245,240,0.25);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.72rem; font-weight: 200;
+      letter-spacing: 0.22em;
+      color: rgba(247,245,240,0.7);
+      text-decoration: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .qf-cta:hover {
+      border-color: rgba(247,245,240,0.7);
+      color: rgba(247,245,240,0.95);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg);
+      padding: 10vh 6vw 6vh;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 5vw;
+    }
+    .footer-brand h3 {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 1rem; font-weight: 300;
+      letter-spacing: 0.15em;
+      color: var(--text);
+      margin-bottom: 1.8rem;
+    }
+    .footer-brand p {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.72rem; font-weight: 200;
+      color: var(--text2);
+      line-height: 2.2; letter-spacing: 0.04em;
+    }
+    .footer-col h4 {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.62rem; font-weight: 300;
+      letter-spacing: 0.25em;
+      color: var(--text2);
+      margin-bottom: 1.6rem;
+    }
+    .footer-col a {
+      display: block;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.72rem; font-weight: 200;
+      color: var(--text);
+      text-decoration: none;
+      line-height: 2.4; letter-spacing: 0.06em;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--accent); }
+    .footer-bottom {
+      max-width: 1100px; margin: 5vh auto 0;
+      padding-top: 3vh;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    .footer-bottom p {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.65rem; font-weight: 200;
+      color: var(--text2); letter-spacing: 0.08em;
+    }
+
+    /* ── THEME BADGE ── */
+    .theme-badge {
+      position: fixed; bottom: 14px; right: 14px; z-index: 9999;
+      display: flex; flex-wrap: wrap; gap: 3px; max-width: 260px; justify-content: flex-end;
+    }
+    .theme-badge a {
+      display: inline-block; padding: 2px 6px;
+      font-size: 9px; border-radius: 2px;
+      background: rgba(0,0,0,0.45); color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      font-family: 'Noto Sans KR', sans-serif;
+      transition: background 0.2s;
+    }
+    .theme-badge a.active, .theme-badge a:hover { background: var(--accent); color: white; }
+
+    /* ── REVEAL ── */
+    .reveal { opacity:0; transform: translateY(24px); transition: opacity 0.9s ease, transform 0.9s ease; }
+    .reveal.vis { opacity:1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .about { grid-template-columns: 1fr; gap: 2rem; }
+      .prog-list { grid-template-columns: 1fr; }
+      .prog-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+      .phil-grid { grid-template-columns: 1fr; }
+      .phil-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+      .footer-inner { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      .sch-item { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- THEME BADGE -->
+<nav class="theme-badge">
+  <% for(let i=1;i<=20;i++){ %><a href="/siann-23/<%= i %>" class="<%= themeId==i?'active':'' %>">T<%= i %></a><% } %>
+</nav>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <a href="#" class="nav-logo">여의명상센터</a>
+  <div class="nav-links">
+    <a href="#about">센터소개</a>
+    <a href="#philosophy">한울사상</a>
+    <a href="#programs">수련프로그램</a>
+    <a href="#schedule">일정</a>
+    <a href="http://211.104.37.65:4200" target="_blank">법문아카이브</a>
+  </div>
+</nav>
+
+<!-- ① HERO — 100vh, 순수 CSS 배경, 대형 한자 靜 -->
+<section class="hero">
+  <span class="hero-hanja-bg" aria-hidden="true">靜</span>
+  <div class="hero-inner">
+    <span class="hero-hanja">靜</span>
+    <div class="hero-line"></div>
+    <span class="hero-ko">여의명상센터</span>
+    <p class="hero-sub">한울사상 · 韓蔚思想<br>하늘의 뜻으로 사는 삶</p>
+  </div>
+  <div class="hero-scroll">
+    <span>SCROLL</span>
+    <div class="scroll-bar"></div>
+  </div>
+</section>
+
+<!-- ② INTRO QUOTE -->
+<div class="intro reveal" id="about">
+  <p class="intro-quote">
+    "나비가 될 번데기는<br>오늘도 껍질을 깨는 중이다"
+  </p>
+  <cite class="intro-cite">— 한울사상 법문</cite>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ③ PHILOSOPHY — 다크 섹션, 한자 3개 -->
+<section class="phil-section" id="philosophy">
+  <div class="phil-grid">
+    <div class="phil-item reveal">
+      <span class="phil-hanja">道</span>
+      <div class="phil-divider"></div>
+      <span class="phil-ko">우주도리</span>
+    </div>
+    <div class="phil-item reveal">
+      <span class="phil-hanja">靈</span>
+      <div class="phil-divider"></div>
+      <span class="phil-ko">영적진화</span>
+    </div>
+    <div class="phil-item reveal">
+      <span class="phil-hanja">責</span>
+      <div class="phil-divider"></div>
+      <span class="phil-ko">세상책임</span>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider" style="background: linear-gradient(to bottom, var(--hero), var(--accent), var(--bg)); height: 120px; width: 1px; margin: 0 auto;"></div>
+
+<!-- ④ ABOUT — 극도의 여백, 텍스트 최소화 -->
+<section class="about">
+  <div class="about-label reveal">CENTER<br>STORY</div>
+  <div class="about-body reveal">
+    침묵이 말하는 자리로 오세요.<br><br>
+    여의명상센터는 한울사상을 바탕으로<br>
+    내면의 고요함을 찾는 이들이 모이는 공간입니다.
+    <span class="about-accent">서울 영등포 · 매주 토요일</span>
+  </div>
+</section>
+
+<!-- 큰 숫자 여백 장식 -->
+<div class="spacer-section" aria-hidden="true">
+  <span class="spacer-number">10,313</span>
+</div>
+
+<!-- ⑤ PROGRAMS — 다크 섹션 -->
+<section class="programs" id="programs">
+  <div class="programs-header reveal">
+    <div class="programs-eyebrow">PROGRAMS</div>
+    <div class="programs-title">수련 프로그램</div>
+  </div>
+  <div class="prog-list">
+    <div class="prog-item reveal">
+      <span class="prog-num">01</span>
+      <div class="prog-name">집중수련</div>
+      <div class="prog-desc">일상을 벗어나<br>깊은 침묵 속으로</div>
+    </div>
+    <div class="prog-item reveal">
+      <span class="prog-num">02</span>
+      <div class="prog-name">생명장수련</div>
+      <div class="prog-desc">우주 에너지와<br>공명하는 과정</div>
+    </div>
+    <div class="prog-item reveal">
+      <span class="prog-num">03</span>
+      <div class="prog-name">토요법문</div>
+      <div class="prog-desc">매주 토요일<br>10,313편 아카이브</div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ SCHEDULE -->
+<section class="schedule" id="schedule">
+  <div class="sch-header reveal">
+    <div class="sch-eyebrow">SCHEDULE</div>
+    <div class="sch-title">2026년 4월 수련 일정</div>
+  </div>
+  <div class="sch-list">
+    <div class="sch-item reveal">
+      <div class="sch-date">4월 5일 (토)</div>
+      <div>
+        <div class="sch-name">토요법문 — 우주도리의 이해</div>
+        <div class="sch-place">여의명상센터 강당</div>
+      </div>
+    </div>
+    <div class="sch-item reveal">
+      <div class="sch-date">4월 12일 (토)</div>
+      <div>
+        <div class="sch-name">집중수련 (1박 2일)</div>
+        <div class="sch-place">여의명상센터 수련관</div>
+      </div>
+    </div>
+    <div class="sch-item reveal">
+      <div class="sch-date">4월 19일 (토)</div>
+      <div>
+        <div class="sch-name">토요법문 — 생명장과 기운영</div>
+        <div class="sch-place">여의명상센터 강당</div>
+      </div>
+    </div>
+    <div class="sch-item reveal">
+      <div class="sch-date">4월 26일 (토)</div>
+      <div>
+        <div class="sch-name">지기문화답사 — 봄 자연 소풍</div>
+        <div class="sch-place">한울 지정 자연 공간</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑦ FULLSCREEN QUOTE + CTA -->
+<section class="quote-full">
+  <div class="quote-full-inner reveal">
+    <span class="qf-mark">"</span>
+    <p class="qf-text">
+      죄는 조이는 것이다<br>
+      스스로를 締約하지 말라<br>
+      우주의 모든 것은 돈다
+    </p>
+    <a href="http://211.104.37.65:4200" target="_blank" class="qf-cta">
+      법문 아카이브 열기 &nbsp;→
+    </a>
+  </div>
+</section>
+
+<!-- ⑧ FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h3>여의명상센터</h3>
+      <p>
+        한울사상 — 하늘의 뜻으로 사는 삶<br>
+        서울특별시 영등포구 여의도동<br>
+        매주 토요일 법문 · 수련 상시 참여<br><br>
+        문의: 여의명상센터 사무국
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>PROGRAMS</h4>
+      <a href="#">집중수련</a>
+      <a href="#">생명장수련</a>
+      <a href="#">기운영</a>
+      <a href="#">토요법문</a>
+      <a href="#">지기문화답사</a>
+    </div>
+    <div class="footer-col">
+      <h4>RESOURCES</h4>
+      <a href="http://211.104.37.65:4200" target="_blank">법문 아카이브 (10,313편)</a>
+      <a href="#">한울사상이란</a>
+      <a href="#">찾아오는 길</a>
+      <a href="#">문의하기</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 여의명상센터 · 한울사상 · 韓蔚思想</p>
+  </div>
+</footer>
+
+<script>
+  // NAV scroll effect
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('solid', window.scrollY > 60);
+  }, { passive: true });
+
+  // Reveal on scroll
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('vis');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>

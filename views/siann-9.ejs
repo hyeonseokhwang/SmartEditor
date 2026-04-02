@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — L9 사진갤러리그리드 · 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Crimson Night',   bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C94848', accentLt:'#E36B6B', accentDk:'#8A2E2E', text:'#F5E8E8', text2:'#D6BEBE', gray:'#AA7A7A', footerBg:'#080408', border:'rgba(201,72,72,0.18)' },
+      3:  { name:'Pearl White',     bg:'#F8F6F2', deep:'#EDEBE5', mid:'#E2DED8', card:'#FFFFFF', accent:'#8B6914', accentLt:'#B08A2A', accentDk:'#5C4408', text:'#1A1814', text2:'#3D3A32', gray:'#8A8478', footerBg:'#D4D0C8', border:'rgba(139,105,20,0.18)' },
+      4:  { name:'Forest Deep',     bg:'#061410', deep:'#0A1E18', mid:'#102820', card:'#0C2018', accent:'#4CAC7C', accentLt:'#6BC49C', accentDk:'#2E7A54', text:'#E8F5EE', text2:'#BEDBCA', gray:'#7AAA90', footerBg:'#030A08', border:'rgba(76,172,124,0.18)' },
+      5:  { name:'Sky Mist',        bg:'#F0F4F8', deep:'#E4EAF2', mid:'#D8E0EC', card:'#FFFFFF', accent:'#3A6E9C', accentLt:'#5A90BC', accentDk:'#1C4E7A', text:'#0E1C2C', text2:'#2A3C50', gray:'#7A90A8', footerBg:'#C8D4E0', border:'rgba(58,110,156,0.18)' },
+      6:  { name:'Ember Dark',      bg:'#160C04', deep:'#221408', mid:'#301C0C', card:'#281808', accent:'#D47830', accentLt:'#EC9848', accentDk:'#9A5418', text:'#F5EADC', text2:'#D8C4A8', gray:'#AA8A68', footerBg:'#080402', border:'rgba(212,120,48,0.18)' },
+      7:  { name:'Lavender Field',  bg:'#F4F0F8', deep:'#EAE4F4', mid:'#DED6EC', card:'#FFFFFF', accent:'#7848AC', accentLt:'#9868CC', accentDk:'#54288A', text:'#140C1E', text2:'#30204A', gray:'#8A78A8', footerBg:'#D4C8E8', border:'rgba(120,72,172,0.18)' },
+      8:  { name:'Midnight Teal',   bg:'#04100E', deep:'#081A18', mid:'#0C2422', card:'#0A1E1C', accent:'#38B4A0', accentLt:'#58D4C0', accentDk:'#187860', text:'#E0F4F2', text2:'#B4D8D4', gray:'#6AA8A0', footerBg:'#020808', border:'rgba(56,180,160,0.18)' },
+      9:  { name:'Rust Iron',       bg:'#120C04', deep:'#1C1408', mid:'#28180C', card:'#1E1408', accent:'#B86828', accentLt:'#D48840', accentDk:'#844414', text:'#F4EAD8', text2:'#D4C0A0', gray:'#A08468', footerBg:'#080402', border:'rgba(184,104,40,0.18)' },
+      10: { name:'Arctic Blue',     bg:'#080E14', deep:'#0C1620', mid:'#10202E', card:'#0C1C28', accent:'#48A0D4', accentLt:'#68C0EC', accentDk:'#2878A8', text:'#E8F2F8', text2:'#C0D4E4', gray:'#7AA0B8', footerBg:'#040810', border:'rgba(72,160,212,0.18)' },
+      11: { name:'Sakura Dark',     bg:'#140810', deep:'#1E1018', mid:'#2A1824', card:'#1E1020', accent:'#C85894', accentLt:'#E478B4', accentDk:'#8C3464', text:'#F8E8F4', text2:'#D8C0D0', gray:'#A87898', footerBg:'#080408', border:'rgba(200,88,148,0.18)' },
+      12: { name:'Sand Dune',       bg:'#F8F4EC', deep:'#EEE8DC', mid:'#E4DCD0', card:'#FFFFFF', accent:'#9C7840', accentLt:'#BC9858', accentDk:'#6C5020', text:'#1C1610', text2:'#3C3024', gray:'#9C9080', footerBg:'#D8D0C0', border:'rgba(156,120,64,0.18)' },
+      13: { name:'Cobalt Night',    bg:'#060A16', deep:'#0A1020', mid:'#10182E', card:'#0C1428', accent:'#4860CC', accentLt:'#6880E8', accentDk:'#2840A0', text:'#E8ECF8', text2:'#C0C8E4', gray:'#7880B0', footerBg:'#030510', border:'rgba(72,96,204,0.18)' },
+      14: { name:'Jade Shadow',     bg:'#061210', deep:'#0A1C18', mid:'#102820', card:'#0C2018', accent:'#4C9C7C', accentLt:'#6CBC9C', accentDk:'#2C7054', text:'#E8F4F0', text2:'#B8D8CC', gray:'#78A898', footerBg:'#030A08', border:'rgba(76,156,124,0.18)' },
+      15: { name:'Cream Linen',     bg:'#F8F4EE', deep:'#EEE8DF', mid:'#E5DDD4', card:'#FFFCF8', accent:'#7C5830', accentLt:'#9C7848', accentDk:'#503818', text:'#1A140C', text2:'#3A3024', gray:'#9C8C7C', footerBg:'#D8CFC4', border:'rgba(124,88,48,0.18)' },
+      16: { name:'Volcanic',        bg:'#100808', deep:'#1A1010', mid:'#281818', card:'#1E1010', accent:'#E04830', accentLt:'#F86848', accentDk:'#A02818', text:'#F8ECEC', text2:'#D8C4C4', gray:'#A88888', footerBg:'#080404', border:'rgba(224,72,48,0.18)' },
+      17: { name:'Galaxy Purple',   bg:'#0C0414', deep:'#140820', mid:'#1E1030', card:'#180C28', accent:'#9050D8', accentLt:'#B070F8', accentDk:'#6030A8', text:'#F0E8FC', text2:'#D0C0EC', gray:'#9880C0', footerBg:'#060210', border:'rgba(144,80,216,0.18)' },
+      18: { name:'Obsidian',        bg:'#080808', deep:'#101010', mid:'#181818', card:'#101010', accent:'#A0A0A0', accentLt:'#C8C8C8', accentDk:'#686868', text:'#F0F0F0', text2:'#D0D0D0', gray:'#888888', footerBg:'#040404', border:'rgba(160,160,160,0.18)' },
+      19: { name:'Morning Fog',     bg:'#F4F4F2', deep:'#EAEAE6', mid:'#E0E0DA', card:'#FFFFFF', accent:'#5C7868', accentLt:'#7C9888', accentDk:'#3C5848', text:'#161814', text2:'#343830', gray:'#8C9890', footerBg:'#D0D4CE', border:'rgba(92,120,104,0.18)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    const IMG1 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjNfMjMy/MDAxNTk4MTgwNTg5MDYy.uA1NHCj3WWGQ4N4X2lBJBLv9kXIyDFNXXBP5QO0SoNIg.FBHqHZmPTrNcD7HpCaqvJX1gUV5ZllRAuMxL9h5Y3wcg.JPEG/KakaoTalk_20200823_195242797.jpg?type=w1600';
+    const IMG2 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTA0/MDAxNTk4MjM4Mjc1ODE3.0k2BaE4ogtlYVBvHyVmHRkQb8dIvqD8i2ULhVKcVEDIg.mH8dOqWbFVT3yJPPHgtnIU8KSzP_vf2YbhLe27F7PfMg.JPEG/%ED%91%9C%EC%99%80_%ED%8F%AC.jpg?type=w1600';
+    const IMG3 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTMx/MDAxNTk4MjQwMjI3NjQ2.hLSA_5kfuWxPRUPy2d3l9Xu6G1t7QFJNw9kXb2mS8AMg.5eZKYCnLCfuPcwJX3HQoEh3k3WHGDsMfI4V0VPK5rZEg.JPEG/%EC%9D%98%EB%A1%9C%EC%9B%80.jpg?type=w1600';
+    const IMG4 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzE3NjgyMTQ4.j8kFmmQFLoFT5PLxTPmYW6T0Tx9BjvDX_pPtY8XvzLYg.7b8L0Uj3lBf6Dh2lGj8LxMHwFlKbdOsT4AaYQ6aHPGYg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AD%ED%8F%AC.jpeg?type=w1600';
+    const IMG5 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMjI4/MDAxNTk4NTA5OTI4NDU2.mh8WzPbnjU9WBrHi-Gq8F2FRitnzLDMpPcC38w4U1Pcg.R6T4a3m4U8yVqFQlYZHpOqT3J0oKW_-2yEIQh_GZ8Pkg.JPEG/1.jpg?type=w1600';
+    const IMG6 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMTE2/MDAxNTk4NTEwMDE1OTU3.hVOK14ZImOyDTiH_nrJCTlKN3U7JgQDrVsw_jCjQ5H8g.tKV1w5uifEyRuvNIf1k_6CDzRHBQw7VPxEJAy2hA0osg.JPEG/2.jpg?type=w1600';
+    %>
+    :root{--bg:<%= t.bg %>;--deep:<%= t.deep %>;--mid:<%= t.mid %>;--card:<%= t.card %>;--accent:<%= t.accent %>;--accentLt:<%= t.accentLt %>;--text:<%= t.text %>;--text2:<%= t.text2 %>;--gray:<%= t.gray %>;--footerBg:<%= t.footerBg %>;--border:<%= t.border %>;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;overflow-x:hidden;}
+    .gh{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:var(--bg);border-bottom:1px solid var(--border);}
+    .gh-logo{font-family:'Noto Serif KR',serif;font-size:1.2rem;font-weight:600;color:var(--accent);text-decoration:none;}
+    .gh-nav{display:flex;gap:8px;}
+    .gnb{padding:6px 18px;border:1px solid var(--border);border-radius:100px;color:var(--text2);font-size:.8rem;font-weight:300;background:transparent;cursor:pointer;transition:all .2s;}
+    .gnb:hover,.gnb.on{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+    .gh-cta{background:var(--accent);color:var(--bg);padding:9px 22px;border-radius:100px;font-size:.82rem;font-weight:500;text-decoration:none;}
+    .hstrip{margin-top:64px;display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:480px;gap:3px;}
+    .hs-m,.hs-i{position:relative;overflow:hidden;}
+    .hs-c{display:grid;grid-template-rows:1fr 1fr;gap:3px;}
+    .hs-m img,.hs-i img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s;}
+    .hs-m:hover img,.hs-i:hover img{transform:scale(1.05);}
+    .ov-lg{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.1) 50%,transparent 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:32px;}
+    .ov-sm{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px;}
+    .ov-tag{display:inline-block;background:var(--accent);color:var(--bg);padding:4px 12px;font-size:.7rem;font-weight:600;letter-spacing:.06em;margin-bottom:12px;border-radius:2px;}
+    .ov-h{font-family:'Noto Serif KR',serif;font-size:1.6rem;font-weight:500;color:#fff;line-height:1.35;margin-bottom:8px;}
+    .ov-p{font-size:.84rem;color:rgba(255,255,255,.8);font-weight:300;line-height:1.6;}
+    .ov-hs{font-family:'Noto Serif KR',serif;font-size:.95rem;font-weight:500;color:#fff;line-height:1.4;}
+    .ov-ss{font-size:.76rem;color:rgba(255,255,255,.7);font-weight:300;margin-top:4px;}
+    .gal-sec{padding:80px 40px;}
+    .gal-hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px;}
+    .glbl{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+    .gal-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:400;color:var(--text);line-height:1.4;}
+    .gal-meta{font-size:.84rem;color:var(--gray);font-weight:300;text-align:right;}
+    .mgrid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:260px;gap:4px;}
+    .mgi{position:relative;overflow:hidden;}
+    .mgi.tall{grid-row:span 2;}
+    .mgi.wide{grid-column:span 2;}
+    .mgi img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
+    .mgi:hover img{transform:scale(1.07);}
+    .mgi-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,transparent 55%);opacity:0;transition:opacity .3s;display:flex;flex-direction:column;justify-content:flex-end;padding:24px;}
+    .mgi:hover .mgi-ov{opacity:1;}
+    .mgi-h{font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:500;color:#fff;margin-bottom:6px;}
+    .mgi-p{font-size:.78rem;color:rgba(255,255,255,.8);font-weight:300;line-height:1.5;}
+    .feat{position:relative;height:560px;overflow:hidden;margin:0 0 4px;}
+    .feat img{width:100%;height:100%;object-fit:cover;display:block;}
+    .feat-ov{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.65) 0%,transparent 60%);display:flex;align-items:center;padding:80px;}
+    .feat-t{max-width:540px;}
+    .feat-lbl{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;}
+    .feat-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:300;color:#fff;line-height:1.35;margin-bottom:20px;}
+    .feat-p{font-size:.95rem;font-weight:300;color:rgba(255,255,255,.85);line-height:1.8;margin-bottom:28px;}
+    .feat-btn{display:inline-block;padding:12px 28px;border:1px solid rgba(255,255,255,.5);color:#fff;font-size:.84rem;font-weight:300;text-decoration:none;border-radius:100px;transition:all .2s;}
+    .feat-btn:hover{background:var(--accent);border-color:var(--accent);}
+    .r2g{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;height:320px;}
+    .r2i{position:relative;overflow:hidden;}
+    .r2i img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
+    .r2i:hover img{transform:scale(1.06);}
+    .r2-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px;}
+    .r2-t{font-family:'Noto Serif KR',serif;font-size:.9rem;font-weight:500;color:#fff;line-height:1.4;}
+    .r2-m{font-size:.72rem;color:rgba(255,255,255,.65);margin-top:4px;}
+    .qband{padding:80px 40px;background:var(--deep);text-align:center;}
+    .qmark{font-family:'Noto Serif KR',serif;font-size:5rem;line-height:.8;color:var(--accent);opacity:.25;display:block;margin-bottom:24px;}
+    .qtext{font-family:'Noto Serif KR',serif;font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:300;color:var(--text);line-height:1.8;max-width:680px;margin:0 auto 20px;}
+    .qsrc{font-size:.8rem;color:var(--gray);letter-spacing:.1em;}
+    .csec{padding:80px 40px;background:var(--mid);}
+    .cs-in{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+    .cs-lbl{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+    .cs-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.5rem,2.8vw,2.2rem);font-weight:400;color:var(--text);margin:16px 0 24px;line-height:1.5;}
+    .cs-p{font-size:.92rem;font-weight:300;color:var(--text2);line-height:1.9;margin-bottom:32px;}
+    .cs-row{display:flex;gap:12px;flex-wrap:wrap;}
+    .bp{background:var(--accent);color:var(--bg);padding:13px 32px;border-radius:100px;font-size:.88rem;font-weight:500;text-decoration:none;transition:all .2s;}
+    .bp:hover{background:var(--accentLt);transform:translateY(-1px);}
+    .bs{border:1px solid var(--border);color:var(--text2);padding:13px 32px;border-radius:100px;font-size:.88rem;font-weight:300;text-decoration:none;background:var(--card);transition:all .2s;}
+    .bs:hover{border-color:var(--accent);color:var(--accent);}
+    .cs-img img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+    footer{background:var(--footerBg);border-top:1px solid var(--border);padding:60px 48px 40px;}
+    .fi{max-width:1100px;margin:0 auto;}
+    .ft{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+    .fb .flogo{font-family:'Noto Serif KR',serif;font-size:1.2rem;font-weight:600;color:var(--accent);margin-bottom:14px;display:block;}
+    .fb p{font-size:.82rem;font-weight:300;color:var(--gray);line-height:1.7;}
+    .fcol h4{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;font-weight:500;}
+    .fcol ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+    .fcol li a{color:var(--gray);font-size:.83rem;font-weight:300;text-decoration:none;transition:color .2s;}
+    .fcol li a:hover{color:var(--text);}
+    .fb2{border-top:1px solid var(--border);padding-top:24px;display:flex;align-items:center;justify-content:space-between;}
+    .fcopy{font-size:.78rem;color:var(--gray);font-weight:300;}
+    .siann-badge{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;font-size:.72rem;color:rgba(255,255,255,.7);font-family:'Noto Sans KR',sans-serif;max-width:300px;line-height:1.5;}
+    .b-row1{margin-bottom:6px;}
+    .b-row1 span{color:var(--accent);font-weight:600;}
+    .b-row2{display:flex;flex-wrap:wrap;gap:3px;}
+    .b-row2 a{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:4px;text-decoration:none;font-size:.66rem;color:rgba(255,255,255,.5);background:rgba(255,255,255,.06);transition:all .15s;}
+    .b-row2 a:hover{background:var(--accent);color:#000;}
+    .b-row2 a.cur{background:var(--accent);color:#000;font-weight:700;}
+    @media(max-width:900px){.gh-nav{display:none;}.hstrip{grid-template-columns:1fr 1fr;grid-template-rows:320px 200px;}.hs-m{grid-column:span 2;}.mgrid{grid-template-columns:1fr 1fr;grid-auto-rows:220px;}.mgi.wide{grid-column:span 2;}.r2g{grid-template-columns:1fr 1fr;height:auto;}.r2i img{height:220px;}.cs-in{grid-template-columns:1fr;}.ft{grid-template-columns:1fr 1fr;}}
+    @media(max-width:600px){.hstrip{grid-template-columns:1fr;height:auto;}.hs-m{grid-column:auto;height:300px;}.hs-i{height:200px;}.mgrid{grid-template-columns:1fr;}.mgi.tall,.mgi.wide{grid-row:auto;grid-column:auto;}.r2g{grid-template-columns:1fr;}.feat-ov{padding:40px 24px;}.ft{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<header class="gh">
+  <a class="gh-logo" href="#">한울사상</a>
+  <nav class="gh-nav">
+    <button class="gnb on" type="button">전체</button>
+    <button class="gnb" type="button">자연</button>
+    <button class="gnb" type="button">공동체</button>
+    <button class="gnb" type="button">수련</button>
+    <button class="gnb" type="button">행사</button>
+  </nav>
+  <a class="gh-cta" href="#">입문 안내</a>
+</header>
+
+<div class="hstrip">
+  <div class="hs-m">
+    <img src="<%= IMG4 %>" alt="천지연폭포" />
+    <div class="ov-lg">
+      <span class="ov-tag">자연</span>
+      <h2 class="ov-h">천지연의 품에서<br>한울의 소리를 듣다</h2>
+      <p class="ov-p">하늘과 땅이 만나는 곳에서 우리는 한울의 이치를 깨닫습니다.</p>
+    </div>
+  </div>
+  <div class="hs-c">
+    <div class="hs-i"><img src="<%= IMG1 %>" alt="한울 공동체" /><div class="ov-sm"><div class="ov-hs">한울 공동체의 만남</div><div class="ov-ss">2020 · 공동체</div></div></div>
+    <div class="hs-i"><img src="<%= IMG2 %>" alt="표와 포" /><div class="ov-sm"><div class="ov-hs">표와 포의 상징</div><div class="ov-ss">2020 · 가르침</div></div></div>
+  </div>
+  <div class="hs-c">
+    <div class="hs-i"><img src="<%= IMG5 %>" alt="수련 1" /><div class="ov-sm"><div class="ov-hs">함께하는 수련의 시간</div><div class="ov-ss">2020 · 수련</div></div></div>
+    <div class="hs-i"><img src="<%= IMG3 %>" alt="의로움" /><div class="ov-sm"><div class="ov-hs">의로움의 길</div><div class="ov-ss">2020 · 말씀</div></div></div>
+  </div>
+</div>
+
+<section class="gal-sec">
+  <div class="gal-hdr">
+    <div><div class="glbl">Gallery · 사진 갤러리</div><h2 class="gal-h">한울의 숨결을 담은<br>사진 아카이브</h2></div>
+    <div class="gal-meta">총 1,240장의 사진<br>연도별 · 주제별 분류</div>
+  </div>
+  <div class="mgrid">
+    <div class="mgi tall"><img src="<%= IMG1 %>" alt="한울 공동체" /><div class="mgi-ov"><div class="mgi-h">한울 가족의 어울림</div><div class="mgi-p">매년 열리는 한울 공동체 모임. 전국 각지에서 모여 서로의 안부를 나눕니다.</div></div></div>
+    <div class="mgi"><img src="<%= IMG2 %>" alt="표와 포" /><div class="mgi-ov"><div class="mgi-h">표와 포의 의미</div><div class="mgi-p">한울사상의 핵심 상징물</div></div></div>
+    <div class="mgi"><img src="<%= IMG3 %>" alt="의로움" /><div class="mgi-ov"><div class="mgi-h">의로움의 실천</div><div class="mgi-p">일상 속 한울의 가르침</div></div></div>
+    <div class="mgi wide"><img src="<%= IMG4 %>" alt="천지연폭포" /><div class="mgi-ov"><div class="mgi-h">천지연 — 하늘과 땅이 연결되는 곳</div><div class="mgi-p">한울사상에서 자연은 스승입니다. 폭포의 힘찬 흐름에서 천지의 이치를 봅니다.</div></div></div>
+    <div class="mgi"><img src="<%= IMG5 %>" alt="수련 1" /><div class="mgi-ov"><div class="mgi-h">수련의 현장</div><div class="mgi-p">마음을 고요히 하는 시간</div></div></div>
+    <div class="mgi"><img src="<%= IMG6 %>" alt="수련 2" /><div class="mgi-ov"><div class="mgi-h">자연과 하나 되기</div><div class="mgi-p">자연 속 명상 수련</div></div></div>
+    <div class="mgi tall"><img src="<%= IMG6 %>" alt="심화 수련" /><div class="mgi-ov"><div class="mgi-h">심화 수련 — 내면의 소리에 귀 기울이기</div><div class="mgi-p">깊은 성찰과 고요함 속에서 참된 자아를 발견하는 심화 수련 과정입니다.</div></div></div>
+    <div class="mgi"><img src="<%= IMG1 %>" alt="공동 수련" /><div class="mgi-ov"><div class="mgi-h">함께하는 공동 수련</div><div class="mgi-p">혼자가 아닌 함께</div></div></div>
+    <div class="mgi"><img src="<%= IMG3 %>" alt="가르침의 시간" /><div class="mgi-ov"><div class="mgi-h">가르침의 시간</div><div class="mgi-p">선생님의 말씀을 경청</div></div></div>
+  </div>
+</section>
+
+<div class="feat">
+  <img src="<%= IMG5 %>" alt="한울 공동체 피처드" />
+  <div class="feat-ov">
+    <div class="feat-t">
+      <div class="feat-lbl">Featured · 이달의 사진</div>
+      <h2 class="feat-h">손을 맞잡고<br>함께 걷는 한울의 길</h2>
+      <p class="feat-p">혼자서는 가기 힘든 길도 함께라면 갈 수 있습니다. 한울사상은 서로를 믿고 의지하며 앞으로 나아가는 공동체의 힘을 소중히 여깁니다.</p>
+      <a class="feat-btn" href="#">더 많은 사진 보기</a>
+    </div>
+  </div>
+</div>
+
+<div class="r2g">
+  <div class="r2i"><img src="<%= IMG2 %>" alt="표와 포 행사" /><div class="r2-ov"><div class="r2-t">표와 포 &mdash; 상징의 이야기</div><div class="r2-m">2020.08 · 교육</div></div></div>
+  <div class="r2i"><img src="<%= IMG3 %>" alt="의로움 강의" /><div class="r2-ov"><div class="r2-t">의로움을 논하다</div><div class="r2-m">2020.08 · 강의</div></div></div>
+  <div class="r2i"><img src="<%= IMG4 %>" alt="자연 명상" /><div class="r2-ov"><div class="r2-t">자연 속 명상</div><div class="r2-m">2020.08 · 수련</div></div></div>
+  <div class="r2i"><img src="<%= IMG6 %>" alt="저녁 수련" /><div class="r2-ov"><div class="r2-t">저녁 수련의 고요함</div><div class="r2-m">2020.08 · 수련</div></div></div>
+</div>
+
+<div class="qband">
+  <span class="qmark">&ldquo;</span>
+  <p class="qtext">사진 한 장에는 천 마디 말보다 더 많은 이야기가 담겨 있다. 한울의 숨결을 눈으로 보고, 가슴으로 느끼시기를 바랍니다.</p>
+  <div class="qsrc">한울사상 갤러리 아카이브 소개 글</div>
+</div>
+
+<section class="csec">
+  <div class="cs-in">
+    <div>
+      <div class="cs-lbl">Visit · 방문하기</div>
+      <h2 class="cs-h">직접 오셔서<br>한울을 만나보세요</h2>
+      <p class="cs-p">사진으로만 보는 것보다 직접 경험하는 것이 훨씬 깊은 감동을 줍니다. 한울사상 수련원을 방문하여 자연과 함께하는 수련의 시간을 가져보시기 바랍니다.</p>
+      <div class="cs-row"><a class="bp" href="#">방문 신청</a><a class="bs" href="#">갤러리 전체 보기</a></div>
+    </div>
+    <div class="cs-img"><img src="<%= IMG1 %>" alt="수련원 전경" /></div>
+  </div>
+</section>
+
+<footer>
+  <div class="fi">
+    <div class="ft">
+      <div class="fb"><span class="flogo">한울사상</span><p>한울의 아름다운 순간들을<br>사진으로 기록하고 나눕니다.</p></div>
+      <div class="fcol"><h4>갤러리</h4><ul><li><a href="#">자연</a></li><li><a href="#">공동체</a></li><li><a href="#">수련</a></li><li><a href="#">행사</a></li></ul></div>
+      <div class="fcol"><h4>한울이란</h4><ul><li><a href="#">가르침</a></li><li><a href="#">말씀</a></li><li><a href="#">아카이브</a></li></ul></div>
+      <div class="fcol"><h4>참여</h4><ul><li><a href="#">입문 안내</a></li><li><a href="#">수련원</a></li><li><a href="#">문의하기</a></li></ul></div>
+    </div>
+    <div class="fb2">
+      <span class="fcopy">&copy; 2024 한울사상 중앙수련원. All rights reserved.</span>
+      <span class="fcopy">테마 <%= themeId %> &middot; <%= t.name %></span>
+    </div>
+  </div>
+</footer>
+
+<div class="siann-badge">
+  <div class="b-row1">L<span>9</span> 사진갤러리그리드 &middot; 테마 <span><%= themeId %>/20 &mdash; <%= themes[themeId] ? themes[themeId].name : '' %></span></div>
+  <div class="b-row2"><% for(let i=1;i<=20;i++){ %><a href="/siann-9/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a><% } %></div>
+</div>
+
+</body>
+</html>

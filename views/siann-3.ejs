@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — L3 스플릿 스크린 · 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen',      bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', footerBg:'#030D07', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White',      bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', footerBg:'#1A1A1A', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', footerBg:'#0E0905', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist',       bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', footerBg:'#2A3547', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple',   bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', footerBg:'#080410', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo',          bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', footerBg:'#1A2010', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain',  bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', footerBg:'#080808', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal',       bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', footerBg:'#030B0D', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber',      bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', footerBg:'#0D0700', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night',     bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', footerBg:'#01060E', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand',       bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', footerBg:'#1C1408', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green',      bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', footerBg:'#050804', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', footerBg:'#03040F', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment',       bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', footerBg:'#1A1005', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz',     bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', footerBg:'#0D0608', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian',        bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', footerBg:'#020202', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon',         bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', footerBg:'#05080A', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White',    bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', footerBg:'#1A2440', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    %>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      <%= t.bg %>;    --deep:    <%= t.deep %>;   --mid:     <%= t.mid %>;
+      --card:    <%= t.card %>;  --gold:    <%= t.accent %>; --gold-lt: <%= t.accentLt %>;
+      --gold-dk: <%= t.accentDk %>; --cream: <%= t.text %>; --cream-2: <%= t.text2 %>;
+      --gray:    <%= t.gray %>;  --border:  <%= t.border %>;
+      --serif:   'Noto Serif KR', 'Malgun Gothic', serif;
+      --sans:    'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--cream); overflow-x: hidden; }
+
+    /* BADGE */
+    .siann-badge { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(0,0,0,0.88); color:#fff; text-align:center; padding:5px 16px; font-size:11px; letter-spacing:0.1em; border-bottom:2px solid <%= t.accent %>; }
+    .b-row1 { margin-bottom:3px; } .b-row1 span { color:<%= t.accent %>; font-weight:700; }
+    .b-row2 { display:flex; justify-content:center; gap:4px; flex-wrap:wrap; }
+    .b-row2 a { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.1); font-size:10px; color:#ccc; text-decoration:none; transition:background 0.2s; }
+    .b-row2 a:hover, .b-row2 a.cur { background:<%= t.accent %>; color:#000; font-weight:700; }
+
+    /* ── LAYOUT 3: 스플릿 스크린 (좌:고정 비주얼 / 우:스크롤 콘텐츠) ── */
+    .split-layout { display: flex; min-height: calc(100vh - 52px); margin-top: 52px; }
+
+    /* LEFT PANEL — fixed visual */
+    .split-left {
+      position: sticky; top: 52px;
+      width: 44%; height: calc(100vh - 52px);
+      background: var(--deep);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .split-left-inner { position: relative; z-index: 2; text-align: center; width: 100%; }
+    .split-logo { font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--gold); letter-spacing: 0.06em; margin-bottom: 8px; }
+    .split-logo span { color: var(--cream); }
+    .split-tagline { font-size: 11px; letter-spacing: 0.32em; color: var(--gray); margin-bottom: 52px; }
+    .split-mandala { width: 280px; height: 280px; margin: 0 auto 44px; }
+    .split-mandala svg { width: 100%; height: 100%; animation: spin 80s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .split-quote { font-family: var(--serif); font-size: 14px; font-weight: 300; color: var(--cream-2); line-height: 2.0; max-width: 300px; text-align: center; font-style: italic; margin-bottom: 40px; }
+    .split-cta { display: inline-block; padding: 11px 28px; background: var(--gold); color: var(--bg); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-decoration: none; border-radius: 2px; transition: background 0.22s; }
+    .split-cta:hover { background: var(--gold-lt); }
+    /* nav dots */
+    .nav-dots { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; }
+    .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.22s; }
+    .nav-dot.active, .nav-dot:hover { background: var(--gold); transform: scale(1.4); }
+
+    /* BG circles */
+    .bg-circles { position: absolute; inset: 0; pointer-events: none; }
+    .bg-circles span { display: block; position: absolute; border-radius: 50%; border: 1px solid var(--border); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+    /* RIGHT PANEL — scrollable */
+    .split-right { flex: 1; overflow-y: auto; }
+
+    /* SECTION PANELS */
+    .panel {
+      min-height: 100vh;
+      padding: 80px 72px;
+      display: flex; flex-direction: column; justify-content: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel:last-child { border-bottom: none; }
+    .panel-num { font-size: 80px; font-weight: 700; font-family: var(--serif); color: var(--gold); opacity: 0.08; line-height: 1; margin-bottom: -30px; }
+    .panel-kicker { font-size: 10px; font-weight: 600; letter-spacing: 0.44em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    .panel-title { font-family: var(--serif); font-size: clamp(28px, 3.5vw, 46px); font-weight: 500; color: var(--cream); line-height: 1.2; margin-bottom: 16px; }
+    .panel-bar { width: 40px; height: 2px; background: var(--gold); margin-bottom: 28px; }
+    .panel-body { font-family: var(--serif); font-size: 16px; font-weight: 300; color: var(--cream-2); line-height: 2.0; max-width: 520px; margin-bottom: 40px; }
+
+    /* About panel items */
+    .pillar-list { display: flex; flex-direction: column; gap: 28px; margin-top: 8px; }
+    .pillar-item { display: flex; gap: 24px; align-items: flex-start; }
+    .pillar-hanja-sm { font-family: var(--serif); font-size: 40px; font-weight: 700; color: var(--gold); opacity: 0.6; line-height: 1; flex-shrink: 0; width: 48px; }
+    .pillar-text h4 { font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--cream); margin-bottom: 4px; }
+    .pillar-text .sub { font-size: 11px; letter-spacing: 0.14em; color: var(--gold); margin-bottom: 8px; }
+    .pillar-text p { font-family: var(--serif); font-size: 14px; font-weight: 300; color: var(--cream-2); line-height: 1.9; }
+
+    /* Teaching row */
+    .teach-row { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; padding: 28px 0; border-bottom: 1px solid var(--border); }
+    .teach-row:first-child { padding-top: 0; }
+    .teach-row:last-child { border-bottom: none; }
+    .teach-char { font-family: var(--serif); font-size: 36px; font-weight: 700; color: var(--gold); opacity: 0.7; line-height: 1; }
+    .teach-txt h4 { font-family: var(--serif); font-size: 20px; font-weight: 500; color: var(--cream); margin-bottom: 4px; }
+    .teach-txt .sub { font-size: 11px; letter-spacing: 0.14em; color: var(--gold-dk); margin-bottom: 10px; }
+    .teach-txt p { font-family: var(--serif); font-size: 14px; font-weight: 300; color: var(--cream-2); line-height: 1.9; }
+
+    /* Quote panel */
+    .quote-panel { background: var(--mid); }
+    .big-quote { font-family: var(--serif); font-size: clamp(20px, 2.8vw, 32px); font-weight: 400; color: var(--cream); line-height: 1.7; max-width: 560px; margin-bottom: 20px; position: relative; padding-left: 32px; }
+    .big-quote::before { content: '"'; position: absolute; left: 0; top: -8px; font-size: 52px; color: var(--gold); opacity: 0.4; line-height: 1; }
+    .quote-attr { font-family: var(--serif); font-size: 12px; color: var(--gold); letter-spacing: 0.1em; padding-left: 32px; }
+    .quote-divider { width: 1px; height: 40px; background: var(--gold-dk); opacity: 0.4; margin: 28px 32px; }
+
+    /* Programs panel */
+    .prog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 8px; }
+    .prog-item { padding: 24px 22px; background: var(--card); border: 1px solid var(--border); border-radius: 2px; transition: border-color 0.22s; }
+    .prog-item:hover { border-color: var(--gold); }
+    .prog-item h4 { font-family: var(--serif); font-size: 15px; font-weight: 500; color: var(--cream); margin-bottom: 6px; }
+    .prog-item p { font-family: var(--serif); font-size: 13px; font-weight: 300; color: var(--cream-2); line-height: 1.8; }
+
+    /* Archive panel */
+    .archive-panel { background: var(--mid); text-align: center; }
+    .archive-num { font-family: var(--serif); font-size: clamp(60px, 10vw, 100px); font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 6px; opacity: 0.85; }
+    .archive-unit { font-size: 11px; letter-spacing: 0.4em; color: var(--gray); margin-bottom: 24px; }
+    .archive-desc { font-family: var(--serif); font-size: 16px; font-weight: 300; color: var(--cream-2); line-height: 1.85; max-width: 400px; margin: 0 auto 36px; }
+    .arch-btn { display: inline-block; padding: 14px 36px; background: var(--gold); color: var(--bg); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-decoration: none; border-radius: 2px; transition: all 0.22s; }
+    .arch-btn:hover { background: var(--gold-lt); }
+
+    /* Footer */
+    .split-footer { background: <%= t.footerBg %>; padding: 48px 72px; border-top: 1px solid var(--border); }
+    .ft-inner { display: flex; gap: 40px; justify-content: space-between; flex-wrap: wrap; }
+    .ft-brand .logo { font-family: var(--serif); font-size: 18px; color: var(--gold); font-weight: 600; margin-bottom: 10px; }
+    .ft-brand p { font-size: 13px; color: var(--gray); line-height: 1.8; }
+    .ft-col h4 { font-size: 10px; letter-spacing: 0.36em; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
+    .ft-col ul { list-style: none; }
+    .ft-col li { margin-bottom: 8px; }
+    .ft-col a { font-size: 13px; color: var(--gray); text-decoration: none; transition: color .2s; }
+    .ft-col a:hover { color: var(--cream); }
+    .ft-copy { margin-top: 28px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.05); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--gray); }
+
+    @media (max-width: 900px) {
+      .split-layout { flex-direction: column; }
+      .split-left { position: relative; top: 0; width: 100%; height: auto; min-height: 60vh; }
+      .panel { padding: 60px 32px; }
+      .prog-grid { grid-template-columns: 1fr; }
+      .split-footer { padding: 40px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- BADGE -->
+<div class="siann-badge">
+  <div class="b-row1">L<span>3</span> 스플릿 스크린 · 테마 <span><%= themeId %>/20 — <%= themes[themeId]?.name || '' %></span></div>
+  <div class="b-row2">
+    <% for(let i=1;i<=20;i++){ %><a href="/siann-3/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a><% } %>
+  </div>
+</div>
+
+<div class="split-layout">
+
+  <!-- LEFT PANEL (fixed) -->
+  <div class="split-left">
+    <div class="bg-circles">
+      <span style="width:600px;height:600px;"></span>
+      <span style="width:440px;height:440px;"></span>
+      <span style="width:300px;height:300px;"></span>
+    </div>
+    <div class="split-left-inner">
+      <div class="split-logo">한울<span>사상</span></div>
+      <p class="split-tagline">한울영성계발원 · 여의명상센터</p>
+      <div class="split-mandala">
+        <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="140" cy="140" r="132" stroke="<%= t.accent %>20" stroke-width="1"/>
+          <circle cx="140" cy="140" r="112" stroke="<%= t.accent %>34" stroke-width="0.5"/>
+          <circle cx="140" cy="140" r="90"  stroke="<%= t.accent %>44" stroke-width="1"/>
+          <circle cx="140" cy="140" r="70"  stroke="<%= t.accent %>54" stroke-width="1"/>
+          <circle cx="140" cy="140" r="50"  stroke="<%= t.accent %>70" stroke-width="1.5"/>
+          <circle cx="140" cy="140" r="30"  fill="<%= t.accent %>18" stroke="<%= t.accent %>99" stroke-width="1.5"/>
+          <circle cx="140" cy="140" r="10"  fill="<%= t.accent %>CC"/>
+          <line x1="140" y1="8"   x2="140" y2="272" stroke="<%= t.accent %>22" stroke-width="0.5"/>
+          <line x1="8"   y1="140" x2="272" y2="140" stroke="<%= t.accent %>22" stroke-width="0.5"/>
+          <line x1="40"  y1="40"  x2="240" y2="240" stroke="<%= t.accent %>18" stroke-width="0.5"/>
+          <line x1="240" y1="40"  x2="40"  y2="240" stroke="<%= t.accent %>18" stroke-width="0.5"/>
+          <text x="140" y="20" text-anchor="middle" font-family="serif" font-size="13" fill="<%= t.accent %>AA">天</text>
+          <text x="140" y="270" text-anchor="middle" font-family="serif" font-size="13" fill="<%= t.accent %>AA">地</text>
+          <text x="16"  y="145" text-anchor="middle" font-family="serif" font-size="13" fill="<%= t.accent %>AA">人</text>
+          <text x="265" y="145" text-anchor="middle" font-family="serif" font-size="13" fill="<%= t.accent %>AA">氣</text>
+        </svg>
+      </div>
+      <p class="split-quote">수도자 1인은 세상자 만인이요<br>중생자 억이라</p>
+      <a href="http://211.104.37.65:4200" class="split-cta" target="_blank">법문 아카이브 →</a>
+    </div>
+    <div class="nav-dots" id="navDots">
+      <div class="nav-dot active" data-target="panel-hero"></div>
+      <div class="nav-dot" data-target="panel-about"></div>
+      <div class="nav-dot" data-target="panel-teachings"></div>
+      <div class="nav-dot" data-target="panel-quotes"></div>
+      <div class="nav-dot" data-target="panel-center"></div>
+      <div class="nav-dot" data-target="panel-archive"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL (scrollable) -->
+  <div class="split-right" id="splitRight">
+
+    <!-- HERO PANEL -->
+    <section class="panel" id="panel-hero">
+      <p class="panel-num">01</p>
+      <p class="panel-kicker">한울영성계발원 · 여의명상센터</p>
+      <h1 class="panel-title">한울사상<br>하늘의 뜻으로<br>사는 삶</h1>
+      <div class="panel-bar"></div>
+      <p class="panel-body">한울은 동서고금의 어떤 종교나 사상과도 구별되는 독자적 사상 체계입니다. 우주의 이치(道)가 인간의 삶 속에서 어떻게 펼쳐지는가를 밝히고, 그 이치에 따라 사는 삶의 길을 제시합니다.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="http://211.104.37.65:4200" style="display:inline-block;padding:13px 32px;background:var(--gold);color:var(--bg);font-size:13px;font-weight:700;letter-spacing:0.06em;text-decoration:none;border-radius:2px;" target="_blank">법문 아카이브</a>
+        <a href="#panel-about" style="display:inline-block;padding:13px 32px;border:1px solid var(--border);color:var(--cream-2);font-size:13px;text-decoration:none;border-radius:2px;">한울사상이란 →</a>
+      </div>
+    </section>
+
+    <!-- ABOUT PANEL -->
+    <section class="panel" id="panel-about">
+      <p class="panel-num">02</p>
+      <p class="panel-kicker">한울이란</p>
+      <h2 class="panel-title">한울(韓蔚)은 하늘의<br>순우리말, 만물의 근원</h2>
+      <div class="panel-bar"></div>
+      <div class="pillar-list">
+        <div class="pillar-item">
+          <div class="pillar-hanja-sm">道</div>
+          <div class="pillar-text">
+            <h4>우주도리</h4><p class="sub">우주의 이치를 깨닫다</p>
+            <p>"우주의 모든 것은 돈다 — 자전하고 공전하는 것이 우주의 도리."</p>
+          </div>
+        </div>
+        <div class="pillar-item">
+          <div class="pillar-hanja-sm">靈</div>
+          <div class="pillar-text">
+            <h4>영적 진화</h4><p class="sub">한울의 존재로 깨어나다</p>
+            <p>인간은 수련과 실천을 통해 더 높은 존재로 진화할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="pillar-item">
+          <div class="pillar-hanja-sm">責</div>
+          <div class="pillar-text">
+            <h4>세상에 대한 책임</h4><p class="sub">한 사람이 세상을 바꾼다</p>
+            <p>"수도자 1인은 세상자 만인이요, 중생자 억이라."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEACHINGS PANEL -->
+    <section class="panel" id="panel-teachings">
+      <p class="panel-num">03</p>
+      <p class="panel-kicker">핵심 가르침</p>
+      <h2 class="panel-title">세 가지 길</h2>
+      <div class="panel-bar"></div>
+      <div>
+        <div class="teach-row">
+          <div class="teach-char">制</div>
+          <div class="teach-txt"><h4>제도 (制道)</h4><p class="sub">수행의 목표이자 결과물</p><p>제도는 도를 삶 속에서 구현하고 세상의 질서를 바로잡는 것입니다.</p></div>
+        </div>
+        <div class="teach-row">
+          <div class="teach-char">場</div>
+          <div class="teach-txt"><h4>생명장 (生命場)</h4><p class="sub">몸을 감싸는 기(氣)의 장</p><p>생명장은 몸을 감싸고 있는 에너지 장(場)입니다.</p></div>
+        </div>
+        <div class="teach-row">
+          <div class="teach-char">損</div>
+          <div class="teach-txt"><h4>손지손지심</h4><p class="sub">損之損之心</p><p>"죄는 조이는 것이다." 한울의 수련은 비우는 것에서 시작합니다.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUOTES PANEL -->
+    <section class="panel quote-panel" id="panel-quotes">
+      <p class="panel-num">04</p>
+      <p class="panel-kicker">큰스승님 법문</p>
+      <h2 class="panel-title">실제 법문 발췌</h2>
+      <div class="panel-bar"></div>
+      <div class="big-quote">나비가 될 번데기는 무엇인가를 단단하게 붙잡지 않고서는 허물을 벗고 나올 수 없다</div>
+      <p class="quote-attr">— 한울 법문 아카이브 수록</p>
+      <div class="quote-divider"></div>
+      <div class="big-quote">죄는 조이는 것이다. 자신과 상대를 무리하게 조이는 것</div>
+      <p class="quote-attr">— 한울 법문 아카이브 수록</p>
+      <div class="quote-divider"></div>
+      <div class="big-quote">우주의 모든 것은 돈다. 자전하고 공전하는 것이 우주의 도리</div>
+      <p class="quote-attr">— 한울 법문 아카이브 수록</p>
+    </section>
+
+    <!-- CENTER PANEL -->
+    <section class="panel" id="panel-center">
+      <p class="panel-num">05</p>
+      <p class="panel-kicker">여의명상센터</p>
+      <h2 class="panel-title">한울영성계발원<br>수련 프로그램</h2>
+      <div class="panel-bar"></div>
+      <p class="panel-body" style="margin-bottom:24px;">여의명상센터 한울영성계발원은 한울사상을 직접 체험하고 실천하는 수련 공동체입니다.</p>
+      <div class="prog-grid">
+        <div class="prog-item"><h4>집중수련</h4><p>한울사상의 깊이를 체험하는 집중 수련 과정</p></div>
+        <div class="prog-item"><h4>생명장 수련</h4><p>몸을 감싸는 기(氣)의 장을 키우는 수련</p></div>
+        <div class="prog-item"><h4>기운영</h4><p>우주의 기운을 바르게 운용하는 수행법</p></div>
+        <div class="prog-item"><h4>토요법문</h4><p>매주 토요일 법문 청취 및 공동 수련</p></div>
+        <div class="prog-item"><h4>지기문화답사</h4><p>우주도리를 자연 속에서 체험하는 답사</p></div>
+        <div class="prog-item"><h4>공동체 활동</h4><p>함께 실천하는 삶의 공동체</p></div>
+      </div>
+    </section>
+
+    <!-- ARCHIVE PANEL -->
+    <section class="panel archive-panel" id="panel-archive">
+      <p class="panel-num">06</p>
+      <p class="panel-kicker" style="text-align:center;">법문 아카이브</p>
+      <div class="archive-num">10,313</div>
+      <p class="archive-unit">법문과 가르침</p>
+      <p class="archive-desc">수십 년에 걸쳐 수집된 한울 법문 전체를 아카이빙했습니다.<br>검색하고, 읽고, 당신만의 방식으로 만나보세요.</p>
+      <a href="http://211.104.37.65:4200" class="arch-btn" target="_blank">법문 아카이브 열기</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="split-footer">
+      <div class="ft-inner">
+        <div class="ft-brand"><div class="logo">한울영성계발원</div><p>여의명상센터 · 한울사상</p></div>
+        <div class="ft-col"><h4>한울사상</h4><ul><li><a href="#panel-about">한울이란</a></li><li><a href="#panel-teachings">핵심 가르침</a></li></ul></div>
+        <div class="ft-col"><h4>수련 프로그램</h4><ul><li><a href="#panel-center">집중수련</a></li><li><a href="#panel-center">토요법문</a></li></ul></div>
+        <div class="ft-col"><h4>아카이브</h4><ul><li><a href="http://211.104.37.65:4200" target="_blank">법문 아카이브</a></li></ul></div>
+      </div>
+      <div class="ft-copy"><span>© 2026 한울영성계발원 여의명상센터.</span><span>수도자 1인은 세상자 만인이요</span></div>
+    </footer>
+
+  </div><!-- split-right -->
+</div><!-- split-layout -->
+
+<script>
+  const right = document.getElementById('splitRight');
+  const dots = document.querySelectorAll('.nav-dot');
+  const panels = ['panel-hero','panel-about','panel-teachings','panel-quotes','panel-center','panel-archive'];
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      document.getElementById(panels[i])?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  right.addEventListener('scroll', () => {
+    const scrollTop = right.scrollTop;
+    let active = 0;
+    panels.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && el.offsetTop - 100 <= scrollTop) active = i;
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === active));
+  }, { passive: true });
+</script>
+</body>
+</html>

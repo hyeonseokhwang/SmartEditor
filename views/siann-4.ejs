@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>한울사상 L4 스크롤 스냅 전체화면 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen',      bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', footerBg:'#030D07', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White',      bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', footerBg:'#1A1A1A', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', footerBg:'#0E0905', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist',       bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', footerBg:'#2A3547', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple',   bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', footerBg:'#080410', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo',          bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', footerBg:'#1A2010', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain',  bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', footerBg:'#080808', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal',       bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', footerBg:'#030B0D', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber',      bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', footerBg:'#0D0700', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night',     bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', footerBg:'#01060E', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand',       bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', footerBg:'#1C1408', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green',      bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', footerBg:'#050804', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', footerBg:'#03040F', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment',       bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', footerBg:'#1A1005', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz',     bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', footerBg:'#0D0608', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian',        bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', footerBg:'#020202', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon',         bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', footerBg:'#05080A', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White',    bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', footerBg:'#1A2440', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    %>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:<%= t.bg %>;--deep:<%= t.deep %>;--mid:<%= t.mid %>;--card:<%= t.card %>;
+      --accent:<%= t.accent %>;--accentLt:<%= t.accentLt %>;--accentDk:<%= t.accentDk %>;
+      --text:<%= t.text %>;--text2:<%= t.text2 %>;--gray:<%= t.gray %>;
+      --border:<%= t.border %>;--footerBg:<%= t.footerBg %>;
+      --serif:'Noto Serif KR','Malgun Gothic',serif;
+      --sans:'Noto Sans KR','Malgun Gothic',sans-serif;
+    }
+    html{scroll-snap-type:y mandatory;overflow-y:scroll;height:100%;}
+    body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100%;}
+    .siann-badge{position:fixed;top:0;left:0;right:0;z-index:2000;background:rgba(0,0,0,0.92);color:#fff;text-align:center;padding:5px 16px;font-size:11px;letter-spacing:0.1em;border-bottom:2px solid <%= t.accent %>;}
+    .siann-badge .b-row1{margin-bottom:3px;}
+    .siann-badge .b-row1 span{color:<%= t.accent %>;font-weight:700;}
+    .siann-badge .b-row2{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;}
+    .siann-badge .b-row2 a{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:10px;color:#ccc;text-decoration:none;transition:background 0.2s;}
+    .siann-badge .b-row2 a:hover,.siann-badge .b-row2 a.cur{background:<%= t.accent %>;color:#000;font-weight:700;}
+    .sec-nav{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:1500;display:flex;flex-direction:column;gap:10px;}
+    .sec-nav a{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);display:block;transition:all 0.3s;border:1px solid rgba(255,255,255,0.35);text-decoration:none;}
+    .sec-nav a:hover{background:var(--accent);transform:scale(1.5);}
+    .snap-sec{scroll-snap-align:start;scroll-snap-stop:always;min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:80px 48px 48px;}
+    .snum{position:absolute;font-family:var(--serif);font-size:clamp(100px,18vw,220px);font-weight:700;line-height:1;opacity:0.04;right:-10px;bottom:-10px;color:var(--text);user-select:none;pointer-events:none;}
+    .s-hero{background:radial-gradient(ellipse 90% 70% at 50% 40%,<%= t.mid %> 0%,<%= t.bg %> 65%);flex-direction:column;text-align:center;}
+    .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.12;pointer-events:none;}
+    .orb1{width:500px;height:500px;background:var(--accent);top:-150px;left:-100px;}
+    .orb2{width:350px;height:350px;background:var(--accentLt);bottom:-80px;right:5%;}
+    .h-kana{font-family:var(--serif);font-size:clamp(11px,1.4vw,13px);letter-spacing:0.7em;color:var(--accent);text-transform:uppercase;margin-bottom:28px;}
+    .h-title{font-family:var(--serif);font-size:clamp(60px,11vw,130px);font-weight:700;line-height:1;color:var(--text);margin-bottom:12px;}
+    .h-sub{font-family:var(--serif);font-size:clamp(15px,2.2vw,26px);font-weight:300;color:var(--text2);letter-spacing:0.2em;margin-bottom:52px;}
+    .h-line{width:1px;height:70px;background:linear-gradient(to bottom,var(--accent),transparent);margin:0 auto 20px;}
+    .h-hint{font-size:11px;letter-spacing:0.5em;color:var(--gray);text-transform:uppercase;}
+    .s-about{background:<%= t.deep %>;}
+    .ag{display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1100px;width:100%;align-items:center;}
+    .slabel{font-size:11px;letter-spacing:0.5em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;}
+    .ah{font-family:var(--serif);font-size:clamp(36px,5vw,68px);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:24px;}
+    .ad{font-size:14px;line-height:1.95;color:var(--text2);}
+    .ml{display:flex;flex-direction:column;gap:18px;}
+    .mc{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);padding:20px 22px;border-radius:4px;}
+    .mh{font-family:var(--serif);font-size:30px;color:var(--accent);margin-bottom:5px;}
+    .mk{font-size:13px;color:var(--text2);line-height:1.7;}
+    .s-teach{background:var(--bg);}
+    .ti{max-width:1100px;width:100%;}
+    .th{text-align:center;margin-bottom:52px;}
+    .tt{font-family:var(--serif);font-size:clamp(30px,4vw,54px);color:var(--text);}
+    .tc{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+    .tcard{background:var(--card);border:1px solid var(--border);padding:36px 26px;border-radius:8px;position:relative;overflow:hidden;}
+    .tcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accentLt));}
+    .tn{font-family:var(--serif);font-size:44px;color:var(--accent);opacity:0.25;margin-bottom:14px;font-weight:700;}
+    .tname{font-family:var(--serif);font-size:22px;color:var(--text);margin-bottom:12px;}
+    .tbody{font-size:13px;line-height:1.85;color:var(--text2);}
+    .s-quote{background:radial-gradient(ellipse 80% 60% at 30% 55%,<%= t.mid %> 0%,<%= t.deep %> 65%);flex-direction:column;}
+    .ql{font-size:11px;letter-spacing:0.5em;text-transform:uppercase;color:var(--accent);margin-bottom:44px;}
+    .qi{max-width:780px;text-align:center;margin-bottom:32px;}
+    .qt{font-family:var(--serif);font-size:clamp(16px,2.2vw,24px);line-height:1.8;color:var(--text);font-weight:300;}
+    .qt::before{content:open-quote;color:var(--accent);margin-right:4px;}
+    .qt::after{content:close-quote;color:var(--accent);margin-left:4px;}
+    .qdiv{width:36px;height:1px;background:var(--accent);margin:24px auto;opacity:0.6;}
+    .s-ctr{background:<%= t.deep %>;}
+    .cg{display:grid;grid-template-columns:1fr 1fr;gap:56px;max-width:1100px;width:100%;align-items:center;}
+    .ci{border-radius:8px;overflow:hidden;height:460px;position:relative;}
+    .ci img{width:100%;height:100%;object-fit:cover;}
+    .ci::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,<%= t.deep %>);}
+    .cinfo h2{font-family:var(--serif);font-size:clamp(26px,3.5vw,46px);color:var(--text);margin-bottom:18px;line-height:1.25;}
+    .cinfo p{font-size:14px;line-height:1.9;color:var(--text2);margin-bottom:28px;}
+    .pl{list-style:none;display:flex;flex-wrap:wrap;gap:8px;}
+    .pl li{background:var(--card);border:1px solid var(--border);padding:5px 13px;border-radius:20px;font-size:12px;color:var(--accent);}
+    .s-arc{background:var(--bg);flex-direction:column;text-align:center;}
+    .an{font-family:var(--serif);font-size:clamp(56px,11vw,130px);font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accentLt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:6px;}
+    .as2{font-size:13px;letter-spacing:0.4em;color:var(--gray);margin-bottom:42px;}
+    .ad2{max-width:580px;margin:0 auto 40px;font-size:14px;line-height:1.9;color:var(--text2);}
+    .abtn{display:inline-block;padding:15px 46px;background:var(--accent);color:var(--bg);text-decoration:none;font-size:13px;letter-spacing:0.2em;font-weight:700;border-radius:4px;transition:all 0.3s;}
+    .abtn:hover{background:var(--accentLt);transform:translateY(-2px);}
+    .s-ft{background:var(--footerBg);flex-direction:column;min-height:40vh;scroll-snap-align:end;}
+    .fi{max-width:860px;text-align:center;}
+    .flogo{font-family:var(--serif);font-size:30px;color:var(--accent);margin-bottom:14px;}
+    .fmotto{font-size:12px;color:var(--gray);letter-spacing:0.3em;margin-bottom:28px;}
+    .flinks{display:flex;justify-content:center;gap:28px;margin-bottom:28px;}
+    .flinks a{font-size:12px;color:var(--gray);text-decoration:none;transition:color 0.2s;}
+    .flinks a:hover{color:var(--accent);}
+    .fcopy{font-size:11px;color:var(--gray);opacity:0.45;}
+    @media(max-width:768px){.ag,.cg{grid-template-columns:1fr;gap:28px;}.tc{grid-template-columns:1fr;}.snum{font-size:80px;}.ci{height:260px;}}
+  </style>
+</head>
+<body>
+<div class="siann-badge">
+  <div class="b-row1">L<span>4</span> [스크롤 스냅 전체화면] &middot; 테마 <span><%= themeId %>/20 &mdash; <%= themes[themeId] ? themes[themeId].name : '' %></span></div>
+  <div class="b-row2"><% for(let i=1;i<=20;i++){ %><a href="/siann-4/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a><% } %></div>
+</div>
+<nav class="sec-nav">
+  <a href="#s1"></a><a href="#s2"></a><a href="#s3"></a><a href="#s4"></a><a href="#s5"></a><a href="#s6"></a><a href="#s7"></a>
+</nav>
+<section class="snap-sec s-hero" id="s1">
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div class="h-kana">Hanwool · 한울사상</div>
+  <div class="h-title">한울</div>
+  <div class="h-sub">하늘의 뜻으로 사는 삶</div>
+  <div class="h-line"></div>
+  <div class="h-hint">scroll to explore</div>
+  <div class="snum">1</div>
+</section>
+<section class="snap-sec s-about" id="s2">
+  <div class="ag">
+    <div>
+      <div class="slabel">02 — 한울이란</div>
+      <div class="ah">만물의<br>근원</div>
+      <p class="ad">한울은 단순한 하늘이 아닙니다. 우주 만물의 근원이자, 삶 속에서 체득해야 할 영적 진리입니다. 도(道)와 영(靈)과 책임(責)이 하나로 어우러진 삶의 원리입니다.</p>
+    </div>
+    <div class="ml">
+      <div class="mc"><div class="mh">道</div><div class="mk">우주도리 — 우주 만물이 흐르는 근본 이치이자 질서. 모든 존재가 따라야 할 큰 길.</div></div>
+      <div class="mc"><div class="mh">靈</div><div class="mk">영적진화 — 인간의 영혼이 끊임없이 성장하고 진화하는 과정. 한울사상의 핵심.</div></div>
+      <div class="mc"><div class="mh">責</div><div class="mk">세상에 대한 책임 — 홍익인간의 정신으로 세상과 이웃을 향한 실천적 삶.</div></div>
+    </div>
+  </div>
+  <div class="snum">2</div>
+</section>
+<section class="snap-sec s-teach" id="s3">
+  <div class="ti">
+    <div class="th"><div class="slabel">03 — 핵심 가르침</div><div class="tt">세 가지 도(道)</div></div>
+    <div class="tc">
+      <div class="tcard"><div class="tn">一</div><div class="tname">제도 (制道)</div><p class="tbody">자신을 바로잡고 세상을 다스리는 도. 내면의 질서에서 시작하여 외적 세계로 확장되는 실천적 수련의 길.</p></div>
+      <div class="tcard"><div class="tn">二</div><div class="tname">생명장 (生命場)</div><p class="tbody">모든 생명을 감싸는 에너지의 장. 우주와 인간이 하나로 연결된 살아있는 에너지 공간에 대한 깨달음.</p></div>
+      <div class="tcard"><div class="tn">三</div><div class="tname">손지손지심 (損之損之心)</div><p class="tbody">덜어내고 또 덜어내는 마음. 욕심과 집착을 내려놓음으로써 참된 본성을 회복하는 수련의 핵심.</p></div>
+    </div>
+  </div>
+  <div class="snum">3</div>
+</section>
+<section class="snap-sec s-quote" id="s4">
+  <div class="ql">04 — 말씀</div>
+  <div class="qi"><div class="qt">나비가 될 번데기는 무엇인가를 단단하게 붙잡지 않고서는 허물을 벗고 나올 수 없다</div></div>
+  <div class="qdiv"></div>
+  <div class="qi"><div class="qt">죄는 조이는 것이다</div></div>
+  <div class="qdiv"></div>
+  <div class="qi"><div class="qt">우주의 모든 것은 돈다</div></div>
+  <div class="snum">4</div>
+</section>
+<section class="snap-sec s-ctr" id="s5">
+  <div class="cg">
+    <div class="ci"><img src="/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTA0/MDAxNTk4MjcxODc5NzI0.mXb9CIQbcw24UrkOVWnBlTWhahS8eMB-0dLFxeGsUPgg.q-aLd5qsW7stRiQYwjg7KgimuCDjWnKWp1pp8WRfIEcg.JPEG/%ED%91%9C%EC%99%80_%ED%8F%AC.jpg?type=w1600" alt="수련원"/></div>
+    <div class="cinfo">
+      <div class="slabel">05 — 수련원</div>
+      <h2>여의명상센터<br>한울영성계발원</h2>
+      <p>고요한 자연 속에서 내면의 빛을 찾아가는 여정. 집중수련부터 일상의 수행까지, 한울사상의 가르침을 몸소 체험할 수 있는 공간입니다.</p>
+      <ul class="pl"><li>집중수련</li><li>생명장수련</li><li>기운영</li><li>토요법문</li><li>지기문화답사</li><li>공동체활동</li></ul>
+    </div>
+  </div>
+  <div class="snum">5</div>
+</section>
+<section class="snap-sec s-arc" id="s6">
+  <div class="slabel">06 — 법문 아카이브</div>
+  <div class="an">10,313</div>
+  <div class="as2">법문</div>
+  <p class="ad2">수십 년에 걸쳐 쌓아온 법문의 지혜를 한 곳에서 만나보세요. 한울사상의 깊은 가르침이 담긴 방대한 아카이브가 여러분을 기다립니다.</p>
+  <a class="abtn" href="http://211.104.37.65:4200" target="_blank">법문 아카이브 바로가기</a>
+  <div class="snum">6</div>
+</section>
+<section class="snap-sec s-ft" id="s7">
+  <div class="fi">
+    <div class="flogo">한울사상</div>
+    <div class="fmotto">하늘의 뜻으로 사는 삶 · 여의명상센터 한울영성계발원</div>
+    <div class="flinks"><a href="#s1">처음으로</a><a href="#s2">한울이란</a><a href="#s3">가르침</a><a href="#s5">수련원</a><a href="http://211.104.37.65:4200" target="_blank">법문 아카이브</a></div>
+    <div class="fcopy">&copy; 한울사상 여의명상센터 영성계발원</div>
+  </div>
+  <div class="snum">7</div>
+</section>
+</body>
+</html>

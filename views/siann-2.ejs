@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — L2 카드 그리드 매거진 · 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen',      bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', footerBg:'#030D07', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White',      bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', footerBg:'#1A1A1A', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', footerBg:'#0E0905', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist',       bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', footerBg:'#2A3547', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple',   bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', footerBg:'#080410', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo',          bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', footerBg:'#1A2010', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain',  bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', footerBg:'#080808', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal',       bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', footerBg:'#030B0D', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber',      bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', footerBg:'#0D0700', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night',     bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', footerBg:'#01060E', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand',       bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', footerBg:'#1C1408', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green',      bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', footerBg:'#050804', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', footerBg:'#03040F', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment',       bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', footerBg:'#1A1005', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz',     bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', footerBg:'#0D0608', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian',        bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', footerBg:'#020202', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon',         bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', footerBg:'#05080A', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White',    bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', footerBg:'#1A2440', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    %>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      <%= t.bg %>;
+      --deep:    <%= t.deep %>;
+      --mid:     <%= t.mid %>;
+      --card:    <%= t.card %>;
+      --gold:    <%= t.accent %>;
+      --gold-lt: <%= t.accentLt %>;
+      --gold-dk: <%= t.accentDk %>;
+      --cream:   <%= t.text %>;
+      --cream-2: <%= t.text2 %>;
+      --gray:    <%= t.gray %>;
+      --border:  <%= t.border %>;
+      --serif:   'Noto Serif KR', 'Malgun Gothic', serif;
+      --sans:    'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--cream); overflow-x: hidden; }
+
+    /* BADGE */
+    .siann-badge {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(0,0,0,0.88); color: #fff; text-align: center;
+      padding: 5px 16px; font-size: 11px; letter-spacing: 0.1em;
+      border-bottom: 2px solid <%= t.accent %>;
+    }
+    .b-row1 { margin-bottom: 3px; }
+    .b-row1 span { color: <%= t.accent %>; font-weight: 700; }
+    .b-row2 { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    .b-row2 a {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); font-size: 10px; color: #ccc;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .b-row2 a:hover, .b-row2 a.cur { background: <%= t.accent %>; color: #000; font-weight: 700; }
+
+    /* ── LAYOUT 2: 상단 수평 네비 + 카드 그리드 매거진 ── */
+
+    /* TOP NAV */
+    .topnav {
+      position: fixed; top: 52px; left: 0; right: 0; z-index: 200;
+      height: 60px;
+      background: var(--deep);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 48px;
+      gap: 0;
+    }
+    .nav-brand {
+      font-family: var(--serif);
+      font-size: 18px; font-weight: 600;
+      color: var(--gold); letter-spacing: 0.06em;
+      text-decoration: none;
+      margin-right: auto;
+    }
+    .nav-brand span { color: var(--cream); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 12px; color: var(--cream-2); text-decoration: none; letter-spacing: 0.04em; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-pill {
+      margin-left: 28px;
+      padding: 7px 20px;
+      border: 1px solid var(--gold-dk);
+      border-radius: 20px;
+      font-size: 11px; color: var(--gold);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-pill:hover { background: var(--gold); color: var(--bg); }
+
+    /* PAGE WRAPPER */
+    .page { padding-top: 112px; } /* badge(52) + nav(60) */
+
+    /* HERO — full-width editorial banner */
+    .hero-banner {
+      background: var(--mid);
+      min-height: 80vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+    .hero-left {
+      padding: 80px 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .hero-kicker {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.5em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(40px, 5.5vw, 72px);
+      font-weight: 600; line-height: 1.1;
+      color: var(--cream); margin-bottom: 28px;
+    }
+    .hero-title strong { display: block; color: var(--gold); font-weight: 300; font-size: 0.5em; letter-spacing: 0.04em; margin-top: 10px; }
+    .hero-desc {
+      font-family: var(--serif);
+      font-size: 16px; font-weight: 300;
+      color: var(--cream-2); line-height: 2.0;
+      max-width: 440px; margin-bottom: 40px;
+    }
+    .hero-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .btn-fill {
+      display: inline-block; padding: 13px 32px;
+      background: var(--gold); color: var(--bg);
+      font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+      text-decoration: none; border-radius: 2px;
+      transition: all 0.22s;
+    }
+    .btn-fill:hover { background: var(--gold-lt); transform: translateY(-2px); }
+    .btn-ghost {
+      display: inline-block; padding: 13px 32px;
+      border: 1px solid var(--border); color: var(--cream-2);
+      font-size: 13px; letter-spacing: 0.04em;
+      text-decoration: none; border-radius: 2px;
+      transition: all 0.22s;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    .hero-right {
+      background: var(--deep);
+      display: flex; align-items: center; justify-content: center;
+      padding: 60px;
+      position: relative; overflow: hidden;
+    }
+    .hero-mandala-wrap { position: relative; width: 360px; height: 360px; }
+    .hero-mandala-wrap svg { width: 100%; height: 100%; animation: spin 100s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hero-center-text {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .hero-center-text p { font-family: var(--serif); font-size: 28px; font-weight: 600; color: var(--gold); }
+    .hero-center-text span { font-size: 11px; letter-spacing: 0.24em; color: var(--gray); display: block; margin-top: 6px; }
+
+    /* SECTION HEADER */
+    .section-header {
+      padding: 64px 48px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+      border-top: 1px solid var(--border);
+      margin-top: 64px;
+    }
+    .sh-left {}
+    .sh-kicker { font-size: 10px; font-weight: 600; letter-spacing: 0.44em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+    .sh-title { font-family: var(--serif); font-size: clamp(22px, 2.8vw, 34px); font-weight: 500; color: var(--cream); }
+    .sh-link { font-size: 12px; color: var(--gold); text-decoration: none; letter-spacing: 0.08em; white-space: nowrap; }
+    .sh-link:hover { text-decoration: underline; }
+
+    /* CARD GRID */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin: 32px 48px 0;
+    }
+    .card-grid.col-4 { grid-template-columns: repeat(4, 1fr); }
+    .card-grid.col-2 { grid-template-columns: repeat(2, 1fr); }
+
+    /* Teaching card — tall */
+    .t-card {
+      background: var(--card);
+      padding: 44px 36px 40px;
+      transition: background 0.25s;
+      position: relative;
+    }
+    .t-card:hover { background: var(--mid); }
+    .t-card-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 1px solid var(--gold-dk);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-size: 22px; color: var(--gold);
+      margin-bottom: 24px;
+    }
+    .t-card h3 { font-family: var(--serif); font-size: 22px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
+    .t-card .sub { font-size: 11px; letter-spacing: 0.18em; color: var(--gold-dk); margin-bottom: 16px; }
+    .t-card p { font-family: var(--serif); font-size: 14px; font-weight: 300; color: var(--cream-2); line-height: 1.95; }
+    .t-card-num { position: absolute; bottom: 24px; right: 28px; font-family: var(--serif); font-size: 40px; font-weight: 700; color: <%= t.accent %>0D; line-height: 1; }
+
+    /* Quote card — horizontal */
+    .q-card {
+      background: var(--deep);
+      padding: 48px 44px;
+      border-left: 3px solid var(--gold);
+    }
+    .q-card .mark { font-family: var(--serif); font-size: 52px; font-weight: 700; color: var(--gold); line-height: 0.6; margin-bottom: 20px; opacity: 0.4; }
+    .q-card .text { font-family: var(--serif); font-size: clamp(16px, 2vw, 22px); font-weight: 400; color: var(--cream); line-height: 1.75; margin-bottom: 16px; }
+    .q-card .attr { font-size: 12px; color: var(--gold); letter-spacing: 0.08em; font-family: var(--serif); }
+
+    /* Pillar card */
+    .p-card {
+      background: var(--card);
+      padding: 40px 32px;
+      transition: transform 0.25s;
+      position: relative; overflow: hidden;
+    }
+    .p-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 0.35s; }
+    .p-card:hover::after { transform: scaleX(1); }
+    .p-card:hover { transform: translateY(-4px); }
+    .p-card-hanja { font-family: var(--serif); font-size: 64px; font-weight: 700; color: <%= t.accent %>10; position: absolute; top: 16px; right: 16px; line-height: 1; pointer-events: none; }
+    .p-card-num { font-size: 10px; letter-spacing: 0.3em; color: var(--gold-dk); margin-bottom: 18px; }
+    .p-card h3 { font-family: var(--serif); font-size: 20px; font-weight: 500; color: var(--cream); margin-bottom: 6px; }
+    .p-card .sub { font-size: 11px; letter-spacing: 0.16em; color: var(--gold); margin-bottom: 14px; }
+    .p-card p { font-family: var(--serif); font-size: 13px; font-weight: 300; color: var(--cream-2); line-height: 1.9; }
+
+    /* Feature card — archive */
+    .feat-card {
+      background: var(--gold);
+      color: var(--bg);
+      padding: 52px 44px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 300px;
+    }
+    .feat-num { font-family: var(--serif); font-size: 72px; font-weight: 700; line-height: 1; margin-bottom: 12px; opacity: 0.9; }
+    .feat-unit { font-size: 11px; letter-spacing: 0.4em; text-transform: uppercase; opacity: 0.7; margin-bottom: 24px; }
+    .feat-title { font-family: var(--serif); font-size: 22px; font-weight: 500; margin-bottom: 8px; }
+    .feat-desc { font-family: var(--serif); font-size: 14px; font-weight: 300; line-height: 1.85; opacity: 0.85; margin-bottom: 32px; }
+    .feat-link { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-decoration: none; color: var(--bg); border-bottom: 1px solid currentColor; padding-bottom: 2px; width: fit-content; }
+
+    /* Program small cards */
+    .prog-card {
+      background: var(--card);
+      padding: 28px 24px;
+      border: 1px solid var(--border);
+      transition: border-color 0.22s;
+    }
+    .prog-card:hover { border-color: var(--gold); }
+    .prog-card h4 { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
+    .prog-card p { font-family: var(--serif); font-size: 12px; font-weight: 300; color: var(--cream-2); line-height: 1.8; }
+
+    /* CTA BANNER */
+    .cta-banner {
+      margin: 64px 48px;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      padding: 64px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-bg-text { position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-family: var(--serif); font-size: 160px; font-weight: 700; color: <%= t.accent %>07; letter-spacing: -0.04em; pointer-events: none; white-space: nowrap; }
+    .cta-kicker { font-size: 10px; font-weight: 600; letter-spacing: 0.44em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    .cta-title { font-family: var(--serif); font-size: clamp(24px, 3.2vw, 40px); font-weight: 500; color: var(--cream); line-height: 1.35; margin-bottom: 20px; }
+    .cta-body { font-family: var(--serif); font-size: 16px; font-weight: 300; color: var(--cream-2); line-height: 1.85; max-width: 460px; margin: 0 auto 36px; }
+
+    /* FOOTER */
+    footer {
+      background: <%= t.footerBg %>;
+      padding: 56px 48px;
+      border-top: 1px solid var(--border);
+      margin-top: 64px;
+    }
+    .ft-inner { display: flex; gap: 48px; justify-content: space-between; flex-wrap: wrap; }
+    .ft-brand .logo { font-family: var(--serif); font-size: 18px; color: var(--gold); font-weight: 600; margin-bottom: 12px; }
+    .ft-brand p { font-size: 13px; color: var(--gray); line-height: 1.8; max-width: 240px; }
+    .ft-col h4 { font-size: 10px; letter-spacing: 0.36em; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
+    .ft-col ul { list-style: none; }
+    .ft-col li { margin-bottom: 8px; }
+    .ft-col a { font-size: 13px; color: var(--gray); text-decoration: none; transition: color .2s; }
+    .ft-col a:hover { color: var(--cream); }
+    .ft-copy { margin-top: 32px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.05); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--gray); }
+
+    @media (max-width: 960px) {
+      .hero-banner { grid-template-columns: 1fr; }
+      .hero-right { min-height: 300px; }
+      .card-grid, .card-grid.col-4 { grid-template-columns: 1fr 1fr; }
+      .section-header, .card-grid, .cta-banner, footer { padding-left: 24px; padding-right: 24px; }
+      .hero-left { padding: 56px 32px; }
+    }
+    @media (max-width: 640px) {
+      .card-grid, .card-grid.col-4, .card-grid.col-2 { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- BADGE -->
+<div class="siann-badge">
+  <div class="b-row1">L<span>2</span> 카드 그리드 매거진 · 테마 <span><%= themeId %>/20 — <%= themes[themeId]?.name || '' %></span></div>
+  <div class="b-row2">
+    <% for(let i=1;i<=20;i++){ %>
+    <a href="/siann-2/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a>
+    <% } %>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <a href="#" class="nav-brand">한울<span>사상</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">한울이란</a></li>
+      <li><a href="#teachings">핵심 가르침</a></li>
+      <li><a href="#center">여의명상센터</a></li>
+      <li><a href="#archive">법문</a></li>
+    </ul>
+    <a href="http://211.104.37.65:4200" class="nav-pill" target="_blank">아카이브 →</a>
+  </nav>
+
+  <!-- HERO BANNER -->
+  <div class="hero-banner">
+    <div class="hero-left">
+      <p class="hero-kicker">한울영성계발원 · 여의명상센터</p>
+      <h1 class="hero-title">한울사상
+        <strong>하늘의 뜻으로 사는 삶</strong>
+      </h1>
+      <p class="hero-desc">한울은 동서고금의 어떤 종교나 사상과도 구별되는 독자적 사상 체계입니다. 우주의 이치가 인간의 삶 속에서 어떻게 펼쳐지는가를 밝힙니다.</p>
+      <div class="hero-actions">
+        <a href="http://211.104.37.65:4200" class="btn-fill" target="_blank">법문 아카이브</a>
+        <a href="#about" class="btn-ghost">한울사상이란</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-mandala-wrap">
+        <svg viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="180" cy="180" r="170" stroke="<%= t.accent %>20" stroke-width="1"/>
+          <circle cx="180" cy="180" r="148" stroke="<%= t.accent %>30" stroke-width="0.5"/>
+          <circle cx="180" cy="180" r="124" stroke="<%= t.accent %>40" stroke-width="1"/>
+          <circle cx="180" cy="180" r="100" stroke="<%= t.accent %>50" stroke-width="1"/>
+          <circle cx="180" cy="180" r="75"  stroke="<%= t.accent %>60" stroke-width="1"/>
+          <circle cx="180" cy="180" r="50"  stroke="<%= t.accent %>80" stroke-width="1.5"/>
+          <circle cx="180" cy="180" r="28"  fill="<%= t.accent %>18" stroke="<%= t.accent %>AA" stroke-width="1.5"/>
+          <line x1="180" y1="10" x2="180" y2="350" stroke="<%= t.accent %>18" stroke-width="0.5"/>
+          <line x1="10" y1="180" x2="350" y2="180" stroke="<%= t.accent %>18" stroke-width="0.5"/>
+          <text x="180" y="24" text-anchor="middle" font-family="serif" font-size="14" fill="<%= t.accent %>90">天</text>
+          <text x="180" y="352" text-anchor="middle" font-family="serif" font-size="14" fill="<%= t.accent %>90">地</text>
+          <text x="18"  y="185" text-anchor="middle" font-family="serif" font-size="14" fill="<%= t.accent %>90">人</text>
+          <text x="343" y="185" text-anchor="middle" font-family="serif" font-size="14" fill="<%= t.accent %>90">氣</text>
+        </svg>
+        <div class="hero-center-text">
+          <p>한울</p>
+          <span>HANWOOL</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: ABOUT (3-col pillars) -->
+  <div class="section-header" id="about">
+    <div class="sh-left">
+      <p class="sh-kicker">한울이란</p>
+      <h2 class="sh-title">만물의 근원 — 세 가지 기둥</h2>
+    </div>
+    <a href="#teachings" class="sh-link">핵심 가르침 →</a>
+  </div>
+  <div class="card-grid" style="margin-top:32px;">
+    <div class="p-card">
+      <span class="p-card-hanja">道</span>
+      <p class="p-card-num">01</p>
+      <h3>우주도리</h3>
+      <p class="sub">우주의 이치를 깨닫다</p>
+      <p>"우주의 모든 것은 돈다 — 자전하고 공전하는 것이 우주의 도리." 한울사상은 우주의 순환 원리를 삶의 근본으로 삼습니다.</p>
+    </div>
+    <div class="p-card">
+      <span class="p-card-hanja">靈</span>
+      <p class="p-card-num">02</p>
+      <h3>영적 진화</h3>
+      <p class="sub">한울의 존재로 깨어나다</p>
+      <p>인간은 수련과 실천을 통해 더 높은 존재로 진화할 수 있습니다. 번데기가 나비가 되듯 우리도 변화합니다.</p>
+    </div>
+    <div class="p-card">
+      <span class="p-card-hanja">責</span>
+      <p class="p-card-num">03</p>
+      <h3>세상에 대한 책임</h3>
+      <p class="sub">한 사람이 세상을 바꾼다</p>
+      <p>"수도자 1인은 세상자 만인이요, 중생자 억이라." 개인의 수행이 곧 세상을 위한 실천입니다.</p>
+    </div>
+  </div>
+
+  <!-- SECTION: TEACHINGS (3-col) + QUOTE (full-span) -->
+  <div class="section-header" id="teachings">
+    <div class="sh-left">
+      <p class="sh-kicker">핵심 가르침</p>
+      <h2 class="sh-title">한울사상이 가리키는 세 가지 길</h2>
+    </div>
+  </div>
+  <div class="card-grid" style="margin-top:32px;">
+    <div class="t-card">
+      <div class="t-card-icon">制</div>
+      <h3>제도 (制道)</h3>
+      <p class="sub">수행의 목표이자 결과물</p>
+      <p>제도는 도를 삶 속에서 구현하고 세상의 질서를 바로잡는 것입니다.</p>
+      <div class="t-card-num">01</div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-icon">場</div>
+      <h3>생명장 (生命場)</h3>
+      <p class="sub">몸을 감싸는 기(氣)의 장</p>
+      <p>생명장은 몸을 감싸고 있는 에너지 장(場)입니다. 이 장이 강하고 맑을수록 건강하고 밝은 삶이 펼쳐집니다.</p>
+      <div class="t-card-num">02</div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-icon">損</div>
+      <h3>손지손지심</h3>
+      <p class="sub">損之損之心 · 비우는 수행</p>
+      <p>"죄는 조이는 것이다." 한울의 수련은 비우는 것에서 시작합니다.</p>
+      <div class="t-card-num">03</div>
+    </div>
+  </div>
+
+  <!-- QUOTE CARD — full width -->
+  <div style="margin: 2px 48px 0;">
+    <div class="q-card">
+      <div class="mark">"</div>
+      <p class="text">나비가 될 번데기는 무엇인가를 단단하게 붙잡지 않고서는 허물을 벗고 나올 수 없다</p>
+      <p class="attr">— 한울 법문 아카이브 수록</p>
+    </div>
+  </div>
+
+  <!-- SECTION: ARCHIVE + PROGRAMS -->
+  <div class="section-header" id="archive">
+    <div class="sh-left">
+      <p class="sh-kicker">법문 & 프로그램</p>
+      <h2 class="sh-title">아카이브 & 여의명상센터</h2>
+    </div>
+  </div>
+  <div class="card-grid col-4" id="center">
+    <div class="feat-card">
+      <div>
+        <div class="feat-num">10,313</div>
+        <p class="feat-unit">법문 아카이브</p>
+        <h3 class="feat-title">한울 법문 전체</h3>
+        <p class="feat-desc">수십 년에 걸쳐 수집된 한울 법문 전체를 검색하고 탐독하세요.</p>
+      </div>
+      <a href="http://211.104.37.65:4200" class="feat-link" target="_blank">아카이브 열기 →</a>
+    </div>
+    <div class="prog-card"><h4>집중수련</h4><p>한울사상의 깊이를 체험하는 집중 수련 과정</p></div>
+    <div class="prog-card"><h4>생명장 수련</h4><p>몸을 감싸는 기(氣)의 장을 키우는 수련</p></div>
+    <div class="prog-card"><h4>기운영</h4><p>우주의 기운을 바르게 운용하는 수행법</p></div>
+  </div>
+  <div class="card-grid col-4" style="margin-top:2px;">
+    <div class="prog-card"><h4>토요법문</h4><p>매주 토요일 법문 청취 및 공동 수련</p></div>
+    <div class="prog-card"><h4>지기문화답사</h4><p>우주도리를 자연 속에서 체험하는 답사</p></div>
+    <div class="prog-card"><h4>공동체 활동</h4><p>한울사상을 함께 실천하는 삶의 공동체</p></div>
+    <div class="q-card" style="padding:28px;"><div class="mark" style="font-size:40px;">❝</div><p class="text" style="font-size:14px;">우주의 모든 것은 돈다</p><p class="attr">— 한울 법문</p></div>
+  </div>
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner">
+    <div class="cta-bg-text">法文</div>
+    <p class="cta-kicker">Coming Soon</p>
+    <h2 class="cta-title">한울사상이 궁금하신가요?<br>무엇이든 물어보세요</h2>
+    <p class="cta-body">10,313건의 법문을 학습한 한울 AI가<br>당신의 질문에 답합니다.</p>
+    <a href="http://211.104.37.65:4200" class="btn-fill" target="_blank">법문 아카이브 바로가기</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="ft-inner">
+      <div class="ft-brand">
+        <div class="logo">한울영성계발원</div>
+        <p>여의명상센터 · 한울사상<br>하늘의 뜻으로 사는 삶</p>
+      </div>
+      <div class="ft-col"><h4>한울사상</h4><ul><li><a href="#about">한울이란</a></li><li><a href="#teachings">핵심 가르침</a></li></ul></div>
+      <div class="ft-col"><h4>여의명상센터</h4><ul><li><a href="#center">집중수련</a></li><li><a href="#center">토요법문</a></li></ul></div>
+      <div class="ft-col"><h4>법문 아카이브</h4><ul><li><a href="http://211.104.37.65:4200" target="_blank">아카이브 열기</a></li></ul></div>
+    </div>
+    <div class="ft-copy">
+      <span>© 2026 한울영성계발원 여의명상센터. All rights reserved.</span>
+      <span>수도자 1인은 세상자 만인이요 — 한울사상</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

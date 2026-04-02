@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>한울사랑 여의명상센터 · 테마 <%= themeId %></title>
+  <title>한울사상 여의명상센터 · 테마 <%= themeId %></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
@@ -101,7 +101,7 @@
     body{font-family:'Noto Sans KR',sans-serif;font-weight:300;background:<%= t.bg %>;color:<%= t.tx %>;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
     /* ── NAV ── */
-    nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:0 80px;height:68px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,box-shadow .4s}
+    nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:0 clamp(16px,4vw,80px);height:68px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,box-shadow .4s}
     nav.solid{background:<%= t.nav %>;backdrop-filter:blur(24px);box-shadow:0 1px 0 <%= t.bd %>}
     .logo{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;color:#fff;letter-spacing:.06em;text-decoration:none}
     nav.solid .logo{color:<%= t.tx %>}
@@ -144,11 +144,12 @@
     .hero-kanji{
       position:absolute;right:8vw;top:50%;transform:translateY(-52%);
       font-family:'Noto Serif KR',serif;font-size:clamp(18rem,32vw,32rem);font-weight:200;
-      color:rgba(255,255,255,.022);line-height:1;pointer-events:none;user-select:none;z-index:1
+      color:rgba(255,255,255,.10);line-height:1;pointer-events:none;user-select:none;z-index:1
     }
     .hero-body{
-      position:absolute;bottom:0;left:0;right:0;
-      padding:0 112px 108px;z-index:2
+      position:absolute;top:50%;left:0;right:0;
+      transform:translateY(-40%);
+      padding:0 clamp(24px,8vw,112px) 0;z-index:2
     }
     .hero-eyebrow{
       display:block;font-size:10px;letter-spacing:.42em;
@@ -163,11 +164,18 @@
     .hero-h1 em{font-style:normal;font-weight:300;color:<%= t.ac %>}
     .hero-btn{
       display:inline-block;padding:17px 58px;
-      border:1px solid rgba(255,255,255,.5);color:#fff;
+      background:<%= t.ac %>;border:1px solid <%= t.ac %>;color:#fff;
+      font-size:11px;font-weight:400;letter-spacing:.2em;
+      text-decoration:none;transition:.3s
+    }
+    .hero-btn:hover{background:transparent;border-color:#fff;color:#fff}
+    .hero-btn2{
+      display:inline-block;padding:17px 42px;margin-left:16px;
+      border:1px solid rgba(255,255,255,.45);color:rgba(255,255,255,.85);
       font-size:11px;font-weight:300;letter-spacing:.2em;
       text-decoration:none;transition:.3s
     }
-    .hero-btn:hover{background:rgba(255,255,255,.1);border-color:#fff}
+    .hero-btn2:hover{background:rgba(255,255,255,.08);border-color:#fff}
     .scroll-ind{
       position:absolute;bottom:34px;right:80px;z-index:2;
       display:flex;flex-direction:column;align-items:center;gap:7px;
@@ -187,16 +195,19 @@
 
     /* ── PHILOSOPHY STRIP ── */
     .phil-strip{
-      display:grid;grid-template-columns:repeat(3,1fr);
-      height:60px;overflow:hidden
+      display:grid;grid-template-columns:repeat(5,1fr);
+      height:80px;overflow:hidden
     }
     .ps{
-      display:flex;align-items:center;justify-content:center;
-      font-size:11px;letter-spacing:.22em;color:rgba(255,255,255,.6)
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+      font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.75);padding:0 8px;text-align:center
     }
+    .ps-ko{font-size:13px;font-family:'Noto Serif KR',serif;font-weight:400;letter-spacing:.08em}
     .ps:nth-child(1){background:<%= t.ac %>}
-    .ps:nth-child(2){background:rgba(<%= t.acR %>,.75)}
-    .ps:nth-child(3){background:rgba(<%= t.acR %>,.5)}
+    .ps:nth-child(2){background:rgba(<%= t.acR %>,.82)}
+    .ps:nth-child(3){background:rgba(<%= t.acR %>,.65)}
+    .ps:nth-child(4){background:rgba(<%= t.acR %>,.48)}
+    .ps:nth-child(5){background:rgba(<%= t.acR %>,.32)}
 
     /* ── ABOUT — 72% / 28% ── */
     .about{display:grid;grid-template-columns:72% 1fr;min-height:680px}
@@ -422,34 +433,12 @@
       footer{padding:44px 28px}
     }
   </style>
-  <% if (locals.showNav) { %>
-  <style>
-    #unified-site-nav{position:fixed;top:0;left:0;right:0;height:38px;background:rgba(15,10,5,0.92);display:flex;align-items:center;gap:0;z-index:99999;padding:0 20px;backdrop-filter:blur(4px)}
-    #unified-site-nav a{color:rgba(232,220,200,0.85);text-decoration:none;font-size:12px;padding:0 12px;height:38px;display:flex;align-items:center;font-family:'Noto Sans KR',sans-serif;letter-spacing:.3px;transition:color .2s;white-space:nowrap}
-    #unified-site-nav a:hover{color:#D4A840}
-    #unified-site-nav .unav-logo{font-size:13px;font-weight:500;color:#E8DCC8;border-right:1px solid rgba(255,255,255,.15);padding-right:16px;margin-right:4px}
-    #unified-site-nav .unav-divider{width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 4px}
-    #unified-site-nav .unav-label{font-size:10px;color:#D4A840;padding:2px 8px;background:rgba(212,168,64,.15);border-radius:10px;margin-left:4px}
-    body{padding-top:38px}
-  </style>
-  <% } %>
 </head>
 <body>
-<% if (locals.showNav) { %>
-<div id="unified-site-nav">
-  <span class="unav-logo">한울사상</span>
-  <a href="/" style="color:#D4A840">홈 <span class="unav-label">A팀</span></a>
-  <a href="/v2">홈 B팀</a>
-  <div class="unav-divider"></div>
-  <a href="/archive">아카이브</a>
-  <a href="/chat">AI 챗봇</a>
-  <a href="/editor">에디터</a>
-</div>
-<% } %>
 
 <!-- NAV -->
 <nav id="nav">
-  <a href="#hero" class="logo">한울사랑</a>
+  <a href="#hero" class="logo">한울사상</a>
   <ul class="nl">
     <li><a href="#about">한울사상</a></li>
     <li><a href="#programs">프로그램</a></li>
@@ -469,19 +458,22 @@
   <div class="hero-body">
     <span class="hero-eyebrow r">한울영성계발원 · 여의명상센터</span>
     <h1 class="hero-h1 r d1">
-      내면의 고요 속으로<br>
-      <em>한울의 길</em>
+      한올들이 어울려<br>
+      <em>한울이 된다</em>
     </h1>
     <a href="#about" class="hero-btn r d2">한울사상 알아보기</a>
+    <a href="/chat" class="hero-btn2 r d2">담당관 채팅</a>
   </div>
   <div class="scroll-ind"><div class="scroll-line"></div><span>SCROLL</span></div>
 </section>
 
-<!-- PHILOSOPHY STRIP -->
-<div class="phil-strip" aria-hidden="true">
-  <div class="ps">손지손지심 損之損之心</div>
-  <div class="ps">생명장 生命場</div>
-  <div class="ps">제도 制道</div>
+<!-- PHILOSOPHY STRIP — 한울사상 5대 교리 -->
+<div class="phil-strip">
+  <div class="ps"><span class="ps-ko">수도</span><span>修道 · 닦아가는 길</span></div>
+  <div class="ps"><span class="ps-ko">제도</span><span>濟度 · 영격을 높이다</span></div>
+  <div class="ps"><span class="ps-ko">생명장</span><span>生命場 · 생명의 공명</span></div>
+  <div class="ps"><span class="ps-ko">각성</span><span>覺醒 · 눈뜨는 공부</span></div>
+  <div class="ps"><span class="ps-ko">성멸오통</span><span>性滅五通 · 초월하여 통하다</span></div>
 </div>
 
 <!-- ABOUT -->
@@ -491,7 +483,7 @@
   </div>
   <div class="about-txt">
     <span class="sec-label r">한울사상</span>
-    <h2 class="sec-title r d1">하늘의 뜻으로<br>사는 삶의 길</h2>
+    <h2 class="sec-title r d1">세상 모든 것을<br>타고 가는 사상</h2>
     <div class="divider r d2"></div>
     <blockquote class="blockq r d2">
       "수도자 1인은 세상자 만인이요,<br>
@@ -509,10 +501,10 @@
     </div>
     <div class="panel-txt">
       <div class="p-order r">CORE TEACHING 01</div>
-      <h3 class="p-title r d1">손지손지심</h3>
-      <p class="p-subtitle r d1">損之損之心 · 덜고 또 덜어내는 마음</p>
+      <h3 class="p-title r d1">각성</h3>
+      <p class="p-subtitle r d1">覺醒 · 깨어남의 길</p>
       <div class="divider r d2"></div>
-      <p class="p-body r d2">욕심과 집착을 하나씩 내려놓을 때 비로소 한울의 빛이 드러납니다. 수련은 더하는 것이 아니라 덜어내는 행위입니다.</p>
+      <p class="p-body r d2">한울사상은 유○론적 각성법을 기반으로 합니다. 우주 궁극의 실체를 ○으로 보는 우주관이며, 개체인 한올들이 공존의 질서 위에서 서로 조화를 이루어 온전한 한울이 되어야 한다는 사상입니다. — 큰스승님 말씀</p>
     </div>
   </div>
 
@@ -525,7 +517,7 @@
       <h3 class="p-title r d1">생명장</h3>
       <p class="p-subtitle r d1">生命場 · 모든 생명의 근원 장</p>
       <div class="divider r d2"></div>
-      <p class="p-body r d2">우주 만물은 하나의 생명장 안에 연결되어 있습니다. 수련은 이 보이지 않는 연결을 몸으로 체험하는 과정입니다.</p>
+      <p class="p-body r d2">내적 생명 파동이 외부 환경세계와 반응하고 조절하고 적응하여 외부세계의 파동과 일치함으로써 진화한다. 생명장을 통해 자기표현을 해야 상대와 충돌하지 않고 공명현상을 통해 서로 조화가 이루어진다. — 큰스승님 말씀</p>
     </div>
   </div>
 
@@ -536,9 +528,9 @@
     <div class="panel-txt">
       <div class="p-order r">CORE TEACHING 03</div>
       <h3 class="p-title r d1">제도</h3>
-      <p class="p-subtitle r d1">制道 · 도를 세우는 길</p>
+      <p class="p-subtitle r d1">濟度 · 영격을 높이다</p>
       <div class="divider r d2"></div>
-      <p class="p-body r d2">개인의 수련이 세상의 질서를 바로잡는 힘이 됩니다. 한 사람의 깨어남이 만인을 향한 빛이 됩니다.</p>
+      <p class="p-body r d2">삶은 궁극적으로 영적진화를 통해 영격을 높이는데 목적이 있습니다. 우주영제도는 개체의 영을 우주영으로 높이기 위한 제도법입니다. 수도자 1인이 세상자 만인이 되어야 합니다.</p>
     </div>
   </div>
 
@@ -549,11 +541,11 @@
   <div class="fq-qdeco" aria-hidden="true">❝</div>
   <div class="fq-inner">
     <blockquote class="fq-txt r">
-      한울이 나이고<br>
-      <em>내가 한울이다</em>
+      세상이 너를 타게 하지 말고<br>
+      <em>네가 세상을 타라</em>
     </blockquote>
     <div class="fq-rule r d1"></div>
-    <cite class="fq-cite r d1">— 한울사상 핵심 경구</cite>
+    <cite class="fq-cite r d1">— 한울계시록</cite>
   </div>
 </section>
 
@@ -570,8 +562,8 @@
       <div class="prog-fade"></div>
       <div class="prog-body">
         <div class="prog-n">PROGRAM 01</div>
-        <div class="prog-title">명상 입문 과정</div>
-        <div class="prog-desc">매주 토요일 오전 10시<br>초심자를 위한 8주 체계적 과정</div>
+        <div class="prog-title">생명장 수련</div>
+        <div class="prog-desc">생명장 점검·조정 수련<br>여의명상센터 정기 수련 과정</div>
       </div>
     </div>
     <div class="prog r d1">
@@ -580,8 +572,8 @@
       <div class="prog-fade"></div>
       <div class="prog-body">
         <div class="prog-n">PROGRAM 02</div>
-        <div class="prog-title">집중 수련 캠프</div>
-        <div class="prog-desc">월 1회 1박 2일 · 12명 한정<br>자연 속 집중 수행</div>
+        <div class="prog-title">집중수도</div>
+        <div class="prog-desc">큰스승님 지도하 집중 수도<br>영성 여행·수도자 과정 포함</div>
       </div>
     </div>
     <div class="prog r d2">
@@ -590,8 +582,8 @@
       <div class="prog-fade"></div>
       <div class="prog-body">
         <div class="prog-n">PROGRAM 03</div>
-        <div class="prog-title">경전 원문 강독</div>
-        <div class="prog-desc">격주 토요일 오후 2시<br>한울사상 핵심 원전 해설</div>
+        <div class="prog-title">법문 강론</div>
+        <div class="prog-desc">큰스승님 법문·강론 공부<br>큰스승님 영상 법문 포함</div>
       </div>
     </div>
   </div>
@@ -606,18 +598,18 @@
   <div class="sl-list">
     <div class="sl-item r">
       <div class="sl-date"><div class="sl-d">토</div><div class="sl-m">매주</div></div>
-      <div class="sl-info"><h4>명상 입문 과정</h4><p>오전 10:00 · 여의명상센터 본원 · 초심자 환영</p></div>
+      <div class="sl-info"><h4>생명장 수련</h4><p>여의명상센터 본원 · 생명장 점검·조정</p></div>
       <span class="sl-tag">정기 수련</span>
     </div>
     <div class="sl-item r">
       <div class="sl-date"><div class="sl-d">1박</div><div class="sl-m">2일</div></div>
-      <div class="sl-info"><h4>집중 수련 캠프</h4><p>월 1회 · 12명 한정 · 장소 별도 안내</p></div>
-      <span class="sl-tag">집중 과정</span>
+      <div class="sl-info"><h4>집중수도</h4><p>큰스승님 직접 지도 · 수도자 집중 과정</p></div>
+      <span class="sl-tag">집중 수도</span>
     </div>
     <div class="sl-item r">
       <div class="sl-date"><div class="sl-d">토</div><div class="sl-m">격주</div></div>
-      <div class="sl-info"><h4>경전 원문 강독</h4><p>오후 2:00 · 한울사상 원전 해설</p></div>
-      <span class="sl-tag">경전 강독</span>
+      <div class="sl-info"><h4>법문 강론</h4><p>큰스승님 법문·영상 강론 공부</p></div>
+      <span class="sl-tag">법문</span>
     </div>
     <div class="sl-item r">
       <div class="sl-date"><div class="sl-d">상시</div><div class="sl-m">예약제</div></div>
@@ -631,7 +623,7 @@
 <section class="cta" id="cta">
   <div class="cta-inner">
     <h2 class="cta-h r">한울사상과 함께하세요</h2>
-    <p class="cta-sub r d1">내면의 고요를 찾는 여정을 지금 시작하세요</p>
+    <p class="cta-sub r d1">수도자 1인은 세상자 만인이요, 중생자 억이라</p>
     <div class="cta-btns">
       <a href="#schedule" class="cta-btn solid r d1">수련 신청</a>
     </div>
@@ -642,7 +634,7 @@
 <footer>
   <div class="ft-inner">
     <div>
-      <div class="ft-brand">한울사랑</div>
+      <div class="ft-brand">한울사상</div>
       <p class="ft-desc">한울영성계발원 · 여의명상센터<br>한울사상 수련 안내</p>
     </div>
     <div class="ft-links">
@@ -658,7 +650,7 @@
       <a href="#">개인정보처리방침</a>
     </div>
   </div>
-  <div class="ft-copy">© 2026 한울사랑 · 여의명상센터 All rights reserved.</div>
+  <div class="ft-copy">© 2026 한울사상 · 여의명상센터 All rights reserved.</div>
 </footer>
 
 <script>

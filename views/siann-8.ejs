@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — L8 수직타임라인여정 · 테마 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes = {
+      1:  { name:'Navy Gold',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', footerBg:'#030810', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Crimson Night',   bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C94848', accentLt:'#E36B6B', accentDk:'#8A2E2E', text:'#F5E8E8', text2:'#D6BEBE', gray:'#AA7A7A', footerBg:'#080408', border:'rgba(201,72,72,0.18)' },
+      3:  { name:'Pearl White',     bg:'#F8F6F2', deep:'#EDEBE5', mid:'#E2DED8', card:'#FFFFFF', accent:'#8B6914', accentLt:'#B08A2A', accentDk:'#5C4408', text:'#1A1814', text2:'#3D3A32', gray:'#8A8478', footerBg:'#D4D0C8', border:'rgba(139,105,20,0.18)' },
+      4:  { name:'Forest Deep',     bg:'#061410', deep:'#0A1E18', mid:'#102820', card:'#0C2018', accent:'#4CAC7C', accentLt:'#6BC49C', accentDk:'#2E7A54', text:'#E8F5EE', text2:'#BEDBCA', gray:'#7AAA90', footerBg:'#030A08', border:'rgba(76,172,124,0.18)' },
+      5:  { name:'Sky Mist',        bg:'#F0F4F8', deep:'#E4EAF2', mid:'#D8E0EC', card:'#FFFFFF', accent:'#3A6E9C', accentLt:'#5A90BC', accentDk:'#1C4E7A', text:'#0E1C2C', text2:'#2A3C50', gray:'#7A90A8', footerBg:'#C8D4E0', border:'rgba(58,110,156,0.18)' },
+      6:  { name:'Ember Dark',      bg:'#160C04', deep:'#221408', mid:'#301C0C', card:'#281808', accent:'#D47830', accentLt:'#EC9848', accentDk:'#9A5418', text:'#F5EADC', text2:'#D8C4A8', gray:'#AA8A68', footerBg:'#080402', border:'rgba(212,120,48,0.18)' },
+      7:  { name:'Lavender Field',  bg:'#F4F0F8', deep:'#EAE4F4', mid:'#DED6EC', card:'#FFFFFF', accent:'#7848AC', accentLt:'#9868CC', accentDk:'#54288A', text:'#140C1E', text2:'#30204A', gray:'#8A78A8', footerBg:'#D4C8E8', border:'rgba(120,72,172,0.18)' },
+      8:  { name:'Midnight Teal',   bg:'#04100E', deep:'#081A18', mid:'#0C2422', card:'#0A1E1C', accent:'#38B4A0', accentLt:'#58D4C0', accentDk:'#187860', text:'#E0F4F2', text2:'#B4D8D4', gray:'#6AA8A0', footerBg:'#020808', border:'rgba(56,180,160,0.18)' },
+      9:  { name:'Rust Iron',       bg:'#120C04', deep:'#1C1408', mid:'#28180C', card:'#1E1408', accent:'#B86828', accentLt:'#D48840', accentDk:'#844414', text:'#F4EAD8', text2:'#D4C0A0', gray:'#A08468', footerBg:'#080402', border:'rgba(184,104,40,0.18)' },
+      10: { name:'Arctic Blue',     bg:'#080E14', deep:'#0C1620', mid:'#10202E', card:'#0C1C28', accent:'#48A0D4', accentLt:'#68C0EC', accentDk:'#2878A8', text:'#E8F2F8', text2:'#C0D4E4', gray:'#7AA0B8', footerBg:'#040810', border:'rgba(72,160,212,0.18)' },
+      11: { name:'Sakura Dark',     bg:'#140810', deep:'#1E1018', mid:'#2A1824', card:'#1E1020', accent:'#C85894', accentLt:'#E478B4', accentDk:'#8C3464', text:'#F8E8F4', text2:'#D8C0D0', gray:'#A87898', footerBg:'#080408', border:'rgba(200,88,148,0.18)' },
+      12: { name:'Sand Dune',       bg:'#F8F4EC', deep:'#EEE8DC', mid:'#E4DCD0', card:'#FFFFFF', accent:'#9C7840', accentLt:'#BC9858', accentDk:'#6C5020', text:'#1C1610', text2:'#3C3024', gray:'#9C9080', footerBg:'#D8D0C0', border:'rgba(156,120,64,0.18)' },
+      13: { name:'Cobalt Night',    bg:'#060A16', deep:'#0A1020', mid:'#10182E', card:'#0C1428', accent:'#4860CC', accentLt:'#6880E8', accentDk:'#2840A0', text:'#E8ECF8', text2:'#C0C8E4', gray:'#7880B0', footerBg:'#030510', border:'rgba(72,96,204,0.18)' },
+      14: { name:'Jade Shadow',     bg:'#061210', deep:'#0A1C18', mid:'#102820', card:'#0C2018', accent:'#4C9C7C', accentLt:'#6CBC9C', accentDk:'#2C7054', text:'#E8F4F0', text2:'#B8D8CC', gray:'#78A898', footerBg:'#030A08', border:'rgba(76,156,124,0.18)' },
+      15: { name:'Cream Linen',     bg:'#F8F4EE', deep:'#EEE8DF', mid:'#E5DDD4', card:'#FFFCF8', accent:'#7C5830', accentLt:'#9C7848', accentDk:'#503818', text:'#1A140C', text2:'#3A3024', gray:'#9C8C7C', footerBg:'#D8CFC4', border:'rgba(124,88,48,0.18)' },
+      16: { name:'Volcanic',        bg:'#100808', deep:'#1A1010', mid:'#281818', card:'#1E1010', accent:'#E04830', accentLt:'#F86848', accentDk:'#A02818', text:'#F8ECEC', text2:'#D8C4C4', gray:'#A88888', footerBg:'#080404', border:'rgba(224,72,48,0.18)' },
+      17: { name:'Galaxy Purple',   bg:'#0C0414', deep:'#140820', mid:'#1E1030', card:'#180C28', accent:'#9050D8', accentLt:'#B070F8', accentDk:'#6030A8', text:'#F0E8FC', text2:'#D0C0EC', gray:'#9880C0', footerBg:'#060210', border:'rgba(144,80,216,0.18)' },
+      18: { name:'Obsidian',        bg:'#080808', deep:'#101010', mid:'#181818', card:'#101010', accent:'#A0A0A0', accentLt:'#C8C8C8', accentDk:'#686868', text:'#F0F0F0', text2:'#D0D0D0', gray:'#888888', footerBg:'#040404', border:'rgba(160,160,160,0.18)' },
+      19: { name:'Morning Fog',     bg:'#F4F4F2', deep:'#EAEAE6', mid:'#E0E0DA', card:'#FFFFFF', accent:'#5C7868', accentLt:'#7C9888', accentDk:'#3C5848', text:'#161814', text2:'#343830', gray:'#8C9890', footerBg:'#D0D4CE', border:'rgba(92,120,104,0.18)' },
+      20: { name:'Copper Age',      bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', footerBg:'#080408', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    const IMG1 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjNfMjMy/MDAxNTk4MTgwNTg5MDYy.uA1NHCj3WWGQ4N4X2lBJBLv9kXIyDFNXXBP5QO0SoNIg.FBHqHZmPTrNcD7HpCaqvJX1gUV5ZllRAuMxL9h5Y3wcg.JPEG/KakaoTalk_20200823_195242797.jpg?type=w1600';
+    const IMG2 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTA0/MDAxNTk4MjM4Mjc1ODE3.0k2BaE4ogtlYVBvHyVmHRkQb8dIvqD8i2ULhVKcVEDIg.mH8dOqWbFVT3yJPPHgtnIU8KSzP_vf2YbhLe27F7PfMg.JPEG/%ED%91%9C%EC%99%80_%ED%8F%AC.jpg?type=w1600';
+    const IMG3 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjRfMTMx/MDAxNTk4MjQwMjI3NjQ2.hLSA_5kfuWxPRUPy2d3l9Xu6G1t7QFJNw9kXb2mS8AMg.5eZKYCnLCfuPcwJX3HQoEh3k3WHGDsMfI4V0VPK5rZEg.JPEG/%EC%9D%98%EB%A1%9C%EC%9B%80.jpg?type=w1600';
+    const IMG4 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjVfMjY0/MDAxNTk4MzE3NjgyMTQ4.j8kFmmQFLoFT5PLxTPmYW6T0Tx9BjvDX_pPtY8XvzLYg.7b8L0Uj3lBf6Dh2lGj8LxMHwFlKbdOsT4AaYQ6aHPGYg.JPEG/%EC%B2%9C%EC%A7%80%EC%97%B0%ED%8F%AD%ED%8F%AC.jpeg?type=w1600';
+    const IMG5 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMjI4/MDAxNTk4NTA5OTI4NDU2.mh8WzPbnjU9WBrHi-Gq8F2FRitnzLDMpPcC38w4U1Pcg.R6T4a3m4U8yVqFQlYZHpOqT3J0oKW_-2yEIQh_GZ8Pkg.JPEG/1.jpg?type=w1600';
+    const IMG6 = '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDA4MjdfMTE2/MDAxNTk4NTEwMDE1OTU3.hVOK14ZImOyDTiH_nrJCTlKN3U7JgQDrVsw_jCjQ5H8g.tKV1w5uifEyRuvNIf1k_6CDzRHBQw7VPxEJAy2hA0osg.JPEG/2.jpg?type=w1600';
+    %>
+    :root {
+      --bg:<%= t.bg %>;--deep:<%= t.deep %>;--mid:<%= t.mid %>;--card:<%= t.card %>;
+      --accent:<%= t.accent %>;--accentLt:<%= t.accentLt %>;--accentDk:<%= t.accentDk %>;
+      --text:<%= t.text %>;--text2:<%= t.text2 %>;--gray:<%= t.gray %>;
+      --footerBg:<%= t.footerBg %>;--border:<%= t.border %>;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;overflow-x:hidden;}
+    .tb{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:var(--deep);border-bottom:1px solid var(--border);}
+    .tb-logo{font-family:'Noto Serif KR',serif;font-size:1.2rem;font-weight:600;color:var(--accent);text-decoration:none;}
+    .tb-nav{display:flex;gap:28px;list-style:none;}
+    .tb-nav a{color:var(--text2);text-decoration:none;font-size:.84rem;font-weight:300;transition:color .2s;}
+    .tb-nav a:hover{color:var(--accent);}
+    .bsm{background:var(--accent);color:var(--bg);padding:8px 20px;border-radius:100px;font-size:.8rem;font-weight:500;text-decoration:none;}
+    .hero{margin-top:60px;position:relative;height:480px;overflow:hidden;display:flex;align-items:flex-end;background:var(--deep);}
+    .hero-bg{position:absolute;inset:0;}
+    .hero-bg img{width:100%;height:100%;object-fit:cover;opacity:.35;}
+    .hero-yr{position:absolute;top:40px;right:80px;z-index:3;font-family:'Noto Serif KR',serif;font-size:5rem;font-weight:700;color:var(--accent);opacity:.18;line-height:1;}
+    .hero-ct{position:relative;z-index:2;padding:60px 80px;max-width:700px;}
+    .eyebrow{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;}
+    .hero-h{font-family:'Noto Serif KR',serif;font-size:clamp(2rem,5vw,3.6rem);font-weight:300;color:var(--text);line-height:1.3;margin-bottom:20px;}
+    .hero-sub{font-size:.95rem;font-weight:300;color:var(--text2);line-height:1.8;max-width:480px;}
+    .tl-sec{padding:100px 0;background:var(--bg);position:relative;}
+    .tl-axis{position:absolute;left:50%;top:240px;bottom:80px;width:1px;background:linear-gradient(to bottom,transparent,var(--accent) 8%,var(--border) 92%,transparent);transform:translateX(-50%);pointer-events:none;}
+    .tl-hw{text-align:center;margin-bottom:80px;padding:0 40px;}
+    .lbl{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+    .sec-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:400;color:var(--text);}
+    .tl-wrap{position:relative;max-width:1100px;margin:0 auto;padding:0 40px;}
+    .tl-e{display:grid;grid-template-columns:1fr 80px 1fr;margin-bottom:80px;align-items:start;}
+    .tl-l{padding-right:48px;text-align:right;}
+    .tl-r{padding-left:48px;text-align:left;}
+    .nd-col{display:flex;flex-direction:column;align-items:center;}
+    .nd{width:52px;height:52px;border-radius:50%;background:var(--card);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:600;color:var(--accent);z-index:2;flex-shrink:0;font-family:'Noto Serif KR',serif;}
+    .nd.ms{background:var(--accent);color:var(--bg);}
+    .card{background:var(--card);border:1px solid var(--border);padding:28px 32px;position:relative;transition:border-color .2s;}
+    .card:hover{border-color:var(--accent);}
+    .tl-l .card::after{content:'';position:absolute;top:20px;right:-8px;width:0;height:0;border-style:solid;border-width:7px 0 7px 8px;border-color:transparent transparent transparent var(--card);}
+    .tl-r .card::after{content:'';position:absolute;top:20px;left:-8px;width:0;height:0;border-style:solid;border-width:7px 8px 7px 0;border-color:transparent var(--card) transparent transparent;}
+    .card-yr{font-size:.72rem;letter-spacing:.14em;color:var(--accent);font-weight:500;margin-bottom:8px;}
+    .card-h{font-family:'Noto Serif KR',serif;font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:12px;line-height:1.4;}
+    .card-p{font-size:.86rem;font-weight:300;color:var(--text2);line-height:1.8;}
+    .tag{display:inline-block;margin-top:14px;padding:4px 12px;border:1px solid var(--border);font-size:.72rem;color:var(--gray);border-radius:100px;}
+    .card-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:20px;}
+    .ms-stripe{position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent);}
+    .ms-card{border-color:var(--accent);background:linear-gradient(135deg,var(--card) 0%,var(--mid) 100%);}
+    .jsum{padding:80px 40px;background:var(--deep);}
+    .jsum-in{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+    .jh{font-family:'Noto Serif KR',serif;font-size:clamp(1.5rem,2.8vw,2.2rem);font-weight:400;color:var(--text);margin:16px 0 24px;line-height:1.5;}
+    .jp{font-size:.92rem;font-weight:300;color:var(--text2);line-height:1.9;margin-bottom:20px;}
+    .jstats{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+    .jstat{text-align:center;padding:28px 20px;border:1px solid var(--border);}
+    .jnum{font-family:'Noto Serif KR',serif;font-size:2.4rem;font-weight:700;color:var(--accent);line-height:1;margin-bottom:8px;}
+    .jlbl{font-size:.82rem;color:var(--gray);font-weight:300;}
+    .fut{padding:100px 40px;background:var(--mid);}
+    .fut-in{max-width:1100px;margin:0 auto;}
+    .fut-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.5rem,2.8vw,2.2rem);font-weight:400;color:var(--text);text-align:center;line-height:1.5;margin:12px 0 0;}
+    .fut-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:60px;}
+    .fc{background:var(--card);padding:48px 36px;position:relative;overflow:hidden;}
+    .fc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .35s;}
+    .fc:hover::before{transform:scaleX(1);}
+    .fc-ico{font-size:2.2rem;margin-bottom:20px;line-height:1;}
+    .fc-t{font-family:'Noto Serif KR',serif;font-size:1.12rem;font-weight:500;color:var(--text);margin-bottom:14px;}
+    .fc-b{font-size:.86rem;font-weight:300;color:var(--text2);line-height:1.8;}
+    .pp{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:80px;}
+    .pp-i{position:relative;overflow:hidden;}
+    .pp-i img{width:100%;height:380px;object-fit:cover;display:block;transition:transform .5s;}
+    .pp-i:hover img{transform:scale(1.05);}
+    .pp-cap{position:absolute;bottom:0;left:0;right:0;padding:20px 24px;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 100%);font-size:.88rem;color:#fff;font-weight:300;}
+    .cta-sec{padding:120px 40px;background:var(--bg);text-align:center;}
+    .cta-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:300;color:var(--text);margin-bottom:24px;line-height:1.4;}
+    .cta-p{font-size:1rem;font-weight:300;color:var(--text2);max-width:560px;margin:0 auto 40px;line-height:1.9;}
+    .cta-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+    .bp{background:var(--accent);color:var(--bg);padding:14px 36px;border-radius:100px;font-size:.9rem;font-weight:500;text-decoration:none;transition:all .2s;}
+    .bp:hover{background:var(--accentLt);transform:translateY(-2px);}
+    .bs{border:1px solid var(--border);color:var(--text2);padding:14px 36px;border-radius:100px;font-size:.9rem;font-weight:300;text-decoration:none;transition:all .2s;background:var(--card);}
+    .bs:hover{border-color:var(--accent);color:var(--accent);}
+    footer{background:var(--footerBg);border-top:1px solid var(--border);padding:60px 48px 40px;}
+    .fi{max-width:1100px;margin:0 auto;}
+    .ft{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+    .fb .flogo{font-family:'Noto Serif KR',serif;font-size:1.2rem;font-weight:600;color:var(--accent);margin-bottom:14px;display:block;}
+    .fb p{font-size:.82rem;font-weight:300;color:var(--gray);line-height:1.7;}
+    .fcol h4{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;font-weight:500;}
+    .fcol ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+    .fcol li a{color:var(--gray);font-size:.83rem;font-weight:300;text-decoration:none;transition:color .2s;}
+    .fcol li a:hover{color:var(--text);}
+    .fb2{border-top:1px solid var(--border);padding-top:24px;display:flex;align-items:center;justify-content:space-between;}
+    .fcopy{font-size:.78rem;color:var(--gray);font-weight:300;}
+    .siann-badge{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;font-size:.72rem;color:rgba(255,255,255,.7);font-family:'Noto Sans KR',sans-serif;max-width:300px;line-height:1.5;}
+    .b-row1{margin-bottom:6px;}
+    .b-row1 span{color:var(--accent);font-weight:600;}
+    .b-row2{display:flex;flex-wrap:wrap;gap:3px;}
+    .b-row2 a{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:4px;text-decoration:none;font-size:.66rem;color:rgba(255,255,255,.5);background:rgba(255,255,255,.06);transition:all .15s;}
+    .b-row2 a:hover{background:var(--accent);color:#000;}
+    .b-row2 a.cur{background:var(--accent);color:#000;font-weight:700;}
+    @media(max-width:900px){
+      .tb-nav{display:none;}
+      .tl-e{grid-template-columns:60px 1fr;}
+      .tl-l{grid-column:2;padding-left:24px;padding-right:0;text-align:left;}
+      .tl-r{grid-column:2;padding-left:24px;}
+      .nd-col{grid-column:1;grid-row:1;}
+      .tl-l .card::after{left:-8px;right:auto;border-width:7px 8px 7px 0;border-color:transparent var(--card) transparent transparent;}
+      .tl-axis{left:calc(40px + 30px);}
+      .jsum-in,.fut-grid,.pp{grid-template-columns:1fr;}
+      .ft{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-width:600px){
+      .hero-ct{padding:40px 24px;}
+      .hero-yr{display:none;}
+      .ft{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<header class="tb">
+  <a class="tb-logo" href="#">한울사상</a>
+  <nav><ul class="tb-nav">
+    <li><a href="#">한울이란</a></li><li><a href="#">가르침</a></li>
+    <li><a href="#">수련</a></li><li><a href="#">공동체</a></li>
+  </ul></nav>
+  <a href="#" class="bsm">입문 안내</a>
+</header>
+
+<div class="hero">
+  <div class="hero-bg"><img src="<%= IMG4 %>" alt="한울여정" /></div>
+  <div class="hero-yr">1986</div>
+  <div class="hero-ct">
+    <div class="eyebrow">Timeline · Journey · 한울의 여정</div>
+    <h1 class="hero-h">한울사상이<br>걸어온 길</h1>
+    <p class="hero-sub">1986년 창립 이래 38년간 이어온 한울사상의 발자취를 시간의 흐름에 따라 만나보세요.</p>
+  </div>
+</div>
+
+<section class="tl-sec">
+  <div class="tl-axis"></div>
+  <div class="tl-hw">
+    <div class="lbl">History · 역사</div>
+    <h2 class="sec-h">연대기로 보는 한울사상</h2>
+  </div>
+  <div class="tl-wrap">
+
+    <div class="tl-e">
+      <div class="tl-l"><div class="card ms-card"><div class="ms-stripe"></div>
+        <div class="card-yr">1986년 · 창립</div>
+        <h3 class="card-h">한울사상의 탄생</h3>
+        <p class="card-p">천지 자연의 이치를 바탕으로 참된 삶의 철학을 전하고자 한울사상 공동체가 서울에서 처음 문을 열었습니다. 창립자의 깊은 성찰과 제자들의 헌신이 한울사상의 씨앗이 되었습니다.</p>
+        <span class="tag">창립 · 서울</span>
+      </div></div>
+      <div class="nd-col"><div class="nd ms">1986</div></div>
+      <div></div>
+    </div>
+
+    <div class="tl-e">
+      <div></div>
+      <div class="nd-col"><div class="nd">1990</div></div>
+      <div class="tl-r"><div class="card">
+        <div class="card-yr">1990년 · 확장</div>
+        <h3 class="card-h">첫 번째 수련원 개원</h3>
+        <p class="card-p">서울 은평구에 중앙수련원을 개원하며 체계적인 수련 과정을 시작했습니다. 입문 수련부터 심화 과정까지 단계적 교육 시스템을 갖추었고, 매주 수백 명이 참여하게 되었습니다.</p>
+        <span class="tag">수련원 · 은평구</span>
+      </div></div>
+    </div>
+
+    <div class="tl-e">
+      <div class="tl-l"><div class="card ms-card"><div class="ms-stripe"></div>
+        <img class="card-img" src="<%= IMG1 %>" alt="1995" />
+        <div class="card-yr">1995년 · 도약</div>
+        <h3 class="card-h">전국 공동체 네트워크 구축</h3>
+        <p class="card-p">서울을 넘어 전국 12개 지역에 한울사상 공동체가 만들어졌습니다. 각 지역별 특색을 살리면서도 하나의 뿌리에서 이어진 가르침을 전하는 분산형 공동체 모델을 확립했습니다.</p>
+        <span class="tag">전국 네트워크 · 12개 지역</span>
+      </div></div>
+      <div class="nd-col"><div class="nd ms">1995</div></div>
+      <div></div>
+    </div>
+
+    <div class="tl-e">
+      <div></div>
+      <div class="nd-col"><div class="nd">2000</div></div>
+      <div class="tl-r"><div class="card">
+        <div class="card-yr">2000년 · 기록</div>
+        <h3 class="card-h">경전 제1집 편찬 완료</h3>
+        <p class="card-p">창립 이래 모아온 선생님의 말씀과 가르침을 체계적으로 정리하여 한울사상 경전 제1집을 완성했습니다. 구전으로만 전해지던 가르침이 문자로 보존되어 후대에 전할 수 있게 되었습니다.</p>
+        <span class="tag">경전 · 출판</span>
+      </div></div>
+    </div>
+
+    <div class="tl-e">
+      <div class="tl-l"><div class="card">
+        <img class="card-img" src="<%= IMG2 %>" alt="2005" />
+        <div class="card-yr">2005년 · 성장</div>
+        <h3 class="card-h">회원 1천 명 돌파</h3>
+        <p class="card-p">창립 19년 만에 정식 회원 수 1,000명을 넘어섰습니다. 입소문과 자연스러운 만남으로 성장해온 한울사상은 상업적 홍보 없이 순수한 가르침의 힘으로만 성장해왔다는 점에서 더욱 뜻깊습니다.</p>
+        <span class="tag">1,000명 · 공동체 성장</span>
+      </div></div>
+      <div class="nd-col"><div class="nd">2005</div></div>
+      <div></div>
+    </div>
+
+    <div class="tl-e">
+      <div></div>
+      <div class="nd-col"><div class="nd">2010</div></div>
+      <div class="tl-r"><div class="card">
+        <div class="card-yr">2010년 · 전환</div>
+        <h3 class="card-h">제2대 지도자 계승</h3>
+        <p class="card-p">창립자의 뒤를 이어 제2대 지도자가 한울사상을 이어받았습니다. 전통적 가르침을 바탕으로 현대인의 삶에 맞는 실용적 수련법을 개발하며 한울사상의 새 시대를 열었습니다.</p>
+        <span class="tag">계승 · 2세대</span>
+      </div></div>
+    </div>
+
+    <div class="tl-e">
+      <div class="tl-l"><div class="card ms-card"><div class="ms-stripe"></div>
+        <div class="card-yr">2015년 · 30주년</div>
+        <h3 class="card-h">창립 30주년 대기념식</h3>
+        <p class="card-p">창립 30주년을 맞아 전국 각지의 회원 3,000여 명이 한자리에 모였습니다. 30년간의 발자취를 돌아보는 기념 전시와 함께 다음 세대를 위한 100년 비전을 선포하는 역사적인 자리였습니다.</p>
+        <span class="tag">30주년 · 3,000명</span>
+      </div></div>
+      <div class="nd-col"><div class="nd ms">2015</div></div>
+      <div></div>
+    </div>
+
+    <div class="tl-e">
+      <div></div>
+      <div class="nd-col"><div class="nd">2020</div></div>
+      <div class="tl-r"><div class="card">
+        <img class="card-img" src="<%= IMG3 %>" alt="2020" />
+        <div class="card-yr">2020년 · 디지털</div>
+        <h3 class="card-h">온라인 수련 플랫폼 개설</h3>
+        <p class="card-p">전 세계적 비대면 상황 속에서 한울사상은 오히려 더 넓은 세상과 연결되었습니다. 온라인 수련 플랫폼을 개설하여 국내외 어디서나 한울의 가르침을 만날 수 있게 되었습니다.</p>
+        <span class="tag">디지털 전환 · 글로벌</span>
+      </div></div>
+    </div>
+
+    <div class="tl-e">
+      <div class="tl-l"><div class="card ms-card"><div class="ms-stripe"></div>
+        <div class="card-yr">2024년 · 현재</div>
+        <h3 class="card-h">새로운 38년을 향해</h3>
+        <p class="card-p">창립 38주년을 맞은 한울사상은 전국 3,800여 명의 회원과 함께 더 나은 미래를 향해 나아가고 있습니다. 디지털과 전통이 조화를 이루며, 다음 세대에게 한울의 가르침을 전하는 사명을 이어갑니다.</p>
+        <span class="tag">38주년 · 현재진행형</span>
+      </div></div>
+      <div class="nd-col"><div class="nd ms">2024</div></div>
+      <div></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="jsum">
+  <div class="jsum-in">
+    <div>
+      <div class="lbl">Summary · 여정의 의미</div>
+      <h2 class="jh">38년, 한결같은 가르침의 길</h2>
+      <p class="jp">한울사상은 38년이라는 긴 세월 동안 한결같이 천지 자연의 이치를 전해왔습니다. 시대가 바뀌고 세상이 변해도 진리는 변하지 않는다는 믿음 아래, 수천 명의 삶을 조용히 변화시켜왔습니다.</p>
+      <p class="jp">이 여정은 아직 끝나지 않았습니다. 오늘도 새로운 분들이 한울의 문을 두드리고 있으며, 내일도 그 문은 활짝 열려 있을 것입니다.</p>
+    </div>
+    <div class="jstats">
+      <div class="jstat"><div class="jnum">38</div><div class="jlbl">년의 역사</div></div>
+      <div class="jstat"><div class="jnum">3,800+</div><div class="jlbl">명의 회원</div></div>
+      <div class="jstat"><div class="jnum">47</div><div class="jlbl">개 수련 과정</div></div>
+      <div class="jstat"><div class="jnum">12</div><div class="jlbl">개 지역 공동체</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="fut">
+  <div class="fut-in">
+    <div class="lbl" style="text-align:center;margin-bottom:12px;">Future · 미래 비전</div>
+    <h2 class="fut-h">다음 38년을 향한<br>한울사상의 비전</h2>
+    <div class="fut-grid">
+      <div class="fc"><div class="fc-ico">🌿</div><h3 class="fc-t">자연과 함께하는 수련</h3><p class="fc-b">도시를 벗어나 자연 속에서의 수련 공간을 확대합니다. 산과 들에서 천지의 기운을 직접 느끼는 생태 수련 프로그램을 개발하여 자연과 사람의 연결을 강화합니다.</p></div>
+      <div class="fc"><div class="fc-ico">📚</div><h3 class="fc-t">디지털 아카이브 완성</h3><p class="fc-b">38년간 축적된 말씀과 자료를 완전한 디지털 형태로 보존합니다. 인공지능 기술을 활용하여 방대한 자료를 검색하고 학습할 수 있는 플랫폼을 구축합니다.</p></div>
+      <div class="fc"><div class="fc-ico">🌐</div><h3 class="fc-t">글로벌 커뮤니티 확장</h3><p class="fc-b">한국을 넘어 세계 각지의 한울사상 연구자와 수련자를 연결합니다. 영어, 일본어 등 다국어 콘텐츠를 통해 한울의 가르침을 세계에 전합니다.</p></div>
+    </div>
+    <div class="pp">
+      <div class="pp-i"><img src="<%= IMG5 %>" alt="한울 공동체" /><div class="pp-cap">함께 걸어가는 한울의 길</div></div>
+      <div class="pp-i"><img src="<%= IMG6 %>" alt="한울 수련" /><div class="pp-cap">자연 속에서 피어나는 깨달음</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-sec">
+  <h2 class="cta-h">지금, 이 여정에<br>함께하시겠습니까?</h2>
+  <p class="cta-p">38년의 역사를 이어온 한울사상의 문이 언제나 열려 있습니다. 첫 발걸음을 내딛는 것이 모든 여정의 시작입니다.</p>
+  <div class="cta-row"><a class="bp" href="#">입문 신청하기</a><a class="bs" href="#">수련원 방문하기</a></div>
+</section>
+
+<footer>
+  <div class="fi">
+    <div class="ft">
+      <div class="fb"><span class="flogo">한울사상</span><p>1986년부터 이어온 한울사상의<br>공식 홈페이지입니다.</p></div>
+      <div class="fcol"><h4>역사</h4><ul><li><a href="#">창립과 기원</a></li><li><a href="#">연대기</a></li><li><a href="#">지도자 계보</a></li></ul></div>
+      <div class="fcol"><h4>수련</h4><ul><li><a href="#">입문 과정</a></li><li><a href="#">심화 수련</a></li><li><a href="#">온라인 수련</a></li></ul></div>
+      <div class="fcol"><h4>커뮤니티</h4><ul><li><a href="#">지역 모임</a></li><li><a href="#">공지사항</a></li><li><a href="#">문의하기</a></li></ul></div>
+    </div>
+    <div class="fb2">
+      <span class="fcopy">© 2024 한울사상 중앙수련원. All rights reserved.</span>
+      <span class="fcopy">테마 <%= themeId %> · <%= t.name %></span>
+    </div>
+  </div>
+</footer>
+
+<div class="siann-badge">
+  <div class="b-row1">L<span>8</span> 수직타임라인여정 &middot; 테마 <span><%= themeId %>/20 &mdash; <%= themes[themeId] ? themes[themeId].name : '' %></span></div>
+  <div class="b-row2"><% for(let i=1;i<=20;i++){ %><a href="/siann-8/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a><% } %></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — 시안 <%= themeId %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ══ 테마 변수 ══ */
+    <%
+    const themes = {
+      1:  { name:'Navy Gold (기본)',       bg:'#080D1A', deep:'#0C1828', mid:'#122035', card:'#0F1D30', accent:'#C9A84C', accentLt:'#E3C76B', accentDk:'#8A6E2E', text:'#F5EFE0', text2:'#D6CEBB', gray:'#7A8FAA', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #152444 0%, #080D1A 65%)', quotesBg:'linear-gradient(160deg,#0C1828 0%,#142238 50%,#0C1828 100%)', footerBg:'#030810', navBg:'rgba(8,13,26,0.98)', border:'rgba(201,168,76,0.18)' },
+      2:  { name:'Forest Zen (숲 명상)',   bg:'#071510', deep:'#0B1E15', mid:'#0F2A1C', card:'#0D2318', accent:'#7EB87A', accentLt:'#A3D49E', accentDk:'#4A8047', text:'#E8F3E4', text2:'#C2D9BB', gray:'#6A8F68', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #0F3022 0%, #071510 65%)', quotesBg:'linear-gradient(160deg,#0B1E15 0%,#113324 50%,#0B1E15 100%)', footerBg:'#030D07', navBg:'rgba(7,21,16,0.98)', border:'rgba(126,184,122,0.18)' },
+      3:  { name:'Pure White (미니멀)',    bg:'#FAFAF8', deep:'#F0F0EC', mid:'#E8E8E2', card:'#FFFFFF', accent:'#2C2C2C', accentLt:'#555555', accentDk:'#111111', text:'#1A1A1A', text2:'#444444', gray:'#888888', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #E8E8E0 0%, #FAFAF8 65%)', quotesBg:'linear-gradient(160deg,#F0F0EC 0%,#E4E4DC 50%,#F0F0EC 100%)', footerBg:'#1A1A1A', navBg:'rgba(250,250,248,0.98)', border:'rgba(44,44,44,0.12)' },
+      4:  { name:'Earthy Brown (대지)',    bg:'#1C1208', deep:'#241808', mid:'#2E200E', card:'#261A0A', accent:'#D4882A', accentLt:'#EAA845', accentDk:'#956018', text:'#F5EAD4', text2:'#D9C9A8', gray:'#8A7658', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #3A2810 0%, #1C1208 65%)', quotesBg:'linear-gradient(160deg,#241808 0%,#2E2010 50%,#241808 100%)', footerBg:'#0E0905', navBg:'rgba(28,18,8,0.98)', border:'rgba(212,136,42,0.18)' },
+      5:  { name:'Dawn Mist (새벽 안개)',  bg:'#F2F4F7', deep:'#E8ECF3', mid:'#DDE3EF', card:'#FFFFFF', accent:'#5B7FA6', accentLt:'#7B9DC4', accentDk:'#3A5F85', text:'#2A3547', text2:'#4A5E7A', gray:'#8A9AB5', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #D8E4F5 0%, #F2F4F7 65%)', quotesBg:'linear-gradient(160deg,#E8ECF3 0%,#DCE4F0 50%,#E8ECF3 100%)', footerBg:'#2A3547', navBg:'rgba(242,244,247,0.98)', border:'rgba(91,127,166,0.18)' },
+      6:  { name:'Sacred Purple (성스러운)', bg:'#100818', deep:'#16082A', mid:'#1E0E38', card:'#160C2E', accent:'#B48FD4', accentLt:'#CDB4E8', accentDk:'#7A5A9E', text:'#F0E8FF', text2:'#D4C4F0', gray:'#8A72A8', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #2A1048 0%, #100818 65%)', quotesBg:'linear-gradient(160deg,#16082A 0%,#201240 50%,#16082A 100%)', footerBg:'#080410', navBg:'rgba(16,8,24,0.98)', border:'rgba(180,143,212,0.18)' },
+      7:  { name:'Bamboo (대나무)',        bg:'#F8F5EC', deep:'#F0EBD8', mid:'#E8E0C8', card:'#FFFDF6', accent:'#5C7A3E', accentLt:'#7A9E56', accentDk:'#3E5A28', text:'#2A3018', text2:'#4A5830', gray:'#7A8A68', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #E0EDD4 0%, #F8F5EC 65%)', quotesBg:'linear-gradient(160deg,#F0EBD8 0%,#E8E2D0 50%,#F0EBD8 100%)', footerBg:'#1A2010', navBg:'rgba(248,245,236,0.98)', border:'rgba(92,122,62,0.18)' },
+      8:  { name:'Stone Mountain (산)',   bg:'#141414', deep:'#1C1C1C', mid:'#242424', card:'#1A1A1A', accent:'#A0A8B0', accentLt:'#C0C8D0', accentDk:'#6A7280', text:'#E8EAEC', text2:'#B8BCC4', gray:'#6A7280', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #282828 0%, #141414 65%)', quotesBg:'linear-gradient(160deg,#1C1C1C 0%,#242424 50%,#1C1C1C 100%)', footerBg:'#080808', navBg:'rgba(20,20,20,0.98)', border:'rgba(160,168,176,0.18)' },
+      9:  { name:'Deep Teal (청록)',      bg:'#061518', deep:'#091E22', mid:'#0E282E', card:'#0A1E24', accent:'#3DB8C4', accentLt:'#65CED8', accentDk:'#228898', text:'#E0F4F6', text2:'#B8E4E8', gray:'#5A8A90', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #0E3038 0%, #061518 65%)', quotesBg:'linear-gradient(160deg,#091E22 0%,#0E2C34 50%,#091E22 100%)', footerBg:'#030B0D', navBg:'rgba(6,21,24,0.98)', border:'rgba(61,184,196,0.18)' },
+      10: { name:'Warm Amber (앰버)',     bg:'#1A0E00', deep:'#221400', mid:'#2C1C00', card:'#221400', accent:'#E8A020', accentLt:'#F0BE50', accentDk:'#A86E00', text:'#FFF0D0', text2:'#E8D4A8', gray:'#907848', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #3A2400 0%, #1A0E00 65%)', quotesBg:'linear-gradient(160deg,#221400 0%,#302000 50%,#221400 100%)', footerBg:'#0D0700', navBg:'rgba(26,14,0,0.98)', border:'rgba(232,160,32,0.18)' },
+      11: { name:'Ocean Night (밤바다)',  bg:'#020C1B', deep:'#031628', mid:'#042035', card:'#041828', accent:'#4A9ECC', accentLt:'#72BEE4', accentDk:'#2A6E9C', text:'#E0EEFF', text2:'#B0CCEE', gray:'#4A6A88', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #062040 0%, #020C1B 65%)', quotesBg:'linear-gradient(160deg,#031628 0%,#042234 50%,#031628 100%)', footerBg:'#01060E', navBg:'rgba(2,12,27,0.98)', border:'rgba(74,158,204,0.18)' },
+      12: { name:'Warm Sand (모래)',      bg:'#F7F0E4', deep:'#EDE4D4', mid:'#E4D8C4', card:'#FFFDF8', accent:'#8B6840', accentLt:'#A88058', accentDk:'#6A4A28', text:'#2C2018', text2:'#4A3828', gray:'#8A7860', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #EAD8BC 0%, #F7F0E4 65%)', quotesBg:'linear-gradient(160deg,#EDE4D4 0%,#E5D9C8 50%,#EDE4D4 100%)', footerBg:'#1C1408', navBg:'rgba(247,240,228,0.98)', border:'rgba(139,104,64,0.18)' },
+      13: { name:'Moss Green (이끼)',     bg:'#0A1208', deep:'#101A0E', mid:'#162014', card:'#0E1A0C', accent:'#8AB84A', accentLt:'#A8D468', accentDk:'#5A8028', text:'#E4F0D8', text2:'#C0D8A8', gray:'#6A8850', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #162814 0%, #0A1208 65%)', quotesBg:'linear-gradient(160deg,#101A0E 0%,#162418 50%,#101A0E 100%)', footerBg:'#050804', navBg:'rgba(10,18,8,0.98)', border:'rgba(138,184,74,0.18)' },
+      14: { name:'Midnight Indigo (인디고)', bg:'#070A1F', deep:'#0C1030', mid:'#121840', card:'#0E1438', accent:'#7B8ED4', accentLt:'#9AAAE8', accentDk:'#4A60A8', text:'#E8EAFF', text2:'#C0C8F0', gray:'#5A6898', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #141A48 0%, #070A1F 65%)', quotesBg:'linear-gradient(160deg,#0C1030 0%,#141C44 50%,#0C1030 100%)', footerBg:'#03040F', navBg:'rgba(7,10,31,0.98)', border:'rgba(123,142,212,0.18)' },
+      15: { name:'Parchment (양피지)',    bg:'#F4EDD8', deep:'#EDE4C8', mid:'#E4D8B8', card:'#FBF6E8', accent:'#6B4C22', accentLt:'#8B6C3A', accentDk:'#4A3010', text:'#2A1C08', text2:'#4A3420', gray:'#7A6040', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #E8D8B4 0%, #F4EDD8 65%)', quotesBg:'linear-gradient(160deg,#EDE4C8 0%,#E6DBBC 50%,#EDE4C8 100%)', footerBg:'#1A1005', navBg:'rgba(244,237,216,0.98)', border:'rgba(107,76,34,0.18)' },
+      16: { name:'Rose Quartz (로즈)',    bg:'#1A0C10', deep:'#240F15', mid:'#2E141C', card:'#1E0E14', accent:'#D4849A', accentLt:'#E8A8BE', accentDk:'#9A5068', text:'#FFE8F0', text2:'#E8C4D4', gray:'#907080', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #3A1820 0%, #1A0C10 65%)', quotesBg:'linear-gradient(160deg,#240F15 0%,#2E1820 50%,#240F15 100%)', footerBg:'#0D0608', navBg:'rgba(26,12,16,0.98)', border:'rgba(212,132,154,0.18)' },
+      17: { name:'Obsidian (흑요석)',     bg:'#050505', deep:'#0A0A0A', mid:'#111111', card:'#080808', accent:'#D4A840', accentLt:'#E8C460', accentDk:'#9A7A20', text:'#F0EEE8', text2:'#C8C4B8', gray:'#6A6860', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #181818 0%, #050505 65%)', quotesBg:'linear-gradient(160deg,#0A0A0A 0%,#141414 50%,#0A0A0A 100%)', footerBg:'#020202', navBg:'rgba(5,5,5,0.98)', border:'rgba(212,168,64,0.18)' },
+      18: { name:'Celadon (청자)',        bg:'#0A1618', deep:'#0E1E22', mid:'#14282E', card:'#0E1E24', accent:'#78B4AA', accentLt:'#98D0C4', accentDk:'#4A8880', text:'#E4F2F0', text2:'#C0DCDA', gray:'#5A8880', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #142C30 0%, #0A1618 65%)', quotesBg:'linear-gradient(160deg,#0E1E22 0%,#142A30 50%,#0E1E22 100%)', footerBg:'#05080A', navBg:'rgba(10,22,24,0.98)', border:'rgba(120,180,170,0.18)' },
+      19: { name:'Winter White (겨울)',   bg:'#F4F6FA', deep:'#EAEEf4', mid:'#E0E6F0', card:'#FFFFFF', accent:'#3A5C8C', accentLt:'#5A80B4', accentDk:'#1A3C6C', text:'#1A2440', text2:'#3A4C6C', gray:'#7A8CAA', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #D8E4F2 0%, #F4F6FA 65%)', quotesBg:'linear-gradient(160deg,#EAEEf4 0%,#E0E8F2 50%,#EAEEf4 100%)', footerBg:'#1A2440', navBg:'rgba(244,246,250,0.98)', border:'rgba(58,92,140,0.15)' },
+      20: { name:'Copper Age (고동)',     bg:'#12080A', deep:'#1C0E10', mid:'#281618', card:'#1A0E10', accent:'#C47848', accentLt:'#DC9860', accentDk:'#8A5028', text:'#F5E8DC', text2:'#D8C4B4', gray:'#8A6858', heroBg:'radial-gradient(ellipse 80% 60% at 50% 35%, #2C1810 0%, #12080A 65%)', quotesBg:'linear-gradient(160deg,#1C0E10 0%,#261818 50%,#1C0E10 100%)', footerBg:'#080408', navBg:'rgba(18,8,10,0.98)', border:'rgba(196,120,72,0.18)' },
+    };
+    const t = themes[themeId] || themes[1];
+    const isLight = [3,5,7,12,15,19].includes(themeId);
+    %>
+    :root {
+      --navy:      <%= t.bg %>;
+      --deep:      <%= t.deep %>;
+      --mid:       <%= t.mid %>;
+      --card:      <%= t.card %>;
+      --gold:      <%= t.accent %>;
+      --gold-lt:   <%= t.accentLt %>;
+      --gold-dk:   <%= t.accentDk %>;
+      --cream:     <%= t.text %>;
+      --cream-2:   <%= t.text2 %>;
+      --gray:      <%= t.gray %>;
+      --border:    <%= t.border %>;
+      --serif:     'Noto Serif KR', 'Malgun Gothic', serif;
+      --sans:      'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--navy); color: var(--cream); overflow-x: hidden; }
+
+    /* 시안 배지 */
+    .siann-badge {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      background: rgba(0,0,0,0.85); color: #fff; text-align: center;
+      padding: 6px 16px; font-size: 12px; letter-spacing: 0.1em;
+      border-bottom: 2px solid <%= t.accent %>;
+    }
+    .siann-badge span { color: <%= t.accent %>; font-weight: 700; }
+    .siann-nav { display: flex; justify-content: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+    .siann-nav a {
+      display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center;
+      border-radius: 50%; background: rgba(255,255,255,0.1); font-size: 11px; color: #ccc;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .siann-nav a:hover, .siann-nav a.cur { background: <%= t.accent %>; color: #000; font-weight: 700; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 58px; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 64px;
+      background: linear-gradient(180deg, <%= t.navBg %> 0%, <%= t.bg %>00 100%);
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    nav.pinned {
+      background: <%= t.navBg %>;
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .nav-logo { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--gold); letter-spacing: 0.06em; text-decoration: none; }
+    .nav-logo span { color: var(--cream); }
+    .nav-menu { display: flex; gap: 36px; list-style: none; }
+    .nav-menu a { font-size: 13px; color: var(--cream-2); text-decoration: none; transition: color 0.2s; }
+    .nav-menu a:hover { color: var(--gold); }
+    .nav-cta { padding: 9px 22px; border: 1px solid var(--gold); border-radius: 2px; font-size: 12px; color: var(--gold); background: transparent; text-decoration: none; transition: all .22s; }
+    .nav-cta:hover { background: var(--gold); color: var(--navy); }
+
+    /* HERO */
+    .hero {
+      position: relative; min-height: 100vh; padding-top: 58px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      background: <%= t.heroBg %>;
+    }
+    .stars {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        radial-gradient(1.5px 1.5px at 8%  18%, rgba(255,255,255,.35) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 18% 72%, rgba(255,255,255,.25) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 28% 10%, rgba(255,255,255,.30) 0%, transparent 100%),
+        radial-gradient(2px   2px   at 42% 58%, <%= t.accent %>44  0%, transparent 100%),
+        radial-gradient(1px   1px   at 55% 25%, rgba(255,255,255,.25) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 75% 12%, rgba(255,255,255,.40) 0%, transparent 100%),
+        radial-gradient(2px   2px   at 90% 68%, <%= t.accent %>33  0%, transparent 100%);
+    }
+    .mandala { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 900px; height: 900px; pointer-events: none; }
+    .mandala svg { width: 100%; height: 100%; animation: mandalaSpin 120s linear infinite; }
+    @keyframes mandalaSpin { to { transform: rotate(360deg); } }
+
+    .hero-inner { position: relative; z-index: 2; text-align: center; padding: 0 24px; }
+    .eyebrow { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 0.45em; text-transform: uppercase; color: var(--gold); margin-bottom: 32px; opacity: 0; animation: fadeUp .9s ease .2s forwards; }
+    .hero-title { font-family: var(--serif); font-size: clamp(48px,8vw,96px); font-weight: 600; color: var(--cream); line-height: 1.08; letter-spacing: -0.01em; margin-bottom: 28px; opacity: 0; animation: fadeUp .9s ease .4s forwards; }
+    .hero-title em { font-style: normal; color: var(--gold); }
+    .hero-sub { font-family: var(--serif); font-size: clamp(15px,2vw,19px); font-weight: 300; color: var(--cream-2); line-height: 1.95; max-width: 560px; margin: 0 auto 52px; opacity: 0; animation: fadeUp .9s ease .6s forwards; }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeUp .9s ease .8s forwards; }
+    .btn-fill { display: inline-block; padding: 15px 40px; background: var(--gold); color: var(--navy); font-family: var(--sans); font-size: 14px; font-weight: 700; letter-spacing: 0.07em; border-radius: 2px; text-decoration: none; transition: all .22s; }
+    .btn-fill:hover { background: var(--gold-lt); transform: translateY(-2px); }
+    .btn-line { display: inline-block; padding: 15px 40px; border: 1px solid var(--border); color: var(--cream-2); font-family: var(--sans); font-size: 14px; letter-spacing: 0.07em; border-radius: 2px; text-decoration: none; transition: all .22s; }
+    .btn-line:hover { border-color: var(--gold); color: var(--gold); }
+    .scroll-hint { position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0; animation: fadeIn 1s ease 1.4s forwards; }
+    .scroll-hint span { font-size: 10px; letter-spacing: 0.38em; color: var(--gray); text-transform: uppercase; }
+    .scroll-bar { width: 1px; height: 44px; background: linear-gradient(180deg, var(--gold) 0%, transparent 100%); animation: scrollAnim 2s ease-in-out infinite; }
+    @keyframes scrollAnim { 0%,100%{opacity:0;transform:scaleY(0) translateY(-100%)} 40%{opacity:1;transform:scaleY(1) translateY(0)} 80%{opacity:0;transform:scaleY(0) translateY(100%)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { to{opacity:1} }
+
+    /* SECTIONS */
+    section { padding: 120px 64px; }
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    .s-label { font-size: 10.5px; font-weight: 600; letter-spacing: 0.42em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+    .s-title { font-family: var(--serif); font-size: clamp(26px,3.5vw,44px); font-weight: 500; color: var(--cream); line-height: 1.28; margin-bottom: 20px; }
+    .s-bar { width: 44px; height: 2px; background: var(--gold); margin-bottom: 36px; }
+    .s-body { font-family: var(--serif); font-size: 17px; font-weight: 300; color: var(--cream-2); line-height: 2.0; max-width: 580px; }
+
+    .about { background: var(--deep); }
+    .about-intro { max-width: 680px; margin-bottom: 72px; }
+    .about-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
+    .about-card { background: var(--card); padding: 48px 36px 44px; position: relative; overflow: hidden; transition: transform .3s; }
+    .about-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform .4s; }
+    .about-card:hover { transform: translateY(-6px); }
+    .about-card:hover::after { transform: scaleX(1); }
+    .ac-hanja { position: absolute; top: 28px; right: 28px; font-family: var(--serif); font-size: 52px; font-weight: 700; color: <%= t.accent %>14; line-height: 1; pointer-events: none; }
+    .ac-num { font-size: 11px; letter-spacing: 0.3em; color: var(--gold-dk); margin-bottom: 24px; }
+    .ac-name { font-family: var(--serif); font-size: 24px; font-weight: 500; color: var(--cream); margin-bottom: 10px; }
+    .ac-sub { font-size: 12px; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 20px; }
+    .ac-desc { font-family: var(--serif); font-size: 15px; font-weight: 300; color: var(--cream-2); line-height: 1.95; }
+
+    .teachings { background: var(--navy); }
+    .teach-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 60px; }
+    .teach-card { background: var(--card); padding: 44px 36px 40px; border: 1px solid var(--border); border-radius: 2px; transition: border-color .3s, transform .3s; }
+    .teach-card:hover { border-color: var(--gold-lt); transform: translateY(-6px); }
+    .t-icon { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--gold-dk); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 22px; color: var(--gold); margin-bottom: 24px; }
+    .t-name { font-family: var(--serif); font-size: 22px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
+    .t-hanja-sm { font-size: 12px; letter-spacing: 0.22em; color: var(--gold); margin-bottom: 18px; }
+    .t-desc { font-family: var(--serif); font-size: 15px; font-weight: 300; color: var(--cream-2); line-height: 1.95; }
+
+    .quotes { background: <%= t.quotesBg %>; position: relative; overflow: hidden; }
+    .quotes-bg { position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-family: var(--serif); font-size: 180px; font-weight: 700; color: <%= t.accent %>09; letter-spacing: -0.04em; pointer-events: none; white-space: nowrap; }
+    .quotes-grid { display: grid; grid-template-columns: 1fr; gap: 56px; position: relative; z-index: 1; }
+    .quote-item { max-width: 760px; }
+    .q-mark { font-family: var(--serif); font-size: 64px; font-weight: 700; color: var(--gold); line-height: 0.6; margin-bottom: 16px; opacity: 0.5; }
+    .q-text { font-family: var(--serif); font-size: clamp(18px,2.4vw,26px); font-weight: 400; color: var(--cream); line-height: 1.72; margin-bottom: 20px; }
+    .q-attr { font-family: var(--serif); font-size: 13px; font-weight: 300; color: var(--gold); letter-spacing: 0.08em; }
+    .q-divider { width: 40px; height: 1px; background: var(--gold-dk); margin: 40px 0; opacity: 0.5; }
+
+    .center { background: var(--deep); }
+    .center-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .programs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+    .prog-item { padding: 28px 24px; border: 1px solid var(--border); background: rgba(0,0,0,0.04); border-radius: 2px; transition: border-color .3s; }
+    .prog-item:hover { border-color: var(--gold); }
+    .prog-item h4 { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
+    .prog-item p { font-family: var(--serif); font-size: 13px; font-weight: 300; color: var(--cream-2); line-height: 1.8; }
+    .center-symbol { display: flex; align-items: center; justify-content: center; height: 460px; position: sticky; top: 120px; }
+    .center-symbol svg { width: 360px; height: 360px; }
+
+    .archive { background: var(--navy); text-align: center; }
+    .archive-num { font-family: var(--serif); font-size: clamp(64px,10vw,120px); font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 8px; opacity: 0.85; }
+    .archive-sub { font-size: 12px; letter-spacing: 0.4em; color: var(--gray); text-transform: uppercase; margin-bottom: 40px; }
+    .archive-desc { font-family: var(--serif); font-size: 18px; font-weight: 300; color: var(--cream-2); line-height: 1.85; max-width: 520px; margin: 0 auto 52px; }
+
+    .qa-sec { background: radial-gradient(ellipse 70% 80% at 50% 50%, <%= t.mid %> 0%, <%= t.bg %> 70%); text-align: center; position: relative; overflow: hidden; }
+    .qa-rings { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
+    .qa-rings span { display: block; position: absolute; border-radius: 50%; border: 1px solid var(--border); transform: translate(-50%,-50%); }
+    .qa-inner { position: relative; z-index: 2; }
+    .qa-badge { display: inline-block; padding: 6px 16px; border: 1px solid var(--border); border-radius: 20px; font-size: 11px; letter-spacing: 0.28em; color: var(--gold-dk); text-transform: uppercase; margin-bottom: 28px; }
+    .qa-title { font-family: var(--serif); font-size: clamp(24px,3.6vw,46px); font-weight: 500; color: var(--cream); line-height: 1.35; margin-bottom: 20px; }
+    .qa-body { font-family: var(--serif); font-size: 17px; font-weight: 300; color: var(--cream-2); line-height: 1.85; max-width: 480px; margin: 0 auto 48px; }
+    .qa-input-wrap { display: flex; max-width: 560px; margin: 0 auto; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+    .qa-input { flex: 1; padding: 16px 20px; background: rgba(0,0,0,0.05); border: none; outline: none; font-family: var(--serif); font-size: 15px; color: var(--cream); }
+    .qa-input::placeholder { color: var(--gray); }
+    .qa-btn { padding: 16px 28px; background: var(--gold); color: var(--navy); font-family: var(--sans); font-size: 13px; font-weight: 700; border: none; cursor: pointer; }
+    .qa-coming { font-size: 12px; color: var(--gray); margin-top: 16px; }
+
+    footer { background: <%= t.footerBg %>; padding: 64px; border-top: 1px solid var(--border); }
+    .ft-inner { max-width: 1120px; margin: 0 auto; display: flex; gap: 48px; justify-content: space-between; flex-wrap: wrap; }
+    .ft-brand .logo { font-family: var(--serif); font-size: 20px; color: var(--gold); font-weight: 600; margin-bottom: 14px; }
+    .ft-brand p { font-size: 13px; color: var(--gray); line-height: 1.8; max-width: 260px; }
+    .ft-col h4 { font-size: 10px; letter-spacing: 0.36em; color: var(--gold); text-transform: uppercase; margin-bottom: 18px; }
+    .ft-col ul { list-style: none; }
+    .ft-col li { margin-bottom: 10px; }
+    .ft-col a { font-size: 14px; color: var(--gray); text-decoration: none; transition: color .2s; }
+    .ft-col a:hover { color: var(--cream); }
+    .ft-copy { max-width: 1120px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.05); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--gray); }
+
+    @media (max-width: 960px) {
+      nav { padding: 16px 24px; top: 58px; }
+      .nav-menu { display: none; }
+      section { padding: 80px 24px; }
+      .about-cards, .teach-grid, .center-grid, .programs { grid-template-columns: 1fr; }
+      footer { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 시안 배지 -->
+<div class="siann-badge">
+  시안 <span><%= themeId %>/20 — <%= themes[themeId]?.name || '' %></span>
+  <div class="siann-nav">
+    <% for(let i=1;i<=20;i++){ %>
+    <a href="/siann/<%= i %>" class="<%= i===themeId?'cur':'' %>"><%= i %></a>
+    <% } %>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">한울<span>사상</span></a>
+  <ul class="nav-menu">
+    <li><a href="#about">한울이란</a></li>
+    <li><a href="#teachings">핵심 가르침</a></li>
+    <li><a href="#center">여의명상센터</a></li>
+    <li><a href="#archive">법문 아카이브</a></li>
+  </ul>
+  <a href="http://211.104.37.65:4200" class="nav-cta" target="_blank">법문 아카이브 →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="stars"></div>
+  <div class="mandala">
+    <svg viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="450" cy="450" r="440" stroke="<%= t.accent %>10" stroke-width="1"/>
+      <circle cx="450" cy="450" r="400" stroke="<%= t.accent %>14" stroke-width="0.5"/>
+      <circle cx="450" cy="450" r="360" stroke="<%= t.accent %>1A" stroke-width="0.5"/>
+      <circle cx="450" cy="450" r="310" stroke="<%= t.accent %>1F" stroke-width="1"/>
+      <circle cx="450" cy="450" r="260" stroke="<%= t.accent %>29" stroke-width="0.5"/>
+      <circle cx="450" cy="450" r="210" stroke="<%= t.accent %>24" stroke-width="1"/>
+      <line x1="450" y1="10"  x2="450" y2="890"  stroke="<%= t.accent %>0D" stroke-width="0.5"/>
+      <line x1="10"  y1="450" x2="890" y2="450"  stroke="<%= t.accent %>0D" stroke-width="0.5"/>
+      <line x1="137" y1="137" x2="763" y2="763"  stroke="<%= t.accent %>0A" stroke-width="0.5"/>
+      <line x1="763" y1="137" x2="137" y2="763"  stroke="<%= t.accent %>0A" stroke-width="0.5"/>
+      <g stroke="<%= t.accent %>4D" stroke-width="1">
+        <line x1="450" y1="12" x2="450" y2="30"/>
+        <line x1="450" y1="870" x2="450" y2="888"/>
+        <line x1="12" y1="450" x2="30" y2="450"/>
+        <line x1="870" y1="450" x2="888" y2="450"/>
+      </g>
+      <text x="450" y="48"  text-anchor="middle" font-family="serif" font-size="18" fill="<%= t.accent %>72">天</text>
+      <text x="450" y="878" text-anchor="middle" font-family="serif" font-size="18" fill="<%= t.accent %>72">地</text>
+      <text x="34"  y="455" text-anchor="middle" font-family="serif" font-size="18" fill="<%= t.accent %>72">人</text>
+      <text x="867" y="455" text-anchor="middle" font-family="serif" font-size="18" fill="<%= t.accent %>72">氣</text>
+    </svg>
+  </div>
+  <div class="hero-inner">
+    <span class="eyebrow">한울영성계발원 · 여의명상센터</span>
+    <h1 class="hero-title">한울사상<br><em>하늘의 뜻으로</em> 사는 삶</h1>
+    <p class="hero-sub">수도자 1인은 세상자 만인이요<br>중생자 억이라</p>
+    <div class="hero-btns">
+      <a href="http://211.104.37.65:4200" class="btn-fill" target="_blank">법문 아카이브 보기</a>
+      <a href="#about" class="btn-line">한울사상이란</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>scroll</span><div class="scroll-bar"></div></div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="wrap">
+    <div class="about-intro">
+      <p class="s-label">한울이란</p>
+      <h2 class="s-title">한울(韓蔚)은 하늘의 순우리말<br>만물의 근원</h2>
+      <div class="s-bar"></div>
+      <p class="s-body">한울은 동서고금의 어떤 종교나 사상과도 구별되는 독자적 사상 체계입니다. 우주의 이치(道)가 인간의 삶 속에서 어떻게 펼쳐지는가를 밝히고, 그 이치에 따라 사는 삶의 길을 제시합니다.</p>
+    </div>
+    <div class="about-cards">
+      <div class="about-card"><span class="ac-hanja">道</span><p class="ac-num">01</p><h3 class="ac-name">우주도리</h3><p class="ac-sub">우주의 이치를 깨닫다</p><p class="ac-desc">"우주의 모든 것은 돈다 — 자전하고 공전하는 것이 우주의 도리." 한울사상은 우주의 순환 원리를 삶의 근본으로 삼습니다.</p></div>
+      <div class="about-card"><span class="ac-hanja">靈</span><p class="ac-num">02</p><h3 class="ac-name">영적 진화</h3><p class="ac-sub">한울의 존재로 깨어나다</p><p class="ac-desc">"나비가 될 번데기는 무엇인가를 단단하게 붙잡지 않고서는 허물을 벗고 나올 수 없다." 인간은 수련과 실천을 통해 더 높은 존재로 진화할 수 있습니다.</p></div>
+      <div class="about-card"><span class="ac-hanja">責</span><p class="ac-num">03</p><h3 class="ac-name">세상에 대한 책임</h3><p class="ac-sub">한 사람이 세상을 바꾼다</p><p class="ac-desc">"수도자 1인은 세상자 만인이요, 중생자 억이라." 개인의 수행이 곧 세상을 위한 실천입니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEACHINGS -->
+<section class="teachings" id="teachings">
+  <div class="wrap">
+    <p class="s-label">핵심 가르침</p>
+    <h2 class="s-title">한울사상이 가리키는<br>세 가지 길</h2>
+    <div class="s-bar"></div>
+    <div class="teach-grid">
+      <div class="teach-card"><div class="t-icon">制</div><h3 class="t-name">제도 (制道)</h3><p class="t-hanja-sm">수행의 목표이자 결과물</p><p class="t-desc">제도는 도를 삶 속에서 구현하고 세상의 질서를 바로잡는 것입니다. 수행의 목표는 깨달음을 넘어 세상에 대한 책임으로 완성됩니다.</p></div>
+      <div class="teach-card"><div class="t-icon">場</div><h3 class="t-name">생명장 (生命場)</h3><p class="t-hanja-sm">몸을 감싸는 기(氣)의 장</p><p class="t-desc">생명장은 몸을 감싸고 있는 에너지 장(場)입니다. 이 장이 강하고 맑을수록 건강하고 밝은 삶이 펼쳐집니다.</p></div>
+      <div class="teach-card"><div class="t-icon">損</div><h3 class="t-name">수련 — 손지손지심</h3><p class="t-hanja-sm">損之損之心 · 채우기보다 비우는 수행</p><p class="t-desc">"죄는 조이는 것이다." 한울의 수련은 비우는 것에서 시작합니다. 덜고 또 덜어내는 마음이 수행의 핵심입니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTES -->
+<section class="quotes" id="quotes">
+  <div class="wrap">
+    <p class="s-label">큰스승님 법문</p>
+    <h2 class="s-title">실제 법문에서 가져온<br>한울의 말씀</h2>
+    <div class="s-bar"></div>
+    <div class="quotes-grid" style="margin-top:60px;">
+      <div class="quote-item"><div class="q-mark">"</div><p class="q-text">나비가 될 번데기는 무엇인가를<br>단단하게 붙잡지 않고서는<br>허물을 벗고 나올 수 없다</p><p class="q-attr">— 한울 법문 아카이브 수록</p></div>
+      <div class="q-divider"></div>
+      <div class="quote-item"><div class="q-mark">"</div><p class="q-text">죄는 조이는 것이다.<br>자신과 상대를<br>무리하게 조이는 것</p><p class="q-attr">— 한울 법문 아카이브 수록</p></div>
+      <div class="q-divider"></div>
+      <div class="quote-item"><div class="q-mark">"</div><p class="q-text">우주의 모든 것은 돈다.<br>자전하고 공전하는 것이<br>우주의 도리</p><p class="q-attr">— 한울 법문 아카이브 수록</p></div>
+    </div>
+  </div>
+  <div class="quotes-bg">法文</div>
+</section>
+
+<!-- CENTER -->
+<section class="center" id="center">
+  <div class="wrap">
+    <div class="center-grid">
+      <div>
+        <p class="s-label">여의명상센터</p>
+        <h2 class="s-title">한울영성계발원<br>수련 프로그램</h2>
+        <div class="s-bar"></div>
+        <p class="s-body" style="margin-bottom:48px;">여의명상센터 한울영성계발원은 한울사상을 직접 체험하고 실천하는 수련 공동체입니다.</p>
+        <div class="programs">
+          <div class="prog-item"><h4>집중수련</h4><p>한울사상의 깊이를 체험하는 집중 수련 과정</p></div>
+          <div class="prog-item"><h4>생명장 수련</h4><p>몸을 감싸는 기(氣)의 장을 키우는 수련</p></div>
+          <div class="prog-item"><h4>기운영</h4><p>우주의 기운을 바르게 운용하는 수행법</p></div>
+          <div class="prog-item"><h4>토요법문</h4><p>매주 토요일 법문 청취 및 공동 수련</p></div>
+          <div class="prog-item"><h4>지기문화답사</h4><p>우주도리를 자연 속에서 체험하는 답사</p></div>
+          <div class="prog-item"><h4>공동체 활동</h4><p>한울사상을 함께 실천하는 삶의 공동체</p></div>
+        </div>
+      </div>
+      <div class="center-symbol">
+        <svg viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="190" cy="190" r="178" stroke="<%= t.accent %>14" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="162" stroke="<%= t.accent %>26" stroke-width="1"/>
+          <circle cx="190" cy="190" r="138" stroke="<%= t.accent %>33" stroke-width="1"/>
+          <circle cx="190" cy="190" r="114" stroke="<%= t.accent %>42" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="90"  stroke="<%= t.accent %>4D" stroke-width="1"/>
+          <circle cx="190" cy="190" r="66"  stroke="<%= t.accent %>66" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="42"  stroke="<%= t.accent %>8C" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="22"  fill="<%= t.accent %>1F" stroke="<%= t.accent %>B3" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="6"   fill="<%= t.accent %>E6"/>
+          <line x1="190" y1="16"  x2="190" y2="364" stroke="<%= t.accent %>1A" stroke-width="0.8"/>
+          <line x1="16"  y1="190" x2="364" y2="190" stroke="<%= t.accent %>1A" stroke-width="0.8"/>
+          <text x="190" y="13" text-anchor="middle" font-family="serif" font-size="14" fill="<%= t.accent %>A6">天</text>
+          <text x="190" y="378" text-anchor="middle" font-family="serif" font-size="14" fill="<%= t.accent %>A6">地</text>
+          <text x="8"   y="195" text-anchor="middle" font-family="serif" font-size="14" fill="<%= t.accent %>A6">人</text>
+          <text x="373" y="195" text-anchor="middle" font-family="serif" font-size="14" fill="<%= t.accent %>A6">氣</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHIVE -->
+<section class="archive" id="archive">
+  <div class="wrap">
+    <p class="s-label" style="text-align:center;margin-bottom:24px;">법문 아카이브</p>
+    <div class="archive-num">10,313</div>
+    <p class="archive-sub">법문과 가르침이 수록된 아카이브</p>
+    <p class="archive-desc">수십 년에 걸쳐 수집된 한울 법문 전체를 아카이빙했습니다.<br>검색하고, 읽고, 당신만의 방식으로 한울사상을 만나보세요.</p>
+    <a href="http://211.104.37.65:4200" class="btn-fill" target="_blank">법문 아카이브 열기</a>
+  </div>
+</section>
+
+<!-- QA -->
+<section class="qa-sec" id="qa">
+  <div class="qa-rings">
+    <span style="width:700px;height:700px;margin-top:-350px;margin-left:-350px;"></span>
+    <span style="width:500px;height:500px;margin-top:-250px;margin-left:-250px;"></span>
+    <span style="width:300px;height:300px;margin-top:-150px;margin-left:-150px;"></span>
+  </div>
+  <div class="wrap">
+    <div class="qa-inner">
+      <div class="qa-badge">Coming Soon</div>
+      <h2 class="qa-title">한울사상이 궁금하신가요?<br>무엇이든 물어보세요</h2>
+      <p class="qa-body">10,313건의 법문을 학습한 한울 AI가<br>당신의 질문에 답합니다.</p>
+      <div class="qa-input-wrap">
+        <input class="qa-input" type="text" placeholder="예: 생명장이란 무엇인가요?" disabled />
+        <button class="qa-btn" disabled>묻기</button>
+      </div>
+      <p class="qa-coming">한울 Q&A 챗봇은 준비 중입니다</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-inner">
+    <div class="ft-brand">
+      <div class="logo">한울영성계발원</div>
+      <p>여의명상센터 · 한울사상<br>하늘의 뜻으로 사는 삶을 실천하는<br>수련 공동체</p>
+    </div>
+    <div class="ft-col"><h4>한울사상</h4><ul><li><a href="#about">한울이란</a></li><li><a href="#teachings">핵심 가르침</a></li><li><a href="#quotes">법문 발췌</a></li></ul></div>
+    <div class="ft-col"><h4>여의명상센터</h4><ul><li><a href="#center">집중수련</a></li><li><a href="#center">생명장 수련</a></li><li><a href="#center">토요법문</a></li><li><a href="#center">지기문화답사</a></li></ul></div>
+    <div class="ft-col"><h4>법문 아카이브</h4><ul><li><a href="http://211.104.37.65:4200" target="_blank">아카이브 열기</a></li><li><a href="#qa">한울 Q&A</a></li></ul></div>
+  </div>
+  <div class="ft-copy">
+    <span>© 2026 한울영성계발원 여의명상센터. All rights reserved.</span>
+    <span>수도자 1인은 세상자 만인이요 — 한울사상</span>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => { nav.classList.toggle('pinned', window.scrollY > 50); }, { passive: true });
+</script>
+</body>
+</html>

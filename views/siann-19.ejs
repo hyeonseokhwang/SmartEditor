@@ -1,0 +1,517 @@
+<%
+const themes = [
+  { name:'새벽숲',    bg:'#f5f0e8', txt:'#2c2416', acc:'#8b7355', acc2:'#c4a882', hero:'rgba(20,15,8,0.35)',  nav:'rgba(245,240,232,0.92)' },
+  { name:'여명',      bg:'#f7f2ec', txt:'#1e1a14', acc:'#a07850', acc2:'#d4b896', hero:'rgba(15,10,5,0.30)',  nav:'rgba(247,242,236,0.92)' },
+  { name:'백련',      bg:'#f8f6f2', txt:'#2a2520', acc:'#7a8c6e', acc2:'#b5c4a8', hero:'rgba(10,15,8,0.32)',  nav:'rgba(248,246,242,0.92)' },
+  { name:'고요',      bg:'#f4f1eb', txt:'#24201a', acc:'#9b8878', acc2:'#c8b8a8', hero:'rgba(20,16,12,0.38)', nav:'rgba(244,241,235,0.92)' },
+  { name:'산안개',    bg:'#f0f2f5', txt:'#1a2030', acc:'#5a7090', acc2:'#9ab0c8', hero:'rgba(8,12,20,0.35)',  nav:'rgba(240,242,245,0.92)' },
+  { name:'솔향',      bg:'#f2f5f0', txt:'#1c2418', acc:'#5c7850', acc2:'#9ab890', hero:'rgba(12,18,8,0.33)',  nav:'rgba(242,245,240,0.92)' },
+  { name:'황토',      bg:'#f6f0e4', txt:'#2a1e0c', acc:'#c48830', acc2:'#e0b870', hero:'rgba(22,14,4,0.36)',  nav:'rgba(246,240,228,0.92)' },
+  { name:'달빛',      bg:'#f5f5f8', txt:'#1c1c28', acc:'#6868a0', acc2:'#a8a8d0', hero:'rgba(10,10,18,0.38)', nav:'rgba(245,245,248,0.92)' },
+  { name:'단풍',      bg:'#f8f2ee', txt:'#2c1810', acc:'#b05030', acc2:'#d89078', hero:'rgba(22,10,6,0.36)',  nav:'rgba(248,242,238,0.92)' },
+  { name:'청풍',      bg:'#eef4f8', txt:'#101c28', acc:'#3070a0', acc2:'#78b0d8', hero:'rgba(6,14,22,0.34)',  nav:'rgba(238,244,248,0.92)' },
+  { name:'운무',      bg:'#f2f2f0', txt:'#222220', acc:'#888878', acc2:'#b8b8a8', hero:'rgba(15,15,12,0.40)', nav:'rgba(242,242,240,0.92)' },
+  { name:'초록숲',    bg:'#edf5ec', txt:'#101e10', acc:'#386838', acc2:'#78a878', hero:'rgba(6,14,6,0.32)',   nav:'rgba(237,245,236,0.92)' },
+  { name:'석양',      bg:'#f8f0e8', txt:'#280e00', acc:'#d06020', acc2:'#f0a060', hero:'rgba(24,8,0,0.35)',   nav:'rgba(248,240,232,0.92)' },
+  { name:'하늘',      bg:'#eaf2fc', txt:'#081828', acc:'#1858a8', acc2:'#60a0e0', hero:'rgba(4,10,20,0.32)',  nav:'rgba(234,242,252,0.92)' },
+  { name:'대나무',    bg:'#f0f5ec', txt:'#181e10', acc:'#607848', acc2:'#a0c080', hero:'rgba(10,14,6,0.34)',  nav:'rgba(240,245,236,0.92)' },
+  { name:'매화',      bg:'#f8f0f4', txt:'#280818', acc:'#c06080', acc2:'#e0a0b8', hero:'rgba(22,4,12,0.35)',  nav:'rgba(248,240,244,0.92)' },
+  { name:'눈꽃',      bg:'#f5f8fc', txt:'#101828', acc:'#5888c0', acc2:'#98c0e8', hero:'rgba(8,12,20,0.36)',  nav:'rgba(245,248,252,0.92)' },
+  { name:'흑토',      bg:'#f3f0ea', txt:'#1a1508', acc:'#6a5830', acc2:'#b09868', hero:'rgba(16,12,4,0.40)',  nav:'rgba(243,240,234,0.92)' },
+  { name:'은행잎',    bg:'#f8f5e0', txt:'#201a00', acc:'#a09000', acc2:'#d8c840', hero:'rgba(18,14,0,0.35)',  nav:'rgba(248,245,224,0.92)' },
+  { name:'연꽃',      bg:'#f5f0f8', txt:'#20102c', acc:'#9060c0', acc2:'#c0a0e0', hero:'rgba(16,8,22,0.36)',  nav:'rgba(245,240,248,0.92)' }
+];
+
+const themeId = parseInt(locals.themeId) || 0;
+const t = themes[themeId % themes.length];
+
+const imgs = {
+  hero:       '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDZfMTg1/MDAxNjU3MDg4Njc0NDY2.8tEzVX-VuR8xSggQirAyAAYPWC_F0J_Vhe1TLBa9qRog.8HHvn6rugEcE2z2fn5zB0OgGSJKSHWi5yKQMedHm7Uog.JPEG/%EB%AA%85%EC%83%81%EB%B2%951.jpg?type=w1600',
+  p1:         '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDlfMTA1/MDAxNjU3MzIxNTI2NDQ3.GiigfbpXlX4rw84WiTlbPsLTuXXB14yDa5EFFLR1Ts4g.-Q5x0GbEpDKynUBvz21qefbgnfadyaChRMEtk3tpD5Eg.JPEG/20220709080237.jpg?type=w1600',
+  p2:         '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDhfNzgg/MDAxNjU3MjM2NjExMDA3.MFCBBVZq2taTNOkSS1lbzZ14uQGwSIsrF8brAlu5GOYg.f1Yj1mQuCmYrOc7NRXA0lnfr4sxC46Dujwc2PFtuNUQg.JPEG/20220708082615.jpg?type=w1600',
+  p3:         '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDJfNjkg/MDAxNjU2NzE5Njg4ODgx.sJkuR4fh-81kXE1283hPZnFYLloC1EkDMODBUTC0TIkg.ktevv0k3zgPEO84m94hxXXlKOkytcGLtUFsTzLWMay4g.JPEG/20220702085225.jpg?type=w1600',
+  p4:         '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDZfMjUz/MDAxNjU3MDg4NjkxNTA5.Gt4mpof_vMt_o-ppd86a7HiJ4gIk_u5jqIYov735slog.gl0INeeCgYHu-5-viJVGoo62Cacw0ZdKmpp697PusqIg.JPEG/%EB%AA%85%EC%83%812.jpg?type=w1600',
+  quote:      '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDFfMTIx/MDAxNjU2NjM3Nzg1ODg5.pdNyn4eQj2Qirg4RkWNCq2npQE5xqc45NJndpWPIK8Qg.SbGxT0le-sLJnGNB0InLFBkNNUiVWwLHSyo5lKAv1gIg.JPEG/IMG_20220701_0001.jpg?type=w1600',
+  g1:         '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMjQx/MDAxNjU3MTc4NDg2MjYz.KqVW_fwVuyeEgEDQrYak1JAk6NewrCfzgY2MYD6nBNsg.zpZkcyq5kJtwbvqpqHv9iwkdJlDDWTj9tERPxRmrimEg.JPEG/Screenshot_20220624-152445_Gallery.jpg?type=w1600',
+  g2:         '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMjYw/MDAxNjU3MTc5MTE0NjU5.9n-1yQWgi-NDKcI0P5Q_0NUP-NtaPLN-2JIyVt2_i-Ig.z70qTq869TlfC7FZPJSDhWHiJL5JeYJz_nPXENj3ly8g.JPEG/1656217586620.jpg?type=w1600',
+  g3:         '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMTUz/MDAxNjU3MTgyMTA5ODM4.90bTQlcbFf0TJa2tAFw3CHGuxZE712IEBaOarIBCtOAg.LrLqEkFhjbpKpZQxmjgZs7wDWqRBUkdVoHgkOL6ZirQg.JPEG/Screenshot_20220707-100803_Photo_Editor.jpg?type=w1600',
+  cta:        '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA3MDdfMTg0/MDAxNjU3MTc5MDQ1Njk5.IM54J4aogS-VOaLLblRPIjRecwk5qBBZNUWoVL7DjWEg.vIbGdFSxVzGzvMAORQRG88Jc3HVUklLBz18WE8Gr_vIg.JPEG/20220626_111145.jpg?type=w1600',
+  retreat1:   '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMDExMDJfMTY2/MDAxNjA0MzI0MjAwMzgz.fS3CvfbkwHDm0wpylXTRNewQw4iwCLmLLy7FGnGGnngg.LGWzpODH2yqdG5Zx7NyHizK2_7_PT4XL4ZMyrpCVy_cg.JPEG/1.jpg?type=w1600',
+  retreat2:   '/api/img-proxy?url=https://cafeptthumb-phinf.pstatic.net/MjAyMjA2MDdfMjQz/MDAxNjU0NTk2MTE1MTg1.kTeD_ABAp7m2imFKm-3WxCqL-xZnoN9pZ6g3jyhExAgg.alM4y6rmabQwzojPpVH8oj9Rq4QphavnDRKVx0pCx8wg.JPEG/KakaoTalk_20220607_173341238_02.jpg?type=w1600'
+};
+%><!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>여의명상센터 — 한울사랑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg: <%- t.bg %>;
+  --txt: <%- t.txt %>;
+  --acc: <%- t.acc %>;
+  --acc2: <%- t.acc2 %>;
+  --hero-ov: <%- t.hero %>;
+  --nav-bg: <%- t.nav %>;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--bg);color:var(--txt);font-family:'Noto Serif KR',serif;line-height:1.8;overflow-x:hidden}
+
+/* ── BADGE ── */
+.badge{position:fixed;top:14px;right:18px;z-index:9999;background:var(--acc);color:#fff;font-size:11px;font-family:'Noto Sans KR',sans-serif;padding:4px 10px;border-radius:20px;letter-spacing:.05em;opacity:.85}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;width:100%;z-index:1000;padding:20px 56px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,padding .3s}
+nav.scrolled{background:var(--nav-bg);padding:14px 56px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.06);box-shadow:0 1px 12px rgba(0,0,0,.08)}
+.nav-logo{font-size:18px;font-weight:500;letter-spacing:.06em;color:#fff;text-decoration:none;transition:color .3s}
+nav.scrolled .nav-logo{color:var(--txt)}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:300;color:rgba(255,255,255,.85);text-decoration:none;letter-spacing:.04em;transition:color .3s}
+nav.scrolled .nav-links a{color:var(--txt)}
+.nav-links a:hover{color:var(--acc2) !important}
+
+/* ── HERO ── */
+#hero{width:100vw;height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-img{position:absolute;inset:0;background:url('<%- imgs.hero %>') center/cover no-repeat;transform:scale(1.05);transition:transform 8s ease-out}
+.hero-img.loaded{transform:scale(1)}
+.hero-overlay{position:absolute;inset:0;background:var(--hero-ov)}
+.hero-content{position:relative;z-index:2;text-align:center;padding:0 24px}
+.hero-en{font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:300;color:rgba(255,255,255,.65);letter-spacing:.35em;text-transform:uppercase;margin-bottom:22px}
+.hero-title{font-size:clamp(42px,7vw,80px);font-weight:300;color:#fff;letter-spacing:.08em;line-height:1.25;margin-bottom:18px}
+.hero-line{width:48px;height:1px;background:rgba(255,255,255,.5);margin:0 auto 22px}
+.hero-sub{font-size:clamp(14px,1.6vw,18px);font-weight:300;color:rgba(255,255,255,.78);letter-spacing:.12em}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2;cursor:pointer}
+.hero-scroll span{font-size:11px;font-family:'Noto Sans KR',sans-serif;color:rgba(255,255,255,.5);letter-spacing:.15em;text-transform:uppercase}
+.scroll-dot{width:1px;height:48px;background:linear-gradient(to bottom,rgba(255,255,255,.5),transparent);animation:scrollDot 2s ease-in-out infinite}
+@keyframes scrollDot{0%,100%{opacity:.4;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.2)}}
+
+/* ── MANIFESTO ── */
+.manifesto{background:#1a1510;padding:88px 24px;text-align:center}
+.manifesto-ko{font-size:clamp(18px,2.8vw,32px);font-weight:300;color:rgba(255,255,255,.92);letter-spacing:.06em;line-height:1.9;margin-bottom:16px}
+.manifesto-divider{width:32px;height:1px;background:var(--acc2);margin:0 auto}
+
+/* ── IMAGE PANELS — 4개 풀폭 이미지 패널 ── */
+.panels{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:520px 520px}
+.panel{position:relative;overflow:hidden;cursor:default}
+.panel-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .8s ease}
+.panel:hover .panel-img{transform:scale(1.04)}
+.panel-dark{position:absolute;inset:0;background:rgba(0,0,0,.32);transition:background .4s}
+.panel:hover .panel-dark{background:rgba(0,0,0,.18)}
+.panel-label{position:absolute;bottom:40px;left:40px;z-index:2}
+.panel-word{font-size:clamp(28px,4vw,52px);font-weight:300;color:#fff;letter-spacing:.08em;display:block;line-height:1}
+.panel-desc{font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:300;color:rgba(255,255,255,.65);letter-spacing:.06em;margin-top:10px;display:block;max-width:220px;line-height:1.6;opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+.panel:hover .panel-desc{opacity:1;transform:translateY(0)}
+.panel-num{position:absolute;top:32px;right:36px;font-size:11px;font-family:'Noto Sans KR',sans-serif;color:rgba(255,255,255,.35);letter-spacing:.15em}
+
+/* ── QUOTE ── */
+.quote-section{width:100vw;height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.quote-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-attachment:fixed}
+.quote-overlay{position:absolute;inset:0;background:rgba(10,8,5,.52)}
+.quote-content{position:relative;z-index:2;max-width:780px;padding:0 48px;text-align:center}
+.quote-mark{font-size:72px;line-height:.6;color:var(--acc2);opacity:.6;margin-bottom:28px;font-family:Georgia,serif}
+.quote-text{font-size:clamp(20px,3vw,34px);font-weight:300;color:#fff;letter-spacing:.04em;line-height:1.8;margin-bottom:32px}
+.quote-attr{font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:300;color:rgba(255,255,255,.5);letter-spacing:.2em;text-transform:uppercase}
+
+/* ── ABOUT — 이미지+텍스트 반반 ── */
+.about{display:grid;grid-template-columns:1fr 1fr;min-height:600px}
+.about-img-wrap{position:relative;overflow:hidden}
+.about-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .8s}
+.about-img-wrap:hover .about-img{transform:scale(1.04)}
+.about-text{display:flex;flex-direction:column;justify-content:center;padding:80px 72px;background:var(--bg)}
+.about-label{font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:500;color:var(--acc);letter-spacing:.28em;text-transform:uppercase;margin-bottom:28px}
+.about-heading{font-size:clamp(26px,3.2vw,40px);font-weight:300;color:var(--txt);letter-spacing:.04em;line-height:1.5;margin-bottom:28px}
+.about-line{width:36px;height:1px;background:var(--acc);margin-bottom:28px}
+.about-body{font-size:15px;font-family:'Noto Sans KR',sans-serif;font-weight:300;color:var(--txt);opacity:.72;line-height:1.9;max-width:380px}
+
+/* ── PROGRAMS ── */
+.programs{padding:96px 56px;background:var(--bg)}
+.sec-header{text-align:center;margin-bottom:64px}
+.sec-label{font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:500;color:var(--acc);letter-spacing:.28em;text-transform:uppercase;margin-bottom:20px}
+.sec-title{font-size:clamp(22px,3vw,36px);font-weight:300;color:var(--txt);letter-spacing:.06em}
+.prog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.prog-card{position:relative;height:360px;overflow:hidden;cursor:pointer}
+.prog-card-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .7s ease}
+.prog-card:hover .prog-card-img{transform:scale(1.06)}
+.prog-card-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.1) 55%,transparent 100%);transition:background .4s}
+.prog-card:hover .prog-card-ov{background:linear-gradient(to top,rgba(0,0,0,.58) 0%,rgba(0,0,0,.08) 55%,transparent 100%)}
+.prog-card-body{position:absolute;bottom:0;left:0;right:0;padding:28px 28px 32px;z-index:2}
+.prog-icon{font-size:22px;margin-bottom:10px;display:block}
+.prog-name{font-size:17px;font-weight:400;color:#fff;letter-spacing:.06em;display:block;margin-bottom:6px}
+.prog-detail{font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:300;color:rgba(255,255,255,.6);letter-spacing:.04em;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.prog-card:hover .prog-detail{opacity:1;transform:translateY(0)}
+
+/* ── GALLERY ── */
+.gallery{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:320px 320px;gap:3px;background:var(--bg);padding:3px}
+.gallery-item{overflow:hidden;position:relative;background:#111}
+.gallery-item:first-child{grid-row:span 2}
+.gallery-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s ease,opacity .3s}
+.gallery-item:hover .gallery-img{transform:scale(1.06)}
+.gallery-overlay{position:absolute;inset:0;background:rgba(0,0,0,.0);transition:background .3s}
+.gallery-item:hover .gallery-overlay{background:rgba(0,0,0,.15)}
+
+/* ── STATS ── */
+.stats{padding:72px 56px;background:#1a1510;display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.stat-item{text-align:center;padding:40px 24px;border-right:1px solid rgba(255,255,255,.06)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-size:clamp(36px,5vw,60px);font-weight:300;color:#fff;letter-spacing:.04em;display:block;line-height:1}
+.stat-unit{font-size:16px;color:var(--acc2);opacity:.8;vertical-align:super;font-weight:300}
+.stat-label{font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:300;color:rgba(255,255,255,.45);letter-spacing:.15em;margin-top:14px;display:block;text-transform:uppercase}
+
+/* ── CTA ── */
+.cta-section{position:relative;height:540px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cta-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-attachment:fixed}
+.cta-overlay{position:absolute;inset:0;background:rgba(8,6,3,.5)}
+.cta-content{position:relative;z-index:2;text-align:center;padding:0 24px}
+.cta-title{font-size:clamp(28px,4.5vw,52px);font-weight:300;color:#fff;letter-spacing:.06em;margin-bottom:14px}
+.cta-sub{font-size:15px;font-family:'Noto Sans KR',sans-serif;font-weight:300;color:rgba(255,255,255,.65);margin-bottom:40px;letter-spacing:.06em}
+.cta-btn{display:inline-block;padding:14px 48px;border:1px solid rgba(255,255,255,.55);color:#fff;text-decoration:none;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:300;letter-spacing:.18em;transition:all .35s}
+.cta-btn:hover{background:rgba(255,255,255,.12);border-color:#fff}
+
+/* ── FOOTER ── */
+footer{background:#120e0a;padding:64px 56px 40px;color:rgba(255,255,255,.4)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand{font-size:18px;font-weight:400;color:rgba(255,255,255,.75);letter-spacing:.08em;margin-bottom:14px}
+.footer-desc{font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:300;line-height:1.8;max-width:280px}
+.footer-col-title{font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:500;color:rgba(255,255,255,.55);letter-spacing:.2em;text-transform:uppercase;margin-bottom:18px}
+.footer-col-list{list-style:none;display:flex;flex-direction:column;gap:9px}
+.footer-col-list li{font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:300}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:24px;display:flex;justify-content:space-between;align-items:center}
+.footer-copy{font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:300;letter-spacing:.04em}
+.footer-tag{font-size:10px;font-family:'Noto Sans KR',sans-serif;background:var(--acc);color:#fff;padding:3px 9px;border-radius:20px;opacity:.7;letter-spacing:.05em}
+
+/* ── THEME SWITCHER ── */
+.theme-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9000;display:flex;gap:7px;background:rgba(20,16,12,.75);padding:10px 16px;border-radius:40px;backdrop-filter:blur(10px)}
+.theme-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .2s,border-color .2s;flex-shrink:0}
+.theme-dot:hover{transform:scale(1.3)}
+.theme-dot.active{border-color:#fff;transform:scale(1.15)}
+.theme-dot-wrap{position:relative}
+.theme-dot-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;font-size:10px;white-space:nowrap;padding:4px 8px;border-radius:4px;pointer-events:none;opacity:0;transition:opacity .2s}
+.theme-dot-wrap:hover .theme-dot-tip{opacity:1}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-32px);transition:opacity .8s ease,transform .8s ease}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(32px);transition:opacity .8s ease,transform .8s ease}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .panels{grid-template-columns:1fr;grid-template-rows:repeat(4,420px)}
+  .about{grid-template-columns:1fr}
+  .about-img-wrap{height:360px;position:relative}
+  .about-img{position:absolute}
+  .about-text{padding:56px 36px}
+  .prog-grid{grid-template-columns:1fr 1fr}
+  .gallery{grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,260px)}
+  .gallery-item:first-child{grid-row:span 1}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr}
+  nav{padding:18px 28px}
+  nav.scrolled{padding:12px 28px}
+}
+</style>
+</head>
+<body>
+
+<div class="badge">B팀 지안 · siann-19</div>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <a href="#" class="nav-logo">여의명상센터</a>
+  <ul class="nav-links">
+    <li><a href="#about">센터소개</a></li>
+    <li><a href="#programs">수련안내</a></li>
+    <li><a href="#gallery">갤러리</a></li>
+    <li><a href="#cta">오시는 길</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-img" id="hero-img"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-en">Yeouido Meditation Center</p>
+    <h1 class="hero-title">여의명상센터</h1>
+    <div class="hero-line"></div>
+    <p class="hero-sub">한울사랑 · 한울사상</p>
+  </div>
+  <div class="hero-scroll" onclick="document.querySelector('.manifesto').scrollIntoView({behavior:'smooth'})">
+    <span>Scroll</span>
+    <div class="scroll-dot"></div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<div class="manifesto reveal">
+  <p class="manifesto-ko">하늘의 이치를 몸으로 깨달아<br>세상에 빛을 나누는 곳</p>
+  <div class="manifesto-divider"></div>
+</div>
+
+<!-- IMAGE PANELS -->
+<div class="panels">
+  <div class="panel reveal">
+    <div class="panel-img" style="background-image:url('<%- imgs.p1 %>')"></div>
+    <div class="panel-dark"></div>
+    <span class="panel-num">01</span>
+    <div class="panel-label">
+      <span class="panel-word">靜</span>
+      <span class="panel-desc">고요히 앉아 내면의 소리에 귀 기울이는 시간</span>
+    </div>
+  </div>
+  <div class="panel reveal">
+    <div class="panel-img" style="background-image:url('<%- imgs.p2 %>')"></div>
+    <div class="panel-dark"></div>
+    <span class="panel-num">02</span>
+    <div class="panel-label">
+      <span class="panel-word">道</span>
+      <span class="panel-desc">자연과 하나 되어 참된 길을 걷는 수련</span>
+    </div>
+  </div>
+  <div class="panel reveal">
+    <div class="panel-img" style="background-image:url('<%- imgs.p3 %>')"></div>
+    <div class="panel-dark"></div>
+    <span class="panel-num">03</span>
+    <div class="panel-label">
+      <span class="panel-word">明</span>
+      <span class="panel-desc">밝은 정신으로 삶의 진리를 밝혀가는 과정</span>
+    </div>
+  </div>
+  <div class="panel reveal">
+    <div class="panel-img" style="background-image:url('<%- imgs.p4 %>')"></div>
+    <div class="panel-dark"></div>
+    <span class="panel-num">04</span>
+    <div class="panel-label">
+      <span class="panel-word">和</span>
+      <span class="panel-desc">서로를 존중하며 함께 성장하는 공동체</span>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE -->
+<section class="quote-section">
+  <div class="quote-bg" style="background-image:url('<%- imgs.quote %>')"></div>
+  <div class="quote-overlay"></div>
+  <div class="quote-content reveal">
+    <div class="quote-mark">"</div>
+    <p class="quote-text">하늘이 내린 본성 그대로<br>살아가는 것이 수련이다</p>
+    <span class="quote-attr">한울사상 · 법문 중에서</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-img-wrap reveal-left">
+    <div class="about-img" style="background-image:url('<%- imgs.retreat1 %>')"></div>
+  </div>
+  <div class="about-text reveal-right">
+    <span class="about-label">About Us</span>
+    <h2 class="about-heading">한울 사상을<br>함께 나누는 공간</h2>
+    <div class="about-line"></div>
+    <p class="about-body">여의명상센터는 한울 사상을 바탕으로 수련과 명상을 통해 내면의 평화를 찾고자 하는 이들이 모이는 곳입니다. 자연과 함께하는 수련, 법문, 집중수련을 정기적으로 진행합니다.</p>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section class="programs" id="programs">
+  <div class="sec-header reveal">
+    <p class="sec-label">Programs</p>
+    <h2 class="sec-title">수련 프로그램</h2>
+  </div>
+  <div class="prog-grid">
+    <div class="prog-card">
+      <div class="prog-card-img" style="background-image:url('<%- imgs.hero %>')"></div>
+      <div class="prog-card-ov"></div>
+      <div class="prog-card-body">
+        <span class="prog-icon">🧘</span>
+        <span class="prog-name">명상수련</span>
+        <span class="prog-detail">매주 토요일 오전 · 정기 수련</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-img" style="background-image:url('<%- imgs.retreat2 %>')"></div>
+      <div class="prog-card-ov"></div>
+      <div class="prog-card-body">
+        <span class="prog-icon">🌿</span>
+        <span class="prog-name">좌통수련</span>
+        <span class="prog-detail">1박2일 집중 수련 · 월 1회</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-img" style="background-image:url('<%- imgs.g1 %>')"></div>
+      <div class="prog-card-ov"></div>
+      <div class="prog-card-body">
+        <span class="prog-icon">🏔</span>
+        <span class="prog-name">자연수련</span>
+        <span class="prog-detail">전등사·산사 답사 · 계절별 진행</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-img" style="background-image:url('<%- imgs.p3 %>')"></div>
+      <div class="prog-card-ov"></div>
+      <div class="prog-card-body">
+        <span class="prog-icon">📿</span>
+        <span class="prog-name">법문 강독</span>
+        <span class="prog-detail">한울 사상 강의 · 매월 둘째 주</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-img" style="background-image:url('<%- imgs.p4 %>')"></div>
+      <div class="prog-card-ov"></div>
+      <div class="prog-card-body">
+        <span class="prog-icon">🌅</span>
+        <span class="prog-name">집중수련</span>
+        <span class="prog-detail">연 2회 · 봄·가을 3박4일</span>
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-card-img" style="background-image:url('<%- imgs.g2 %>')"></div>
+      <div class="prog-card-ov"></div>
+      <div class="prog-card-body">
+        <span class="prog-icon">🤝</span>
+        <span class="prog-name">공동체 모임</span>
+        <span class="prog-detail">친목 · 나눔 · 봉사</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="gallery">
+    <div class="gallery-item">
+      <img class="gallery-img" src="<%- imgs.g1 %>" alt="수련 현장" loading="lazy">
+      <div class="gallery-overlay"></div>
+    </div>
+    <div class="gallery-item">
+      <img class="gallery-img" src="<%- imgs.p1 %>" alt="자연" loading="lazy">
+      <div class="gallery-overlay"></div>
+    </div>
+    <div class="gallery-item">
+      <img class="gallery-img" src="<%- imgs.g3 %>" alt="소풍" loading="lazy">
+      <div class="gallery-overlay"></div>
+    </div>
+    <div class="gallery-item">
+      <img class="gallery-img" src="<%- imgs.p2 %>" alt="명상" loading="lazy">
+      <div class="gallery-overlay"></div>
+    </div>
+    <div class="gallery-item">
+      <img class="gallery-img" src="<%- imgs.g2 %>" alt="자연" loading="lazy">
+      <div class="gallery-overlay"></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats reveal">
+  <div class="stat-item">
+    <span class="stat-num">30<span class="stat-unit">+</span></span>
+    <span class="stat-label">Years of Practice</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">500<span class="stat-unit">+</span></span>
+    <span class="stat-label">Members</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">12<span class="stat-unit">회</span></span>
+    <span class="stat-label">Annual Programs</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">1<span class="stat-unit">心</span></span>
+    <span class="stat-label">One Community</span>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-bg" style="background-image:url('<%- imgs.cta %>')"></div>
+  <div class="cta-overlay"></div>
+  <div class="cta-content reveal">
+    <h2 class="cta-title">함께 걷겠습니다</h2>
+    <p class="cta-sub">여의명상센터의 문은 언제나 열려 있습니다</p>
+    <a href="#" class="cta-btn">참여 문의</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <p class="footer-brand">여의명상센터</p>
+      <p class="footer-desc">한울 사상을 바탕으로 수련과 명상을 통해 내면의 빛을 찾는 공동체입니다.</p>
+    </div>
+    <div>
+      <p class="footer-col-title">프로그램</p>
+      <ul class="footer-col-list">
+        <li>명상수련</li>
+        <li>좌통수련</li>
+        <li>집중수련</li>
+        <li>법문 강독</li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">안내</p>
+      <ul class="footer-col-list">
+        <li>센터 소개</li>
+        <li>오시는 길</li>
+        <li>수련 일정</li>
+        <li>후원 안내</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 여의명상센터 · 한울사랑. All rights reserved.</span>
+    <span class="footer-tag">B팀 지안 siann-19</span>
+  </div>
+</footer>
+
+<!-- THEME SWITCHER -->
+<div class="theme-bar" id="theme-bar"></div>
+
+<script>
+(function(){
+  /* ── 히어로 이미지 로드 ── */
+  const heroImg = document.getElementById('hero-img');
+  const img = new Image();
+  img.onload = () => { heroImg.style.backgroundImage = "url('<%- imgs.hero %>')"; heroImg.classList.add('loaded'); };
+  img.src = '<%- imgs.hero %>';
+
+  /* ── Nav scroll ── */
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, {passive:true});
+
+  /* ── Reveal on scroll ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  }, {threshold:0.12});
+  document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => observer.observe(el));
+
+  /* ── Theme switcher ── */
+  const themes = <%- JSON.stringify(themes.map((t,i)=>({name:t.name,acc:t.acc,i}))) %>;
+  const bar = document.getElementById('theme-bar');
+  const cur = <%- themeId % themes.length %>;
+  themes.forEach(({name,acc,i}) => {
+    const wrap = document.createElement('div');
+    wrap.className='theme-dot-wrap';
+    const dot = document.createElement('div');
+    dot.className='theme-dot'+(i===cur?' active':'');
+    dot.style.background=acc;
+    dot.title=name;
+    dot.onclick=()=>{ window.location.href='/siann-19/'+i; };
+    const tip=document.createElement('span');
+    tip.className='theme-dot-tip';
+    tip.textContent=name;
+    wrap.appendChild(dot);wrap.appendChild(tip);bar.appendChild(wrap);
+  });
+})();
+</script>
+</body>
+</html>
