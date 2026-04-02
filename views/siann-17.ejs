@@ -546,6 +546,12 @@
       .footer-inner { flex-direction: column; gap: 40px; }
       .footer-cols { flex-wrap: wrap; gap: 36px; }
     }
+    /* LANGUAGE TOGGLE */
+    .lang-btn{padding:5px 14px;border:1px solid var(--ac);background:transparent;color:var(--ac);border-radius:20px;font-size:12px;cursor:pointer;letter-spacing:.08em;transition:all .2s;font-family:inherit;margin-left:16px;}
+    .lang-btn:hover,.lang-btn.active{background:var(--ac);color:#fff;}
+    [data-en]{display:none;}
+    body.lang-en [data-ko]{display:none;}
+    body.lang-en [data-en]{display:revert;}
   </style>
 </head>
 <body>
@@ -554,15 +560,16 @@
   <nav class="nav" id="nav">
     <a href="#" class="nav-logo">한울사상</a>
     <ul class="nav-links">
-      <li><a href="#philosophy">사상</a></li>
-      <li><a href="#programs">수련</a></li>
-      <li><a href="#teachings">가르침</a></li>
+      <li><a href="#philosophy" data-ko>사상</a><a href="#philosophy" data-en>Philosophy</a></li>
+      <li><a href="#programs" data-ko>수련</a><a href="#programs" data-en>Programs</a></li>
+      <li><a href="#teachings" data-ko>가르침</a><a href="#teachings" data-en>Teachings</a></li>
       <li class="nav-sep" aria-hidden="true">|</li>
-      <li><a href="/archive" class="nav-page">아카이브</a></li>
-      <li><a href="/chat" class="nav-page">챗봇</a></li>
-      <li><a href="/editor" class="nav-page">에디터</a></li>
+      <li><a href="/archive" class="nav-page" data-ko>아카이브</a><a href="/archive" class="nav-page" data-en>Archive</a></li>
+      <li><a href="/chat" class="nav-page" data-ko>챗봇</a><a href="/chat" class="nav-page" data-en>AI Chat</a></li>
     </ul>
-    <a href="#contact" class="nav-cta">수련 신청</a>
+    <a href="#contact" class="nav-cta" data-ko>수련 신청</a>
+    <a href="#contact" class="nav-cta" data-en>Join Us</a>
+    <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">EN</button>
   </nav>
 
   <!-- HERO -->
@@ -570,18 +577,27 @@
     <div class="hero-bg-glyph">한울</div>
     <div class="hero-lines"></div>
     <div class="hero-inner">
-      <div class="hero-badge">Hanul Sarang · Since 1992</div>
-      <h1 class="hero-title">
+      <div class="hero-badge">Hanul Thought · Since 1992</div>
+      <h1 class="hero-title" data-ko>
         하늘과 땅 사이,<br><em>그 침묵 속에</em><br>내가 있다
       </h1>
+      <h1 class="hero-title" data-en>
+        Between heaven and earth,<br><em>in that silence</em><br>I am
+      </h1>
       <p class="hero-sub-hanja">天 · 地 · 人</p>
-      <p class="hero-desc">
+      <p class="hero-desc" data-ko>
         한울사상 여의명상센터는 한울사상의 뿌리 위에서<br>
         몸과 마음이 쉬고, 깨어나는 공간입니다.
       </p>
+      <p class="hero-desc" data-en>
+        Yeoui Meditation Center — rooted in Hanul Philosophy,<br>
+        a space where body and mind rest, and awaken.
+      </p>
       <div class="hero-cta-wrap">
-        <a href="#programs" class="hero-btn">수련 과정 보기</a>
-        <a href="/chat" class="hero-btn-sub">담당관 채팅하기</a>
+        <a href="#programs" class="hero-btn" data-ko>수련 과정 보기</a>
+        <a href="#programs" class="hero-btn" data-en>Explore Programs</a>
+        <a href="/chat" class="hero-btn-sub" data-ko>담당관 채팅하기</a>
+        <a href="/chat" class="hero-btn-sub" data-en>AI Counselor</a>
       </div>
     </div>
     <div class="hero-scroll">
@@ -601,13 +617,15 @@
   <section class="philosophy" id="philosophy">
     <div class="container">
       <div class="sec-label">한울사상 · Philosophy</div>
-      <h2 class="sec-title">핵심 가르침</h2>
-      <p class="sec-desc">한울사상의 실천 — 수도·생명장·성멸제도·성멸오통.</p>
+      <h2 class="sec-title" data-ko>핵심 가르침</h2>
+      <h2 class="sec-title" data-en>Core Teachings</h2>
+      <p class="sec-desc" data-ko>한울사상의 실천 — 수도·생명장·성멸제도·성멸오통.</p>
+      <p class="sec-desc" data-en>The practice of Hanul Philosophy — Sudo, Life Field, Seongmyeol Jedo, Seongmyeol Otong.</p>
     </div>
     <div class="phil-grid" style="max-width:1140px;margin:0 auto;padding:0 48px;margin-top:0;">
       <% const philData = [
         {n:'01', name:'修道  수도', hanja:'닦아가는 길', text:'깊이 공부해서 수련과 수도를 겸해서 지도해줄 수 있어야 합니다. 수도는 스스로를 닦는 것을 넘어 세상을 함께 깨우는 길입니다. — 큰스승님 말씀'},
-        {n:'02', name:'生命場  생명장', hanja:'생명의 공명', text:'생명장을 통해 자기표현을 해야 상대와 충돌하지 않는다. 생명장에 의해 공명현상이 일어나고, 그 공명을 통해 서로 조화가 이루어져야 한다. — 한울기공 말씀'},
+        {n:'02', name:'生命場  생명장', hanja:'생명의 공명', text:'생명장(Life field)이란 생명체의 몸氣(몸을 운영하는 기운)와, 영기(靈氣:영혼의 기운)와, 지기(地氣:터전과 환경의 기운)의 조합이 이루어내는 氣의 장(場)입니다. 생명장을 통해 자기표현을 해야 상대와 충돌하지 않고, 공명현상으로 서로 조화가 이루어집니다. — 여의선원 [생명장]'},
         {n:'03', name:'性滅濟度  성멸제도', hanja:'사람 성을 비우다', text:'성멸제도일은 자신이 멸해야 할 성, 즉 사람 성·사람 정을 소멸하는 날입니다. 부질없고 쓸모없는 것들을 버리고 영격을 높여가는 수도의 과정입니다.'},
         {n:'04', name:'性滅五通  성멸오통', hanja:'초월하여 통하다', text:'성(性)에 묶이지 않고 초월해야 전체와 통할 수 있다. 주계좌를 득한 이후 성멸오통에 이르는 것으로 끝나는 것이 아니라 반드시 더 깊이 나아가야 한다. — 큰스승님 말씀'}
       ]; %>
@@ -627,10 +645,14 @@
   <section class="dark-quote" id="quote">
     <div class="dark-quote-inner">
       <p class="dark-quote-label">한울사상 · 핵심 가르침</p>
-      <blockquote class="dark-quote-text">
+      <blockquote class="dark-quote-text" data-ko>
         "수도자 1인은 세상자 만인이요,<br>중생자 억이라"
       </blockquote>
-      <p class="dark-quote-sub">내 안에서 깨어난 한울의 빛이 세상을 밝힌다</p>
+      <blockquote class="dark-quote-text" data-en>
+        "One practitioner is ten thousand in the world,<br>a hundred million sentient beings"
+      </blockquote>
+      <p class="dark-quote-sub" data-ko>내 안에서 깨어난 한울의 빛이 세상을 밝힌다</p>
+      <p class="dark-quote-sub" data-en>The light of Hanul, awakened within, illuminates the world</p>
       <div class="dark-quote-tags">
         <span>戒 계</span><span>命 명</span><span>道 도</span><span>情 정</span><span>性 성</span>
       </div>
@@ -645,7 +667,8 @@
       <div class="prog-intro">
         <div class="prog-intro-left">
           <div class="sec-label">수련 과정 · Programs</div>
-          <h2 class="sec-title">몸과 마음을 위한<br>여섯 가지 길</h2>
+          <h2 class="sec-title" data-ko>몸과 마음을 위한<br>여섯 가지 길</h2>
+          <h2 class="sec-title" data-en>Six Paths for<br>Body &amp; Mind</h2>
         </div>
         <div class="prog-intro-right">
           <div class="prog-stat-big">6</div>
@@ -679,10 +702,14 @@
   <section class="quote-sec">
     <div class="quote-inner">
       <span class="quote-mark">"</span>
-      <p class="quote-text">
+      <p class="quote-text" data-ko>
         세상이 너를 타게 하지 말고,<br>네가 세상을 타라
       </p>
-      <div class="quote-source">한울사상 핵심 가르침</div>
+      <p class="quote-text" data-en>
+        Do not let the world ride you —<br>you must ride the world
+      </p>
+      <div class="quote-source" data-ko>한울사상 핵심 가르침</div>
+      <div class="quote-source" data-en>Core Teaching of Hanul Philosophy</div>
     </div>
   </section>
 
@@ -692,8 +719,10 @@
       <div class="teach-grid">
         <div class="teach-sticky">
           <div class="sec-label">가르침 · Teachings</div>
-          <h2 class="sec-title">삶이 곧<br>수련입니다</h2>
-          <p class="sec-desc" style="margin-top:16px;">한울사상의 가르침은 수련원 안에 머물지 않고 일상으로 흘러갑니다.</p>
+          <h2 class="sec-title" data-ko>삶이 곧<br>수련입니다</h2>
+          <h2 class="sec-title" data-en>Life itself<br>is practice</h2>
+          <p class="sec-desc" style="margin-top:16px;" data-ko>한울사상의 가르침은 수련원 안에 머물지 않고 일상으로 흘러갑니다.</p>
+          <p class="sec-desc" style="margin-top:16px;" data-en>The teachings of Hanul Philosophy flow beyond the meditation hall into everyday life.</p>
         </div>
         <ul class="teach-list">
           <% const teaches = [
@@ -815,6 +844,17 @@
     window.addEventListener('scroll', () => {
       nav.classList.toggle('solid', window.scrollY > 60);
     }, { passive: true });
+
+    // Language Toggle
+    function toggleLang(){
+      const isEn = document.body.classList.toggle('lang-en');
+      const btn = document.getElementById('lang-toggle');
+      btn.textContent = isEn ? 'KO' : 'EN';
+      btn.classList.toggle('active', isEn);
+      document.documentElement.lang = isEn ? 'en' : 'ko';
+      try { localStorage.setItem('hanul-lang', isEn ? 'en' : 'ko'); } catch(e) {}
+    }
+    try { if(localStorage.getItem('hanul-lang') === 'en') toggleLang(); } catch(e) {}
   </script>
 </body>
 </html>
