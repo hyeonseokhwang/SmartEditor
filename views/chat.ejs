@@ -74,15 +74,29 @@
     .src-bar{font-size:10px;color:#B0A890;margin-top:6px;letter-spacing:.04em}
     .src-tag{display:inline-block;padding:2px 8px;background:#F0E8D4;border-radius:10px;margin:2px;font-size:10px;color:#7A6048}
 
+    /* MARKDOWN rendered in bubble */
+    .bubble h3,.bubble h4{font-family:'Noto Serif KR',serif;margin:.8em 0 .3em;font-size:1em}
+    .bubble strong{color:#7A5230;font-weight:700}
+    .bubble ul,.bubble ol{padding-left:1.4em;margin:.5em 0}
+    .bubble li{margin:.25em 0}
+    .bubble blockquote{border-left:2px solid #D4A840;padding-left:.8em;color:#5A4030;margin:.5em 0;font-style:italic}
+    .bubble hr{border:none;border-top:1px solid #DDD8C8;margin:.8em 0}
+
+    /* QUICK QUESTIONS (2줄) */
+    .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .quick-btn{padding:8px 12px;background:#F4EFE4;color:#5A3E18;border:1px solid #DDD0B0;border-radius:8px;font-size:12px;cursor:pointer;text-align:left;transition:background .15s;font-family:'Noto Sans KR',sans-serif;line-height:1.4}
+    .quick-btn:hover{background:#EDE0C8}
+
     /* MOBILE */
     @media(max-width:640px){
       .chat-wrap{padding:12px 0 0;max-width:100%}
       .chat-header{border-radius:0;border-left:0;border-right:0}
-      .messages{max-height:calc(100vh - 290px)}
-      .bubble{max-width:90%;font-size:13px}
+      .messages{max-height:calc(100vh - 300px)}
+      .bubble{max-width:92%;font-size:13px}
       .sugg-area{padding:8px 12px}
-      .input-area input{padding:12px 12px;font-size:13px}
-      .input-area button{padding:12px 16px;font-size:12px}
+      .quick-grid{grid-template-columns:1fr}
+      .input-area input{padding:12px 12px;font-size:14px}
+      .input-area button{padding:12px 18px;font-size:13px}
       .site-nav a:not(.logo){display:none}
       .site-nav .logo{margin-right:0;border-right:none}
     }
@@ -104,7 +118,7 @@
     <div class="op-avatar">한</div>
     <div class="op-info">
       <div class="op-name">한울사상 AI 상담관</div>
-      <div class="op-sub">여의선원 · 10,000건+ 아카이브 기반 답변</div>
+      <div class="op-sub">여의선원 경전 996건 · 카페 게시글 9,400건+ 기반 · GPT-4o 구동</div>
     </div>
     <div class="op-status">
       <div class="status-dot"></div>
@@ -117,8 +131,9 @@
       <div class="avatar">한</div>
       <div>
         <div class="bubble">안녕하세요. 여의선원 한울사상 AI 상담관입니다.<br><br>
-        생명장·수도·제도·성멸오통·집중수도 등 한울사상 전반에 대해 여의선원 경전 및 게시글 10,000건+ 기반으로 답변드립니다.<br><br>
-        아래 자주 묻는 질문을 선택하시거나, 직접 입력해 주세요.</div>
+        <strong>생명장 · 수도 · 제도(濟度) · 성멸오통 · 각성 · 집중수도</strong> 등<br>
+        한울사상 전반에 대해 여의선원 경전 및 큰스승님 법문 게시글 기반으로 답변드립니다.<br><br>
+        아래 질문을 선택하시거나 직접 입력해 주세요.</div>
         <div class="msg-time">방금</div>
       </div>
     </div>
@@ -126,20 +141,18 @@
 
   <div class="notice-bar">
     <span>☯</span>
-    <span>담당관이 직접 읽고 답변드립니다 · 잠시 기다려 주시면 성심껏 안내해 드리겠습니다</span>
+    <span>한울사상 경전 원문 및 큰스승님 말씀을 기반으로 답변드립니다</span>
   </div>
 
   <div class="sugg-area">
-    <div class="sugg-label">자주 묻는 질문</div>
-    <div class="suggestions">
-      <span class="sugg" onclick="ask(this.textContent)">한울사상의 핵심은 무엇인가요?</span>
-      <span class="sugg" onclick="ask(this.textContent)">생명장이란 무엇인가요?</span>
-      <span class="sugg" onclick="ask(this.textContent)">우주영제도란 무엇인가요?</span>
-      <span class="sugg" onclick="ask(this.textContent)">성멸오통에 대해 알고 싶습니다</span>
-      <span class="sugg" onclick="ask(this.textContent)">수도자 1인은 세상자 만인이요의 의미</span>
-      <span class="sugg" onclick="ask(this.textContent)">집중수도 프로그램을 알고 싶습니다</span>
-      <span class="sugg" onclick="ask(this.textContent)">처음 수련을 시작하려면 어떻게 하나요?</span>
-      <span class="sugg" onclick="ask(this.textContent)">여의명상센터 위치와 수련 일정</span>
+    <div class="sugg-label">빠른 질문</div>
+    <div class="quick-grid">
+      <button class="quick-btn" onclick="ask(this.textContent)">생명장이란 무엇인가요?</button>
+      <button class="quick-btn" onclick="ask(this.textContent)">성멸오통이란 무엇인가요?</button>
+      <button class="quick-btn" onclick="ask(this.textContent)">우주영제도는 무엇인가요?</button>
+      <button class="quick-btn" onclick="ask(this.textContent)">집중수도는 어떻게 하나요?</button>
+      <button class="quick-btn" onclick="ask(this.textContent)">수도자 1인은 세상자 만인의 의미는?</button>
+      <button class="quick-btn" onclick="ask(this.textContent)">한울사상의 핵심은 무엇인가요?</button>
     </div>
   </div>
 
@@ -207,8 +220,8 @@ async function sendMsg() {
       <div class="msg bot">
         <div class="avatar">한</div>
         <div>
-          <div class="bubble">${escHtml(r.answer)}</div>
-          ${r.sources && r.sources.length ? `<div class="src-bar">${r.sources.slice(0,3).map(s=>`<span class="src-tag">${s.book}</span>`).join('')}</div>` : ''}
+          <div class="bubble">${renderMd(r.answer)}</div>
+          ${r.sources && r.sources.length ? `<div class="src-bar">${r.sources.slice(0,3).map(s=>`<span class="src-tag">${escHtml(s.book)}</span>`).join('')}</div>` : ''}
           <div class="msg-time">${nowTime()} · 한울사상 AI</div>
         </div>
       </div>`;
@@ -230,7 +243,28 @@ async function sendMsg() {
   document.getElementById('q').focus();
 }
 
-function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderMd(s) {
+  return escHtml(s)
+    // headers
+    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    // bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // blockquote
+    .replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
+    // hr
+    .replace(/^---$/gm, '<hr>')
+    // unordered list
+    .replace(/^[*\-] (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    // ordered list
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // newlines
+    .replace(/\n{2,}/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
 </script>
 </body>
 </html>
