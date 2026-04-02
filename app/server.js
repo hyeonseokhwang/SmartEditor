@@ -214,52 +214,64 @@ app.get('/api/stats', async (req, res) => {
 //  AI CHATBOT API  (OpenAI embedding + pgvector)
 // ════════════════════════════════════════════════════════════════
 
+// ── 직원 응대 챗봇: 질문 저장 → hanul-aide instruct → 폴링 대기 ──
 app.post('/api/chat', async (req, res) => {
   try {
     const { question } = req.body;
     if (!question) return res.status(400).json({ error: 'question required' });
 
-    // 1) Embed question
-    const openai = getOpenAI();
-    const embRes = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: question,
-    });
-    const qVec = embRes.data[0].embedding;
-    const vecStr = '[' + qVec.join(',') + ']';
-
-    // 2) Vector similarity search (top 5)
-    const chunks = await pool.query(
-      `SELECT chunk_text, book_name,
-              1 - (embedding <=> $1::vector) AS similarity
-       FROM yeouiseonwon.book_chunks
-       ORDER BY embedding <=> $1::vector
-       LIMIT 5`,
-      [vecStr]
+    // 1) DB에 질문 저장
+    const qRow = await pool.query(
+      'INSERT INTO yeouiseonwon.chat_questions (question) VALUES ($1) RETURNING id',
+      [question]
     );
+    const questionId = qRow.rows[0].id;
 
-    const context = chunks.rows.map((r, i) =>
-      `[${i+1}] (${r.book_name})\n${r.chunk_text}`
-    ).join('\n\n');
-
-    // 3) GPT answer
-    const chat = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: '당신은 한울사상 여의명상센터의 안내자입니다. 아래 경전 구절을 바탕으로 질문에 성실히 답변해주세요. 출처를 밝혀주세요.' },
-        { role: 'user', content: `관련 구절:\n${context}\n\n질문: ${question}` },
-      ],
-      max_tokens: 800,
+    // 2) hanul-aide에게 instruct 전달
+    const instrBody = JSON.stringify({
+      worker: 'hanul-aide',
+      from: 'hanul-chat',
+      instruction: `[한울챗봇 질문 #${questionId}] 사용자 질문: "${question}"\n\n답변 후 아래 Node.js 코드로 저장하세요 (curl 금지 — 한글 인코딩 깨짐):\n\nnode -e "const h=require('http');const b=JSON.stringify({questionId:${questionId},answer:'여기에 답변 입력',agentId:'hanul-aide'});h.request({hostname:'localhost',port:8080,path:'/api/chat/answers',method:'POST',headers:{'Content-Type':'application/json; charset=utf-8','Content-Length':Buffer.byteLength(b)}},()=>{}).end(b)"`,
     });
+    fetch('http://localhost:9000/api/instruct', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: instrBody,
+    }).catch(() => {});
 
-    res.json({
-      answer: chat.choices[0].message.content,
-      sources: chunks.rows.map(r => ({ book: r.book_name, similarity: r.similarity })),
-    });
+    res.json({ questionId, status: 'pending', message: '담당관에게 전달되었습니다. 잠시 기다려 주세요.' });
   } catch (e) {
     console.error('[chat]', e.message);
     res.status(500).json({ error: e.message });
   }
+});
+
+// ── 담당관 답변 저장 (hanul-aide가 호출) ──
+app.post('/api/chat/answers', async (req, res) => {
+  try {
+    const { questionId, answer, agentId } = req.body;
+    if (!questionId || !answer) return res.status(400).json({ error: 'questionId and answer required' });
+    await pool.query(
+      'INSERT INTO yeouiseonwon.chat_answers (question_id, answer, agent_id) VALUES ($1, $2, $3)',
+      [questionId, answer, agentId || 'hanul-aide']
+    );
+    await pool.query('UPDATE yeouiseonwon.chat_questions SET answered=TRUE WHERE id=$1', [questionId]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── 답변 폴링 ──
+app.get('/api/chat/answers', async (req, res) => {
+  try {
+    const { questionId } = req.query;
+    if (!questionId) return res.status(400).json({ error: 'questionId required' });
+    const r = await pool.query(
+      'SELECT * FROM yeouiseonwon.chat_answers WHERE question_id=$1 ORDER BY answered_at DESC LIMIT 1',
+      [questionId]
+    );
+    if (!r.rows.length) return res.json({ pending: true });
+    res.json({ pending: false, answer: r.rows[0].answer, agentId: r.rows[0].agent_id, answeredAt: r.rows[0].answered_at });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ════════════════════════════════════════════════════════════════
