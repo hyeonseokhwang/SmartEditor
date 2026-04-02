@@ -244,6 +244,30 @@
     .divider{width:32px;height:1.5px;background:<%= t.ac %>;margin-bottom:28px}
     .blockq{padding-left:20px;border-left:2px solid rgba(<%= t.acR %>,.45);font-family:'Noto Serif KR',serif;font-size:.92rem;font-weight:300;color:<%= t.t2 %>;line-height:2.1;font-style:italic}
 
+    /* ── STATS STRIP ── */
+    .stats-strip{display:grid;grid-template-columns:repeat(4,1fr);background:<%= t.bg3 %>}
+    .ss{padding:44px 20px;text-align:center;border-right:1px solid <%= t.bd %>}
+    .ss:last-child{border-right:none}
+    .ss-num{font-family:'Noto Serif KR',serif;font-size:clamp(2.2rem,4vw,3.2rem);font-weight:200;color:<%= t.ac %>;line-height:1;margin-bottom:10px}
+    .ss-unit{font-size:1.1rem;font-family:'Noto Sans KR',sans-serif}
+    .ss-label{font-size:11px;letter-spacing:.18em;color:<%= t.gr %>}
+
+    /* ── TEACHER PROFILE ── */
+    .teacher-wrap{background:<%= t.bg %>;padding:80px 80px;display:grid;grid-template-columns:1fr 2fr;gap:60px;align-items:center}
+    .teacher-portrait{
+      position:relative;display:flex;align-items:center;justify-content:center;
+      aspect-ratio:1/1;max-width:280px;overflow:hidden;
+      background:linear-gradient(145deg,<%= t.bg3 %> 0%,<%= t.bg2 %> 100%);
+    }
+    .teacher-portrait::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-42deg,transparent,transparent 64px,rgba(<%= t.acR %>,.025) 64px,rgba(<%= t.acR %>,.025) 65px)}
+    .teacher-portrait::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,transparent,<%= t.ac %> 40%,<%= t.ac %> 60%,transparent)}
+    .teacher-glyph{font-family:'Noto Serif KR',serif;font-size:clamp(8rem,14vw,14rem);font-weight:200;color:rgba(<%= t.acR %>,.12);line-height:1;user-select:none}
+    .teacher-txt .sec-label{margin-bottom:12px}
+    .teacher-name{font-family:'Noto Serif KR',serif;font-size:clamp(1.6rem,2.8vw,2.4rem);font-weight:300;color:<%= t.tx %>;line-height:1.3;margin-bottom:6px}
+    .teacher-title{font-size:12px;letter-spacing:.14em;color:<%= t.ac %>;margin-bottom:20px}
+    .teacher-divider{width:32px;height:1.5px;background:<%= t.ac %>;margin-bottom:24px}
+    .teacher-body{font-size:13.5px;color:<%= t.t2 %>;line-height:2;max-width:520px}
+
     /* ── TEACHING PANELS — 3 full sections ── */
     .panels{display:flex;flex-direction:column}
     .panel{
@@ -416,6 +440,12 @@
     .nav-mobile a:hover{color:<%= t.ac %>}
 
     @media(max-width:768px){
+      .stats-strip{grid-template-columns:repeat(2,1fr)}
+      .ss{padding:28px 16px;border-bottom:1px solid <%= t.bd %>}
+      .ss:nth-child(1),.ss:nth-child(2){border-right:1px solid <%= t.bd %>}
+      .ss:nth-child(3){border-right:none}
+      .teacher-wrap{grid-template-columns:1fr;gap:32px;padding:48px 28px}
+      .teacher-portrait{max-width:180px;margin:0 auto}
       .nl,.ncta{display:none!important}
       .nav-mobile{display:flex}
       .lang-btn{font-size:10px;padding:4px 10px;margin-left:4px}
@@ -447,6 +477,8 @@
       footer{padding:44px 24px}
     }
     @media(max-width:480px){
+      .stats-strip{grid-template-columns:repeat(2,1fr)}
+      .teacher-wrap{padding:40px 20px}
       nav{padding:0 16px}
       .logo{font-size:13px}
       .nav-mobile{gap:8px}
@@ -474,25 +506,47 @@
 
     /* ── ENGLISH MODE TYPOGRAPHY ── */
     body.lang-en{font-family:'Inter','Noto Sans KR',sans-serif;letter-spacing:.01em}
-    body.lang-en .hero-h1{font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:.03em;line-height:1.15}
-    body.lang-en .hero-h1 em{font-style:italic;font-weight:400}
-    body.lang-en .hero-eyebrow{font-family:'Inter',sans-serif;letter-spacing:.18em;font-weight:400}
-    body.lang-en .sec-title{font-family:'Cormorant Garamond',serif;font-weight:400;letter-spacing:.02em}
-    body.lang-en .sec-label{font-family:'Inter',sans-serif;letter-spacing:.2em;font-weight:500}
-    body.lang-en .p-title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(26px,3vw,34px)}
-    body.lang-en .p-subtitle{font-family:'Inter',sans-serif;font-weight:400;letter-spacing:.06em}
-    body.lang-en .p-body{font-family:'Inter',sans-serif;font-weight:300;line-height:2.1;letter-spacing:.01em}
-    body.lang-en .blockq{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(18px,2.2vw,24px);line-height:1.7}
-    body.lang-en .about-p{font-family:'Inter',sans-serif;line-height:2;letter-spacing:.01em}
-    body.lang-en .fq-txt{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;letter-spacing:.02em}
-    body.lang-en .prog-title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:18px}
-    body.lang-en .prog-desc{font-family:'Inter',sans-serif;font-weight:300}
-    body.lang-en .cta-h{font-family:'Cormorant Garamond',serif;font-weight:400;letter-spacing:.03em}
-    body.lang-en .cta-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300}
-    body.lang-en .ft-brand{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.04em}
-    body.lang-en .logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.08em}
-    body.lang-en .ps-ko{font-family:'Cormorant Garamond',serif;font-weight:500}
-    body.lang-en .sl-item h4{font-family:'Cormorant Garamond',serif;font-weight:500}
+    /* Hero */
+    body.lang-en .hero-h1{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(3.8rem,7.4vw,7.2rem);letter-spacing:.015em;line-height:1.1}
+    body.lang-en .hero-h1 em{font-style:italic;font-weight:400;letter-spacing:.025em}
+    body.lang-en .hero-eyebrow{font-family:'Inter',sans-serif;letter-spacing:.24em;font-weight:500;font-size:10.5px}
+    /* Sections */
+    body.lang-en .sec-title{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(2.2rem,3.5vw,3.4rem);letter-spacing:.015em;line-height:1.32}
+    body.lang-en .sec-label{font-family:'Inter',sans-serif;letter-spacing:.24em;font-weight:500;font-size:10px}
+    /* Teaching panels */
+    body.lang-en .p-title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(2.4rem,3.8vw,3.8rem);letter-spacing:.015em;line-height:1.15}
+    body.lang-en .p-subtitle{font-family:'Inter',sans-serif;font-weight:400;letter-spacing:.1em;font-size:.77rem}
+    body.lang-en .p-order{font-family:'Inter',sans-serif;letter-spacing:.3em;font-weight:500;font-size:9px}
+    body.lang-en .p-body{font-family:'Inter',sans-serif;font-weight:300;font-size:14px;line-height:2.2;letter-spacing:.01em}
+    /* About */
+    body.lang-en .about-p{font-family:'Inter',sans-serif;font-size:14.5px;line-height:2.25;letter-spacing:.01em}
+    body.lang-en .blockq{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(1.25rem,2.3vw,1.7rem);line-height:1.75}
+    /* Quote section */
+    body.lang-en .fq-txt{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;letter-spacing:.015em;font-size:clamp(2.4rem,4.2vw,4rem);line-height:1.65}
+    body.lang-en .fq-cite{font-family:'Inter',sans-serif;letter-spacing:.28em;font-size:9.5px}
+    /* Programs */
+    body.lang-en .prog-title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:23px;line-height:1.2}
+    body.lang-en .prog-n{font-family:'Inter',sans-serif;letter-spacing:.3em;font-weight:500;font-size:8.5px}
+    body.lang-en .prog-desc{font-family:'Inter',sans-serif;font-weight:300;font-size:12px;line-height:1.85}
+    /* Schedule */
+    body.lang-en .sl-item h4{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:1.2rem}
+    body.lang-en .sl-m{font-family:'Inter',sans-serif;letter-spacing:.1em;font-size:8px}
+    body.lang-en .sl-tag{font-family:'Inter',sans-serif;letter-spacing:.14em;font-size:8px}
+    /* CTA */
+    body.lang-en .cta-h{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(2.6rem,4.2vw,3.8rem);letter-spacing:.02em;line-height:1.35}
+    body.lang-en .cta-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:16px;line-height:2;color:rgba(255,255,255,.72);max-width:620px;margin-left:auto;margin-right:auto}
+    /* Nav & logo */
+    body.lang-en .logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.12em;font-size:16px}
+    body.lang-en .nl a{font-family:'Inter',sans-serif;letter-spacing:.09em;font-size:11px}
+    body.lang-en .ncta{font-family:'Inter',sans-serif;letter-spacing:.16em;font-size:10px}
+    body.lang-en .nav-mobile a{font-family:'Inter',sans-serif;letter-spacing:.06em}
+    /* Footer */
+    body.lang-en .ft-brand{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.06em;font-size:1.45rem}
+    body.lang-en .ft-desc{font-family:'Inter',sans-serif;font-size:12px;line-height:2;letter-spacing:.01em}
+    body.lang-en .ft-links a{font-family:'Inter',sans-serif;letter-spacing:.05em;font-size:12px}
+    /* Phil strip */
+    body.lang-en .ps-ko{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;letter-spacing:.03em}
+    body.lang-en .ps{font-family:'Inter',sans-serif;font-size:8.5px;letter-spacing:.14em}
   </style>
 </head>
 <body>
@@ -563,7 +617,7 @@
     <h2 class="sec-title r d1" data-en>A Wisdom That Transcends<br>All of Creation</h2>
     <div class="divider r d2"></div>
     <p class="about-p r d2" data-ko>한울사상은 유○론적 각성법(唯○論的 覺醒法)을 기반으로 합니다. '한 올', '한 올'들이 어울려서 '한울'이 된다는 사상으로, 개체인 한올들이 공존의 질서 위에서 서로 조화를 이루어 온전한 한울이 되어야 한다는 대전제를 바탕으로 합니다.</p>
-    <p class="about-p r d2" data-en>Hanul Philosophy is founded upon the UniO Awakening method (唯○論的 覺醒法) — a cosmology that sees the ultimate reality of the universe as ○. Just as individual threads (한올, <em>han-ol</em>) weave together to form the great tapestry of existence (한울, <em>Hanul</em>), each soul carries the seed of cosmic wholeness within.</p>
+    <p class="about-p r d2" data-en>Hanul Philosophy is founded upon the UniO Awakening method (唯○論的 覺醒法) — a profound cosmology that perceives the ultimate reality of existence as ○: boundless, whole, and ever-present. Just as countless individual threads (<em>han-ol</em>, 한올) weave together to form the great tapestry of being (Hanul, 한울), each soul carries within it the seed of cosmic wholeness. To practise is to remember this unity — and to live it.</p>
     <blockquote class="blockq r d2" data-ko>
       "수도자 1인은 세상자 만인이요,<br>
       중생자 억이라"<br>
@@ -576,6 +630,30 @@
     </blockquote>
   </div>
 </section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="ss">
+    <div class="ss-num">32<span class="ss-unit" data-ko>년</span><span class="ss-unit" data-en>yrs</span></div>
+    <div class="ss-label" data-ko>수련원 역사</div>
+    <div class="ss-label" data-en>Years of Heritage</div>
+  </div>
+  <div class="ss">
+    <div class="ss-num">10,313</div>
+    <div class="ss-label" data-ko>법문·말씀 아카이브</div>
+    <div class="ss-label" data-en>Archived Teachings</div>
+  </div>
+  <div class="ss">
+    <div class="ss-num">5</div>
+    <div class="ss-label" data-ko>핵심 가르침</div>
+    <div class="ss-label" data-en>Core Teachings</div>
+  </div>
+  <div class="ss">
+    <div class="ss-num">365</div>
+    <div class="ss-label" data-ko>연중 상시 수련</div>
+    <div class="ss-label" data-en>Days Open</div>
+  </div>
+</div>
 
 <!-- TEACHING PANELS -->
 <section class="panels" id="phil">
@@ -592,7 +670,7 @@
       <p class="p-subtitle r d1" data-en>唯○論的 覺醒 · The Foundational Principle of Awakening</p>
       <div class="divider r d2"></div>
       <p class="p-body r d2" data-ko>한울사상은 유○론적 각성법을 기반으로 합니다. 우주 궁극의 실체를 ○으로 보는 우주관이며, 개체인 한올들이 공존의 질서 위에서 서로 조화를 이루어 온전한 한울이 되어야 한다는 사상입니다. — 큰스승님 말씀</p>
-      <p class="p-body r d2" data-en>Hanul Philosophy is grounded in the UniO awakening method — a cosmology that views the ultimate reality of the universe as ○. Individual souls (한올) must achieve harmony within the order of coexistence to become the complete Hanul. — Grandmaster's Teaching</p>
+      <p class="p-body r d2" data-en>At the heart of Hanul Philosophy lies the UniO Awakening (唯○論的 覺醒法) — a cosmology that perceives the ultimate reality of all existence as ○: formless, boundless, and whole. The individual soul (한올, <em>han-ol</em>) is not separate from this wholeness; it is a living thread within it. Practice is the art of weaving oneself back into the whole. — Grandmaster Kim Jun-won</p>
     </div>
   </div>
 
@@ -608,7 +686,7 @@
       <p class="p-subtitle r d1" data-en>生命場 · The Resonant Field of All Life</p>
       <div class="divider r d2"></div>
       <p class="p-body r d2" data-ko>생명장(生命場)이란 생명체의 몸氣(몸을 운영하는 기운)와, 몸을 조종하는 영기(靈氣)와, 생명활동을 보장하는 지기(地氣)의 조합이 이루어내는 氣의 場입니다. 생명장을 통해 자기표현을 해야 상대와 충돌하지 않고 공명현상을 통해 서로 조화가 이루어집니다. — 여의선원 [여의수행원리]</p>
-      <p class="p-body r d2" data-en>The Life Field (生命場) is the energetic field formed by the body's Ki (몸氣), spiritual energy (靈氣), and earth energy (地氣). Through one's Life Field, authentic self-expression creates resonance and harmony rather than conflict. — Yeoui Seonwon [Principles of Practice]</p>
+      <p class="p-body r d2" data-en>The Life Field (生命場) is the luminous energetic field that arises from the convergence of body vital force (몸氣), spiritual essence (靈氣), and earth energy (地氣). When one expresses authentically through this field, conflict dissolves and deep resonance takes its place — allowing each soul to vibrate in harmony with all of life. — Yeoui Seonwon, <em>Principles of Yeoui Practice</em></p>
     </div>
   </div>
 
@@ -624,7 +702,7 @@
       <p class="p-subtitle r d1" data-en>濟度 · Rising Through the Spirit</p>
       <div class="divider r d2"></div>
       <p class="p-body r d2" data-ko>삶은 궁극적으로 영적진화를 통해 영격을 높이는데 목적이 있습니다. 이제 인격의 완성에서 영격의 완성으로 차원을 높여야 할 때입니다. 우주영제도는 개체의 영을 우주영으로 높이기 위한 제도법입니다. — 여의선원 [수행프로그램]</p>
-      <p class="p-body r d2" data-en>Life's ultimate purpose is to elevate one's spiritual rank (영격) through inner evolution. Moving beyond perfecting the human character, we must now ascend to the completion of the spirit. Cosmic Spirit Elevation (우주영제도) is the method for raising the individual spirit toward cosmic consciousness. — Yeoui Seonwon [Practice Programs]</p>
+      <p class="p-body r d2" data-en>Life's deepest purpose is the elevation of one's spiritual rank (영격) through conscious inner evolution. The age of merely perfecting human character is passing; we are called now to the greater completion — the ascension of the spirit itself. Cosmic Spirit Elevation (우주영제도) is the sacred method for raising the individual spirit toward universal consciousness. — Yeoui Seonwon, <em>Practice Programs</em></p>
     </div>
   </div>
 
@@ -640,7 +718,7 @@
       <p class="p-subtitle r d1" data-en>性滅五通 · Dissolve the Self · Unite With All</p>
       <div class="divider r d2"></div>
       <p class="p-body r d2" data-ko>성멸제도일은 자신이 멸해야 할 성(性), 즉 사람 성·사람 정을 소멸하는 날입니다. 성(性)에 묶이지 않고 초월해야 전체와 통할 수 있습니다. 성멸오통은 그 완성의 경지를 뜻합니다. — 여의선원 큰스승님 말씀</p>
-      <p class="p-body r d2" data-en>The Day of Seongmyeol is dedicated to dissolving human nature (性) — personal desires and emotional attachments. Only by transcending the self can one truly unite with the whole. Seongmyeol-otong is the state of that transcendent completion. — Grandmaster's Teaching, Yeoui Seonwon</p>
+      <p class="p-body r d2" data-en>Seongmyeol (性滅) is the sacred dissolution of human nature — the release of personal desire, attachment, and the illusions of the separate self. When the self is no longer grasping, the five gates of transcendence open: perception, wisdom, compassion, freedom, and unity. Seongmyeol-otong is not an ending — it is the great opening. — Grandmaster Kim Jun-won, Yeoui Seonwon</p>
     </div>
   </div>
 
@@ -676,7 +754,7 @@
     <h2 class="sec-title r d1" data-en>The Path of Intensive Practice<br>with Master Mugyeon</h2>
     <div class="divider r d2"></div>
     <p class="about-p r d2" data-ko>집중수도는 무견 김상국 스승님의 직접 지도 아래 수도자들이 모여 집중적으로 수행하는 과정입니다. 1박2일 집중수도와 정기 수련이 운영되며, 참여자들은 스승님의 법문과 생명장 수련, 성멸제도 수행을 통해 영격을 높여 나갑니다.</p>
-    <p class="about-p r d2" data-en>Intensive Practice (집중수도) is a concentrated retreat program under the direct guidance of Master Mugyeon (Kim Sang-guk). Running as 1-night 2-day retreats and regular sessions, participants deepen their practice through dharma talks, Life Field training, and Seongmyeol elevation.</p>
+    <p class="about-p r d2" data-en>Intensive Practice (집중수도) is a concentrated retreat journey held under the direct and personal guidance of Master Mugyeon, Kim Sang-guk. Conducted as 1-night 2-day immersive retreats and regular sessions, practitioners gather to deepen their path through dharma teachings, Life Field cultivation, and the transformative practices of Seongmyeol elevation — stepping beyond the ordinary mind into the light of the whole.</p>
     <blockquote class="blockq r d2" data-ko>
       "수도자 1인은 세상자 만인이요,<br>중생자 억이라"<br>
       <small style="font-size:.8em;opacity:.7">— 한울 김준원 큰스승님 말씀</small>
@@ -684,6 +762,28 @@
     <blockquote class="blockq r d2" data-en>
       "One practitioner equals ten thousand in the world,<br>and a billion in the realm of liberation."<br>
       <small style="font-size:.8em;opacity:.7">— Grandmaster Kim Jun-won's Teaching</small>
+    </blockquote>
+  </div>
+</section>
+
+<!-- TEACHER PROFILE -->
+<section class="teacher-wrap" id="teacher">
+  <div class="teacher-portrait r">
+    <span class="teacher-glyph" aria-hidden="true">見</span>
+  </div>
+  <div class="teacher-txt">
+    <span class="sec-label r" data-ko>지도 스승</span>
+    <span class="sec-label r" data-en>Our Teacher</span>
+    <h2 class="teacher-name r d1" data-ko>무견(無見) 김상국 스승님</h2>
+    <h2 class="teacher-name r d1" data-en>Master Mugyeon (Kim Sang-guk)</h2>
+    <div class="teacher-title r d1" data-ko>여의선원 원장 · 한울사상 지도자</div>
+    <div class="teacher-title r d1" data-en>Director, Yeoui Seonwon · Hanul Philosophy Teacher</div>
+    <div class="teacher-divider r d2"></div>
+    <p class="teacher-body r d2" data-ko>무견 김상국 스승님은 한울 김준원 큰스승님의 가르침을 이어받아 여의선원을 이끌고 계십니다. 「한울말씀강론」의 저자이시며, 여의수행법 체계를 정립하셨습니다. 매주 수련 지도와 집중수도, 법문 강론을 통해 수행자들이 유○론적 각성의 길을 걸어갈 수 있도록 직접 지도하십니다.</p>
+    <p class="teacher-body r d2" data-en>Master Mugyeon (Kim Sang-guk) continues the lineage of Grandmaster Hanul Kim Jun-won, leading Yeoui Seonwon today. Author of <em>Hanul's Dharma Discourses</em> (한울말씀강론) and the architect of the Yeoui Practice System, he guides practitioners personally through weekly sessions, intensive retreats, and dharma lectures — walking each student along the path of UniO Awakening.</p>
+    <blockquote class="blockq r d3" data-en style="margin-top:24px">
+      "The path of practice is not a retreat from the world —<br>it is the deepest engagement with it."<br>
+      <small style="font-size:.8em;opacity:.7">— Master Mugyeon, Yeoui Seonwon</small>
     </blockquote>
   </div>
 </section>
@@ -788,9 +888,9 @@
 <section class="cta" id="cta">
   <div class="cta-inner">
     <h2 class="cta-h r" data-ko>한울사상과 함께하세요</h2>
-    <h2 class="cta-h r" data-en>Begin Your Journey Toward Wholeness</h2>
+    <h2 class="cta-h r" data-en>Step Into the Path<br><em style="font-style:italic">Toward Wholeness</em></h2>
     <p class="cta-sub r d1" data-ko>수도자 1인은 세상자 만인이요, 중생자 억이라</p>
-    <p class="cta-sub r d1" data-en>"A single practitioner equals ten thousand in the world,<br>and a billion in the realm of spiritual liberation."</p>
+    <p class="cta-sub r d1" data-en>"One who practises with sincerity equals ten thousand in the world, and a billion in the realm of liberation."<br><small style="font-size:.85em;letter-spacing:.08em;opacity:.8">— Grandmaster Kim Jun-won</small></p>
     <div class="cta-btns">
       <a href="#schedule" class="cta-btn solid r d1" data-ko>수련 신청</a>
       <a href="#schedule" class="cta-btn solid r d1" data-en>Apply Now</a>
