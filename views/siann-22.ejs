@@ -6,7 +6,7 @@
   <title>한울사상 여의명상센터 · 테마 <%= themeId %></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500&family=Noto+Sans+KR:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     <%
     /* ── 이미지 완전 제거 — CSS 배경+타이포그래피 전용 시안 ── */
@@ -471,6 +471,28 @@
     [data-en]{display:none}
     body.lang-en [data-ko]{display:none}
     body.lang-en [data-en]{display:revert}
+
+    /* ── ENGLISH MODE TYPOGRAPHY ── */
+    body.lang-en{font-family:'Inter','Noto Sans KR',sans-serif;letter-spacing:.01em}
+    body.lang-en .hero-h1{font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:.03em;line-height:1.15}
+    body.lang-en .hero-h1 em{font-style:italic;font-weight:400}
+    body.lang-en .hero-eyebrow{font-family:'Inter',sans-serif;letter-spacing:.18em;font-weight:400}
+    body.lang-en .sec-title{font-family:'Cormorant Garamond',serif;font-weight:400;letter-spacing:.02em}
+    body.lang-en .sec-label{font-family:'Inter',sans-serif;letter-spacing:.2em;font-weight:500}
+    body.lang-en .p-title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(26px,3vw,34px)}
+    body.lang-en .p-subtitle{font-family:'Inter',sans-serif;font-weight:400;letter-spacing:.06em}
+    body.lang-en .p-body{font-family:'Inter',sans-serif;font-weight:300;line-height:2.1;letter-spacing:.01em}
+    body.lang-en .blockq{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(18px,2.2vw,24px);line-height:1.7}
+    body.lang-en .about-p{font-family:'Inter',sans-serif;line-height:2;letter-spacing:.01em}
+    body.lang-en .fq-txt{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;letter-spacing:.02em}
+    body.lang-en .prog-title{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:18px}
+    body.lang-en .prog-desc{font-family:'Inter',sans-serif;font-weight:300}
+    body.lang-en .cta-h{font-family:'Cormorant Garamond',serif;font-weight:400;letter-spacing:.03em}
+    body.lang-en .cta-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300}
+    body.lang-en .ft-brand{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.04em}
+    body.lang-en .logo{font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.08em}
+    body.lang-en .ps-ko{font-family:'Cormorant Garamond',serif;font-weight:500}
+    body.lang-en .sl-item h4{font-family:'Cormorant Garamond',serif;font-weight:500}
   </style>
 </head>
 <body>
@@ -509,8 +531,8 @@
       <em>한울이 된다</em>
     </h1>
     <h1 class="hero-h1 r d1" data-en>
-      When each soul unites,<br>
-      <em>Hanul is born</em>
+      Where Every Thread of Being<br>
+      <em>Weaves Into One</em>
     </h1>
     <a href="#about" class="hero-btn r d2" data-ko>한울사상 알아보기</a>
     <a href="#about" class="hero-btn r d2" data-en>Explore Hanul Philosophy</a>
@@ -538,10 +560,10 @@
     <span class="sec-label r" data-ko>한울사상</span>
     <span class="sec-label r" data-en>Hanul Philosophy</span>
     <h2 class="sec-title r d1" data-ko>세상 모든 것을<br>타고 가는 사상</h2>
-    <h2 class="sec-title r d1" data-en>A Philosophy That Rides<br>Through All of Creation</h2>
+    <h2 class="sec-title r d1" data-en>A Wisdom That Transcends<br>All of Creation</h2>
     <div class="divider r d2"></div>
     <p class="about-p r d2" data-ko>한울사상은 유○론적 각성법(唯○論的 覺醒法)을 기반으로 합니다. '한 올', '한 올'들이 어울려서 '한울'이 된다는 사상으로, 개체인 한올들이 공존의 질서 위에서 서로 조화를 이루어 온전한 한울이 되어야 한다는 대전제를 바탕으로 합니다.</p>
-    <p class="about-p r d2" data-en>Hanul Philosophy is rooted in the UniO awakening method (唯○論的 覺醒法). "Hanul" is formed when countless individual souls (한올) unite in harmony. Each individual carries the seed of the cosmos within, and through practice, returns to wholeness.</p>
+    <p class="about-p r d2" data-en>Hanul Philosophy is founded upon the UniO Awakening method (唯○論的 覺醒法) — a cosmology that sees the ultimate reality of the universe as ○. Just as individual threads (한올, <em>han-ol</em>) weave together to form the great tapestry of existence (한울, <em>Hanul</em>), each soul carries the seed of cosmic wholeness within.</p>
     <blockquote class="blockq r d2" data-ko>
       "수도자 1인은 세상자 만인이요,<br>
       중생자 억이라"<br>
@@ -766,9 +788,9 @@
 <section class="cta" id="cta">
   <div class="cta-inner">
     <h2 class="cta-h r" data-ko>한울사상과 함께하세요</h2>
-    <h2 class="cta-h r" data-en>Join the Hanul Community</h2>
+    <h2 class="cta-h r" data-en>Begin Your Journey Toward Wholeness</h2>
     <p class="cta-sub r d1" data-ko>수도자 1인은 세상자 만인이요, 중생자 억이라</p>
-    <p class="cta-sub r d1" data-en>"One practitioner equals ten thousand — and a billion in liberation."</p>
+    <p class="cta-sub r d1" data-en>"A single practitioner equals ten thousand in the world,<br>and a billion in the realm of spiritual liberation."</p>
     <div class="cta-btns">
       <a href="#schedule" class="cta-btn solid r d1" data-ko>수련 신청</a>
       <a href="#schedule" class="cta-btn solid r d1" data-en>Apply Now</a>
