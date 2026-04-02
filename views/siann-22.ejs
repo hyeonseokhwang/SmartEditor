@@ -553,6 +553,36 @@
     /* Phil strip */
     body.lang-en .ps-ko{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;letter-spacing:.03em}
     body.lang-en .ps{font-family:'Inter',sans-serif;font-size:8.5px;letter-spacing:.14em}
+
+    /* ── EDITOR MODAL (SmartEditor2 통합) ── */
+    .ed-overlay{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.88);overflow-y:auto;padding:0 16px 40px}
+    .ed-overlay.open{display:block}
+    .ed-modal{max-width:960px;margin:48px auto 0;background:<%= t.bg %>;border:1px solid <%= t.bd %>;border-radius:8px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+    .ed-mhead{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid <%= t.bd %>;background:<%= t.bg2 %>}
+    .ed-mtitle{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;color:<%= t.tx %>;letter-spacing:.04em}
+    .ed-close{background:none;border:none;cursor:pointer;color:<%= t.gr %>;font-size:26px;line-height:1;padding:0 2px;transition:color .2s}
+    .ed-close:hover{color:<%= t.ac %>}
+    .ed-body{padding:22px 24px}
+    .ed-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+    .ed-toolbar input[type=text]{padding:7px 11px;border:1px solid <%= t.bd %>;border-radius:5px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:<%= t.bg2 %>;color:<%= t.tx %>;flex:1;min-width:160px;outline:none;transition:border-color .2s}
+    .ed-toolbar input[type=text]:focus{border-color:<%= t.ac %>}
+    .ed-toolbar input[type=text]::placeholder{color:<%= t.gr %>}
+    .ed-toolbar select{padding:7px 10px;border:1px solid <%= t.bd %>;border-radius:5px;font-size:12px;background:<%= t.bg2 %>;color:<%= t.tx %>;font-family:'Noto Sans KR',sans-serif;outline:none;cursor:pointer}
+    .ed-btn{padding:7px 16px;border:none;border-radius:5px;cursor:pointer;font-size:12px;font-family:'Noto Sans KR',sans-serif;letter-spacing:.04em;transition:.15s}
+    .ed-btn-p{background:<%= t.ac %>;color:#fff}
+    .ed-btn-p:hover{opacity:.82}
+    .ed-btn-s{background:<%= t.bg3 %>;color:<%= t.tx %>;border:1px solid <%= t.bd %>}
+    .ed-btn-s:hover{background:<%= t.bg2 %>}
+    .ed-status{font-size:11px;color:<%= t.gr %>;letter-spacing:.04em;margin-left:4px}
+    .ed-status.ok{color:#4A8A3A}
+    .ed-status.err{color:#C05050}
+    .ed-frame{background:#fff;border:1px solid <%= t.bd %>;border-radius:6px;overflow:hidden;margin-bottom:20px}
+    #se-iframe2{width:100%;height:480px;border:none;display:block}
+    .ed-posts-hd{font-family:'Noto Serif KR',serif;font-size:13px;font-weight:400;color:<%= t.t2 %>;margin-bottom:10px;letter-spacing:.03em}
+    .ed-post-item{background:<%= t.bg2 %>;border:1px solid <%= t.bd %>;border-radius:5px;padding:10px 14px;margin-bottom:7px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+    .ed-post-item:hover{background:<%= t.bg3 %>}
+    .ed-post-title{font-size:13px;color:<%= t.tx %>}
+    .ed-post-meta{font-size:11px;color:<%= t.gr %>;white-space:nowrap;margin-left:10px;flex-shrink:0}
   </style>
 </head>
 <body>
@@ -958,6 +988,84 @@
     try{localStorage.setItem('hanul-lang',isEn?'en':'ko');}catch(e){}
   }
   try{if(localStorage.getItem('hanul-lang')==='en')toggleLang();}catch(e){}
+</script>
+
+<!-- EDITOR MODAL (SmartEditor2 통합) -->
+<div class="ed-overlay" id="ed-overlay">
+  <div class="ed-modal">
+    <div class="ed-mhead">
+      <span class="ed-mtitle">법문·말씀 게시판</span>
+      <button class="ed-close" onclick="closeEditorModal()" aria-label="닫기">×</button>
+    </div>
+    <div class="ed-body">
+      <div class="ed-toolbar">
+        <select id="ed-board" onchange="edFilterBoard()" style="max-width:160px">
+          <option value="">전체 게시판</option>
+        </select>
+        <input type="text" id="ed-search" placeholder="제목 검색…" onkeydown="if(event.key==='Enter')edDoSearch()">
+        <button class="ed-btn ed-btn-s" onclick="edDoSearch()">검색</button>
+      </div>
+      <div class="ed-toolbar">
+        <input type="text" id="ed-post-id" placeholder="게시글 ID 입력 후 불러오기…">
+        <button class="ed-btn ed-btn-s" onclick="edLoadPost()">불러오기</button>
+        <button class="ed-btn ed-btn-p" onclick="edSavePost()">저장</button>
+        <span class="ed-status" id="ed-status"></span>
+      </div>
+      <div class="ed-frame">
+        <iframe id="se-iframe2" src="/public/se-wrapper.html" title="SmartEditor2 법문 에디터"></iframe>
+      </div>
+      <div>
+        <div class="ed-posts-hd">최근 게시글 (클릭하여 편집)</div>
+        <div id="ed-post-list">불러오는 중…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/public/js/se-init.js"></script>
+<script>
+(function(){
+  let edState={board:'',search:'',page:1};
+  let edCurrentId=null;
+
+  function openEditorModal(){document.getElementById('ed-overlay').classList.add('open');document.body.style.overflow='hidden';edLoadBoards();edLoadRecent();}
+  function closeEditorModal(){document.getElementById('ed-overlay').classList.remove('open');document.body.style.overflow='';}
+  window.openEditorModal=openEditorModal;
+  window.closeEditorModal=closeEditorModal;
+
+  document.querySelectorAll('a[href="/editor"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();openEditorModal();});});
+  document.getElementById('ed-overlay').addEventListener('click',function(e){if(e.target===this)closeEditorModal();});
+
+  function edGetEditor(){try{const cw=document.getElementById('se-iframe2').contentWindow;return cw&&cw.oEditors&&cw.oEditors.getById&&cw.oEditors.getById['ir1'];}catch{return null;}}
+  function edGetHTML(){const ed=edGetEditor();if(!ed)return'';try{ed.exec('UPDATE_CONTENTS_FIELD',[]);}catch{}try{return document.getElementById('se-iframe2').contentWindow.document.getElementById('ir1').value||'';}catch{return'';}}
+  function edSetHTML(html){const ed=edGetEditor();if(!ed){setTimeout(()=>edSetHTML(html),300);return;}try{ed.exec('SET_IR_VALUE',[html||'']);}catch{try{const ta=document.getElementById('se-iframe2').contentWindow.document.getElementById('ir1');if(ta)ta.value=html||'';}catch{}}}
+
+  async function edLoadPost(){
+    const pid=document.getElementById('ed-post-id').value.trim();if(!pid)return;edSetStatus('불러오는 중…');
+    try{const d=await fetch('/api/posts/'+encodeURIComponent(pid)).then(r=>r.json());if(d.error){edSetStatus('오류: '+d.error,true);return;}edCurrentId=d.post_id;edSetHTML(d.content_html||'<p>'+(d.content||'').replace(/\n/g,'<br>')+'</p>');edSetStatus('"'+d.title+'" 불러옴',false,true);}
+    catch(e){edSetStatus('오류: '+e.message,true);}
+  }
+  async function edSavePost(){
+    if(!edCurrentId){edSetStatus('먼저 게시글을 불러오세요',true);return;}edSetStatus('저장 중…');
+    try{const html=edGetHTML();const r=await fetch('/api/posts/'+encodeURIComponent(edCurrentId),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content_html:html})}).then(r=>r.json());edSetStatus(r.ok?'저장 완료':'오류: '+r.error,!r.ok,r.ok);}
+    catch(e){edSetStatus('오류: '+e.message,true);}
+  }
+  function edSetStatus(msg,isErr=false,isOk=false){const el=document.getElementById('ed-status');el.textContent=msg;el.className='ed-status'+(isErr?' err':isOk?' ok':'');}
+  async function edLoadBoards(){const boards=await fetch('/api/boards').then(r=>r.json());const sel=document.getElementById('ed-board');sel.innerHTML='<option value="">전체 게시판</option>'+boards.map(b=>`<option value="${edEsc(b.board)}">${edEsc(b.board)} (${b.count})</option>`).join('');}
+  function edFilterBoard(){edState.board=document.getElementById('ed-board').value;edState.page=1;edLoadRecent();}
+  function edDoSearch(){edState.search=document.getElementById('ed-search').value;edState.page=1;edLoadRecent();}
+  async function edLoadRecent(){
+    const p=new URLSearchParams({limit:15,page:edState.page});if(edState.board)p.set('board',edState.board);if(edState.search)p.set('search',edState.search);
+    const data=await fetch('/api/posts?'+p).then(r=>r.json());const el=document.getElementById('ed-post-list');
+    if(!data.posts?.length){el.innerHTML='<p style="font-size:12px;opacity:.5;padding:8px">게시글 없음</p>';return;}
+    el.innerHTML=data.posts.map(p=>`<div class="ed-post-item" onclick="document.getElementById('ed-post-id').value='${edEscJs(p.post_id)}';edLoadPost()"><span class="ed-post-title">${edEsc(p.title||'(제목없음)')}</span><span class="ed-post-meta">${edEsc(p.board||'')} · ${p.created_at?new Date(p.created_at).toLocaleDateString('ko'):''}</span></div>`).join('');
+    const tot=data.totalPages||1,cur=data.page||1;
+    if(tot>1){const pages=[];for(let i=Math.max(1,cur-2);i<=Math.min(tot,cur+2);i++)pages.push(`<button onclick="edState.page=${i};edLoadRecent()" style="padding:3px 8px;border:1px solid;border-radius:3px;cursor:pointer;font-size:11px;font-family:inherit">${i}</button>`);el.innerHTML+=`<div style="display:flex;gap:4px;margin-top:8px;justify-content:center">${pages.join('')}</div>`;}
+  }
+  function edEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function edEscJs(s){return String(s||'').replace(/'/g,"\\'").replace(/\n/g,'');}
+  window.edFilterBoard=edFilterBoard;window.edDoSearch=edDoSearch;window.edLoadPost=edLoadPost;window.edSavePost=edSavePost;
+})();
 </script>
 </body>
 </html>
