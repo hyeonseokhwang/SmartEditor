@@ -4,16 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-  "dev": "node --watch app/server.js"
+    "dev": "node --watch app/server.js"
   },
   "dependencies": {
-  "ejs": "^3.1.10",
     "cloudinary": "^1.41.3",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.19.2",
-  "multer-storage-cloudinary": "^4.0.0",
-  "multer": "^2.0.0",
+    "multer": "^2.0.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "node-fetch": "^3.3.2",
+    "openai": "^6.33.0",
+    "pg": "^8.20.0",
     "uuid": "^9.0.1"
   }
 }

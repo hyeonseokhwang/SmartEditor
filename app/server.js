@@ -214,32 +214,48 @@ app.get('/api/stats', async (req, res) => {
 //  AI CHATBOT API  (OpenAI embedding + pgvector)
 // ════════════════════════════════════════════════════════════════
 
-// ── 직원 응대 챗봇: 질문 저장 → hanul-aide instruct → 폴링 대기 ──
+// ── AI 챗봇: OpenAI 임베딩 + pgvector RAG (즉시 응답) ──────────
 app.post('/api/chat', async (req, res) => {
   try {
     const { question } = req.body;
     if (!question) return res.status(400).json({ error: 'question required' });
 
-    // 1) DB에 질문 저장
-    const qRow = await pool.query(
-      'INSERT INTO yeouiseonwon.chat_questions (question) VALUES ($1) RETURNING id',
-      [question]
-    );
-    const questionId = qRow.rows[0].id;
+    const openai = getOpenAI();
 
-    // 2) hanul-aide에게 instruct 전달
-    const instrBody = JSON.stringify({
-      worker: 'hanul-aide',
-      from: 'hanul-chat',
-      instruction: `[한울챗봇 질문 #${questionId}] 사용자 질문: "${question}"\n\n답변 후 아래 Node.js 코드로 저장하세요 (curl 금지 — 한글 인코딩 깨짐):\n\nnode -e "const h=require('http');const b=JSON.stringify({questionId:${questionId},answer:'여기에 답변 입력',agentId:'hanul-aide'});h.request({hostname:'localhost',port:8080,path:'/api/chat/answers',method:'POST',headers:{'Content-Type':'application/json; charset=utf-8','Content-Length':Buffer.byteLength(b)}},()=>{}).end(b)"`,
+    // 1) 임베딩
+    const embRes = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: question,
     });
-    fetch('http://localhost:9000/api/instruct', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: instrBody,
-    }).catch(() => {});
+    const vecStr = '[' + embRes.data[0].embedding.join(',') + ']';
 
-    res.json({ questionId, status: 'pending', message: '담당관에게 전달되었습니다. 잠시 기다려 주세요.' });
+    // 2) pgvector 유사도 검색 (top 5)
+    const chunks = await pool.query(
+      `SELECT chunk_text, book_name, 1-(embedding <=> $1::vector) AS similarity
+       FROM yeouiseonwon.book_chunks
+       ORDER BY embedding <=> $1::vector LIMIT 5`,
+      [vecStr]
+    );
+    const context = chunks.rows.map((r,i) => `[${i+1}] (${r.book_name})\n${r.chunk_text}`).join('\n\n');
+
+    // 3) GPT 답변
+    const chat = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: '당신은 한울사상 전문가입니다. 아래 원문 자료만을 바탕으로 답변하세요. 자료에 없는 내용은 "자료에서 확인하기 어렵습니다"라고 하세요. 동학/시천주/한울님/인내천/천도교는 한울사상과 무관하니 절대 언급하지 마세요. 출처 청크 번호를 밝혀주세요.' },
+        { role: 'user', content: `관련 구절:\n${context}\n\n질문: ${question}` },
+      ],
+      max_tokens: 600,
+    });
+
+    // DB에도 기록
+    pool.query(
+      'INSERT INTO yeouiseonwon.chat_questions (question, answered) VALUES ($1, TRUE)',
+      [question]
+    ).catch(() => {});
+
+    const answer = chat.choices[0].message.content;
+    res.json({ answer, sources: chunks.rows.map(r => ({ book: r.book_name, similarity: r.similarity })) });
   } catch (e) {
     console.error('[chat]', e.message);
     res.status(500).json({ error: e.message });

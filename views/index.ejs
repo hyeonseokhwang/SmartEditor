@@ -1,57 +1,735 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hanwool SmartEditor 2.0 테스트</title>
-    <link rel="stylesheet" href="/public/css/styles.css" />
-  </head>
-  <body>
-    <header>
-      <h1>네이버 스마트에디터 2.0 데모</h1>
-      <p>한글 문서에서 붙여넣기 시 이미지 자동 업로드(<%= hasCloudinary ? 'Cloudinary' : 'Local' %>)</p>
-    </header>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사상 — 하늘의 뜻으로 사는 삶</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <main>
-      <div id="editor-container">
-        <p>아래 SmartEditor2 에디터에서 작성하세요. (이 페이지에서 직접 초기화합니다.)</p>
-          <form onsubmit="return false;" style="margin-top:12px;">
-            <textarea id="ir1" name="ir1" rows="10" cols="100" style="width:100%;height:420px;display:none;"></textarea>
-          </form>
-          <div id="status" style="margin-top:8px;color:#64748b;font-size:13px;">Initializing SmartEditor…</div>
+    :root {
+      --navy:      #080D1A;
+      --deep:      #0C1828;
+      --mid:       #122035;
+      --card:      #0F1D30;
+      --gold:      #C9A84C;
+      --gold-lt:   #E3C76B;
+      --gold-dk:   #8A6E2E;
+      --cream:     #F5EFE0;
+      --cream-2:   #D6CEBB;
+      --gray:      #7A8FAA;
+      --border:    rgba(201,168,76,0.18);
+      --serif:     'Noto Serif KR', 'Malgun Gothic', serif;
+      --sans:      'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--navy); color: var(--cream); overflow-x: hidden; }
+
+    /* ── NAV ───────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 64px;
+      background: linear-gradient(180deg, rgba(8,13,26,0.98) 0%, rgba(8,13,26,0.0) 100%);
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    nav.pinned {
+      background: rgba(8,13,26,0.97);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .nav-logo {
+      font-family: var(--serif); font-size: 20px; font-weight: 600;
+      color: var(--gold); letter-spacing: 0.06em; text-decoration: none;
+    }
+    .nav-logo span { color: var(--cream); }
+    .nav-menu { display: flex; gap: 36px; list-style: none; }
+    .nav-menu a {
+      font-size: 13px; font-weight: 400; letter-spacing: 0.07em;
+      color: var(--cream-2); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-menu a:hover { color: var(--gold); }
+    .nav-cta {
+      padding: 9px 22px; border: 1px solid var(--gold); border-radius: 2px;
+      font-size: 12px; font-weight: 500; letter-spacing: 0.09em;
+      color: var(--gold); background: transparent; text-decoration: none;
+      transition: all 0.22s;
+    }
+    .nav-cta:hover { background: var(--gold); color: var(--navy); }
+
+    /* ── HERO ──────────────────────────────── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      background: radial-gradient(ellipse 80% 60% at 50% 35%, #152444 0%, #080D1A 65%);
+    }
+    .stars {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        radial-gradient(1.5px 1.5px at 8%  18%, rgba(255,255,255,.55) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 18% 72%, rgba(255,255,255,.35) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 28% 10%, rgba(255,255,255,.50) 0%, transparent 100%),
+        radial-gradient(2px   2px   at 42% 58%, rgba(201,168,76,.30)  0%, transparent 100%),
+        radial-gradient(1px   1px   at 55% 25%, rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 63% 80%, rgba(255,255,255,.30) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 75% 12%, rgba(255,255,255,.60) 0%, transparent 100%),
+        radial-gradient(1px   1px   at 82% 45%, rgba(255,255,255,.40) 0%, transparent 100%),
+        radial-gradient(2px   2px   at 90% 68%, rgba(201,168,76,.25)  0%, transparent 100%),
+        radial-gradient(1px   1px   at 95% 30%, rgba(255,255,255,.35) 0%, transparent 100%);
+    }
+    .mandala {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 900px; height: 900px; pointer-events: none;
+    }
+    .mandala svg { width: 100%; height: 100%; animation: mandalaSpin 120s linear infinite; }
+    @keyframes mandalaSpin { to { transform: rotate(360deg); } }
+
+    .hero-inner { position: relative; z-index: 2; text-align: center; padding: 0 24px; }
+    .eyebrow {
+      display: inline-block;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.45em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 32px;
+      opacity: 0; animation: fadeUp .9s ease .2s forwards;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(48px, 8vw, 96px); font-weight: 600;
+      color: var(--cream); line-height: 1.08; letter-spacing: -0.01em;
+      margin-bottom: 28px;
+      opacity: 0; animation: fadeUp .9s ease .4s forwards;
+    }
+    .hero-title em { font-style: normal; color: var(--gold); }
+    .hero-sub {
+      font-family: var(--serif);
+      font-size: clamp(15px, 2vw, 19px); font-weight: 300;
+      color: var(--cream-2); line-height: 1.95; max-width: 560px; margin: 0 auto 52px;
+      opacity: 0; animation: fadeUp .9s ease .6s forwards;
+    }
+    .hero-btns {
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .9s ease .8s forwards;
+    }
+    .btn-fill {
+      display: inline-block; padding: 15px 40px;
+      background: var(--gold); color: var(--navy);
+      font-family: var(--sans); font-size: 14px; font-weight: 700; letter-spacing: 0.07em;
+      border-radius: 2px; text-decoration: none; transition: all .22s;
+    }
+    .btn-fill:hover { background: var(--gold-lt); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,.3); }
+    .btn-line {
+      display: inline-block; padding: 15px 40px;
+      border: 1px solid rgba(201,168,76,.45); color: var(--cream-2);
+      font-family: var(--sans); font-size: 14px; font-weight: 400; letter-spacing: 0.07em;
+      border-radius: 2px; text-decoration: none; transition: all .22s;
+    }
+    .btn-line:hover { border-color: var(--gold); color: var(--gold); }
+
+    .scroll-hint {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      opacity: 0; animation: fadeIn 1s ease 1.4s forwards;
+    }
+    .scroll-hint span { font-size: 10px; letter-spacing: 0.38em; color: var(--gray); text-transform: uppercase; }
+    .scroll-bar { width: 1px; height: 44px; background: linear-gradient(180deg, var(--gold) 0%, transparent 100%); animation: scrollAnim 2s ease-in-out infinite; }
+    @keyframes scrollAnim { 0%,100%{opacity:0;transform:scaleY(0) translateY(-100%)} 40%{opacity:1;transform:scaleY(1) translateY(0)} 80%{opacity:0;transform:scaleY(0) translateY(100%)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { to{opacity:1} }
+
+    /* ── SECTION BASE ──────────────────────── */
+    section { padding: 120px 64px; }
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    .s-label {
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 18px;
+    }
+    .s-title {
+      font-family: var(--serif);
+      font-size: clamp(26px, 3.5vw, 44px); font-weight: 500;
+      color: var(--cream); line-height: 1.28; margin-bottom: 20px;
+    }
+    .s-bar { width: 44px; height: 2px; background: var(--gold); margin-bottom: 36px; }
+    .s-body {
+      font-family: var(--serif); font-size: 17px; font-weight: 300;
+      color: var(--cream-2); line-height: 2.0; max-width: 580px;
+    }
+
+    /* ── ABOUT (한울이란) ─────────────────── */
+    .about { background: var(--deep); }
+    .about-intro { max-width: 680px; margin-bottom: 72px; }
+    .about-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
+    .about-card {
+      background: var(--card); padding: 48px 36px 44px;
+      position: relative; overflow: hidden;
+      transition: transform .3s;
+    }
+    .about-card::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+      background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform .4s;
+    }
+    .about-card:hover { transform: translateY(-6px); }
+    .about-card:hover::after { transform: scaleX(1); }
+    .ac-hanja {
+      position: absolute; top: 28px; right: 28px;
+      font-family: var(--serif); font-size: 52px; font-weight: 700;
+      color: rgba(201,168,76,.08); line-height: 1; pointer-events: none;
+    }
+    .ac-num { font-size: 11px; letter-spacing: 0.3em; color: var(--gold-dk); margin-bottom: 24px; }
+    .ac-name {
+      font-family: var(--serif); font-size: 24px; font-weight: 500;
+      color: var(--cream); margin-bottom: 10px;
+    }
+    .ac-sub { font-size: 12px; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 20px; }
+    .ac-desc {
+      font-family: var(--serif); font-size: 15px; font-weight: 300;
+      color: var(--cream-2); line-height: 1.95;
+    }
+
+    /* ── TEACHINGS (핵심 가르침) ─────────── */
+    .teachings { background: var(--navy); }
+    .teach-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 60px; }
+    .teach-card {
+      background: var(--card); padding: 44px 36px 40px;
+      border: 1px solid var(--border); border-radius: 2px;
+      transition: border-color .3s, transform .3s;
+    }
+    .teach-card:hover { border-color: rgba(201,168,76,.45); transform: translateY(-6px); }
+    .t-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      border: 1px solid var(--gold-dk);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-size: 22px; color: var(--gold);
+      margin-bottom: 24px;
+    }
+    .t-name {
+      font-family: var(--serif); font-size: 22px; font-weight: 500;
+      color: var(--cream); margin-bottom: 8px;
+    }
+    .t-hanja-sm { font-size: 12px; letter-spacing: 0.22em; color: var(--gold); margin-bottom: 18px; }
+    .t-desc {
+      font-family: var(--serif); font-size: 15px; font-weight: 300;
+      color: var(--cream-2); line-height: 1.95;
+    }
+
+    /* ── QUOTES (법문 발췌) ──────────────── */
+    .quotes {
+      background: linear-gradient(160deg, #0C1828 0%, #142238 50%, #0C1828 100%);
+      position: relative; overflow: hidden;
+    }
+    .quotes-bg {
+      position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+      font-family: var(--serif); font-size: 180px; font-weight: 700;
+      color: rgba(201,168,76,.035); letter-spacing: -0.04em; pointer-events: none; white-space: nowrap;
+    }
+    .quotes-grid { display: grid; grid-template-columns: 1fr; gap: 56px; position: relative; z-index: 1; }
+    .quote-item { max-width: 760px; }
+    .q-mark {
+      font-family: var(--serif); font-size: 64px; font-weight: 700;
+      color: var(--gold); line-height: 0.6; margin-bottom: 16px; opacity: 0.5;
+    }
+    .q-text {
+      font-family: var(--serif);
+      font-size: clamp(18px, 2.4vw, 26px); font-weight: 400;
+      color: var(--cream); line-height: 1.72; margin-bottom: 20px;
+    }
+    .q-attr {
+      font-family: var(--serif); font-size: 13px; font-weight: 300;
+      color: var(--gold); letter-spacing: 0.08em;
+    }
+    .q-divider { width: 40px; height: 1px; background: var(--gold-dk); margin: 40px 0; opacity: 0.5; }
+
+    /* ── CENTER (여의명상센터) ──────────── */
+    .center { background: var(--deep); }
+    .center-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .programs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+    .prog-item {
+      padding: 28px 24px;
+      border: 1px solid var(--border);
+      background: rgba(201,168,76,.025); border-radius: 2px;
+      transition: border-color .3s, background .3s;
+    }
+    .prog-item:hover { border-color: rgba(201,168,76,.4); background: rgba(201,168,76,.05); }
+    .prog-item h4 {
+      font-family: var(--serif); font-size: 16px; font-weight: 500;
+      color: var(--cream); margin-bottom: 8px;
+    }
+    .prog-item p {
+      font-family: var(--serif); font-size: 13px; font-weight: 300;
+      color: var(--cream-2); line-height: 1.8;
+    }
+    .center-symbol {
+      display: flex; align-items: center; justify-content: center;
+      height: 460px; position: sticky; top: 120px;
+    }
+    .center-symbol svg { width: 360px; height: 360px; }
+
+    /* ── ARCHIVE (법문 아카이브) ─────────── */
+    .archive { background: var(--navy); text-align: center; }
+    .archive-num {
+      font-family: var(--serif);
+      font-size: clamp(64px, 10vw, 120px); font-weight: 700;
+      color: var(--gold); line-height: 1; margin-bottom: 8px;
+      opacity: 0.85;
+    }
+    .archive-sub {
+      font-size: 12px; letter-spacing: 0.4em; color: var(--gray); text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+    .archive-desc {
+      font-family: var(--serif); font-size: 18px; font-weight: 300;
+      color: var(--cream-2); line-height: 1.85; max-width: 520px; margin: 0 auto 52px;
+    }
+
+    /* ── QA (챗봇) ─────────────────────────── */
+    .qa-sec {
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, #142238 0%, #080D1A 70%);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .qa-rings {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .qa-rings span {
+      display: block; position: absolute; border-radius: 50%;
+      border: 1px solid rgba(201,168,76,.07);
+      transform: translate(-50%,-50%);
+    }
+    .qa-inner { position: relative; z-index: 2; }
+    .qa-badge {
+      display: inline-block; padding: 6px 16px;
+      border: 1px solid rgba(201,168,76,.3); border-radius: 20px;
+      font-size: 11px; letter-spacing: 0.28em; color: var(--gold-dk);
+      text-transform: uppercase; margin-bottom: 28px;
+    }
+    .qa-title {
+      font-family: var(--serif);
+      font-size: clamp(24px, 3.6vw, 46px); font-weight: 500;
+      color: var(--cream); line-height: 1.35; margin-bottom: 20px;
+    }
+    .qa-body {
+      font-family: var(--serif); font-size: 17px; font-weight: 300;
+      color: var(--cream-2); line-height: 1.85; max-width: 480px; margin: 0 auto 48px;
+    }
+    .qa-input-wrap {
+      display: flex; max-width: 560px; margin: 0 auto;
+      border: 1px solid rgba(201,168,76,.35); border-radius: 2px;
+      overflow: hidden;
+    }
+    .qa-input {
+      flex: 1; padding: 16px 20px;
+      background: rgba(201,168,76,.04); border: none; outline: none;
+      font-family: var(--serif); font-size: 15px; color: var(--cream);
+    }
+    .qa-input::placeholder { color: var(--gray); }
+    .qa-btn {
+      padding: 16px 28px;
+      background: var(--gold); color: var(--navy);
+      font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+      border: none; cursor: pointer; transition: background .2s;
+    }
+    .qa-btn:hover { background: var(--gold-lt); }
+    .qa-coming { font-size: 12px; color: var(--gray); margin-top: 16px; }
+
+    /* ── FOOTER ─────────────────────────────── */
+    footer {
+      background: #030810; padding: 64px;
+      border-top: 1px solid var(--border);
+    }
+    .ft-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; gap: 48px; justify-content: space-between; flex-wrap: wrap;
+    }
+    .ft-brand .logo { font-family: var(--serif); font-size: 20px; color: var(--gold); font-weight: 600; margin-bottom: 14px; }
+    .ft-brand p { font-size: 13px; color: var(--gray); line-height: 1.8; max-width: 260px; }
+    .ft-col h4 { font-size: 10px; letter-spacing: 0.36em; color: var(--gold); text-transform: uppercase; margin-bottom: 18px; }
+    .ft-col ul { list-style: none; }
+    .ft-col li { margin-bottom: 10px; }
+    .ft-col a { font-size: 14px; color: var(--gray); text-decoration: none; transition: color .2s; }
+    .ft-col a:hover { color: var(--cream); }
+    .ft-copy {
+      max-width: 1120px; margin: 40px auto 0; padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,.05);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+      font-size: 12px; color: var(--gray);
+    }
+
+    /* ── RESPONSIVE ─────────────────────────── */
+    @media (max-width: 960px) {
+      nav { padding: 16px 24px; }
+      .nav-menu { display: none; }
+      section { padding: 80px 24px; }
+      .about-cards, .teach-grid, .center-grid, .programs { grid-template-columns: 1fr; }
+      .center-symbol { height: auto; position: static; padding: 40px 0; }
+      footer { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">한울<span>사상</span></a>
+  <ul class="nav-menu">
+    <li><a href="#about">한울이란</a></li>
+    <li><a href="#teachings">핵심 가르침</a></li>
+    <li><a href="#center">여의명상센터</a></li>
+    <li><a href="#archive">법문 아카이브</a></li>
+  </ul>
+  <a href="http://211.104.37.65:4200" class="nav-cta" target="_blank">법문 아카이브 →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="stars"></div>
+  <div class="mandala">
+    <svg viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="450" cy="450" r="440" stroke="rgba(201,168,76,0.06)" stroke-width="1"/>
+      <circle cx="450" cy="450" r="400" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
+      <circle cx="450" cy="450" r="360" stroke="rgba(201,168,76,0.10)" stroke-width="0.5"/>
+      <circle cx="450" cy="450" r="310" stroke="rgba(201,168,76,0.12)" stroke-width="1"/>
+      <circle cx="450" cy="450" r="260" stroke="rgba(201,168,76,0.16)" stroke-width="0.5"/>
+      <circle cx="450" cy="450" r="210" stroke="rgba(201,168,76,0.14)" stroke-width="1"/>
+      <line x1="450" y1="10"  x2="450" y2="890"  stroke="rgba(201,168,76,0.05)" stroke-width="0.5"/>
+      <line x1="10"  y1="450" x2="890" y2="450"  stroke="rgba(201,168,76,0.05)" stroke-width="0.5"/>
+      <line x1="137" y1="137" x2="763" y2="763"  stroke="rgba(201,168,76,0.04)" stroke-width="0.5"/>
+      <line x1="763" y1="137" x2="137" y2="763"  stroke="rgba(201,168,76,0.04)" stroke-width="0.5"/>
+      <g stroke="rgba(201,168,76,0.3)" stroke-width="1">
+        <line x1="450" y1="12" x2="450" y2="30"/>
+        <line x1="450" y1="870" x2="450" y2="888"/>
+        <line x1="12" y1="450" x2="30" y2="450"/>
+        <line x1="870" y1="450" x2="888" y2="450"/>
+      </g>
+      <text x="450" y="48"  text-anchor="middle" font-family="serif" font-size="18" fill="rgba(201,168,76,0.45)">天</text>
+      <text x="450" y="878" text-anchor="middle" font-family="serif" font-size="18" fill="rgba(201,168,76,0.45)">地</text>
+      <text x="34"  y="455" text-anchor="middle" font-family="serif" font-size="18" fill="rgba(201,168,76,0.45)">人</text>
+      <text x="867" y="455" text-anchor="middle" font-family="serif" font-size="18" fill="rgba(201,168,76,0.45)">氣</text>
+    </svg>
+  </div>
+
+  <div class="hero-inner">
+    <span class="eyebrow">한울영성계발원 · 여의명상센터</span>
+    <h1 class="hero-title">한울사상<br><em>하늘의 뜻으로</em> 사는 삶</h1>
+    <p class="hero-sub">
+      수도자 1인은 세상자 만인이요<br>
+      중생자 억이라
+    </p>
+    <div class="hero-btns">
+      <a href="http://211.104.37.65:4200" class="btn-fill" target="_blank">법문 아카이브 보기</a>
+      <a href="#about" class="btn-line">한울사상이란</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-bar"></div>
+  </div>
+</section>
+
+<!-- ABOUT: 한울이란 -->
+<section class="about" id="about">
+  <div class="wrap">
+    <div class="about-intro">
+      <p class="s-label">한울이란</p>
+      <h2 class="s-title">한울(韓蔚)은 하늘의 순우리말<br>만물의 근원</h2>
+      <div class="s-bar"></div>
+      <p class="s-body">
+        한울은 동서고금의 어떤 종교나 사상과도 구별되는 독자적 사상 체계입니다.
+        우주의 이치(道)가 인간의 삶 속에서 어떻게 펼쳐지는가를 밝히고,
+        그 이치에 따라 사는 삶의 길을 제시합니다.
+      </p>
+    </div>
+    <div class="about-cards">
+      <div class="about-card">
+        <p class="ac-num">01</p>
+        <span class="ac-hanja">道</span>
+        <h3 class="ac-name">우주도리</h3>
+        <p class="ac-sub">우주의 이치를 깨닫다</p>
+        <p class="ac-desc">
+          "우주의 모든 것은 돈다 — 자전하고 공전하는 것이 우주의 도리."
+          한울사상은 우주의 순환 원리를 삶의 근본으로 삼습니다.
+          돌고 도는 이치 안에서 인간의 자리를 찾는 것이 수행의 출발점입니다.
+        </p>
       </div>
-    </main>
+      <div class="about-card">
+        <p class="ac-num">02</p>
+        <span class="ac-hanja">靈</span>
+        <h3 class="ac-name">영적 진화</h3>
+        <p class="ac-sub">한울의 존재로 깨어나다</p>
+        <p class="ac-desc">
+          "나비가 될 번데기는 무엇인가를 단단하게 붙잡지 않고서는
+          허물을 벗고 나올 수 없다."
+          인간은 수련과 삶의 실천을 통해 더 높은 존재로 진화할 수 있습니다.
+        </p>
+      </div>
+      <div class="about-card">
+        <p class="ac-num">03</p>
+        <span class="ac-hanja">責</span>
+        <h3 class="ac-name">세상에 대한 책임</h3>
+        <p class="ac-sub">한 사람이 세상을 바꾼다</p>
+        <p class="ac-desc">
+          "수도자 1인은 세상자 만인이요, 중생자 억이라."
+          한울사상은 개인의 수행이 곧 세상을 위한 실천임을 강조합니다.
+          나 한 사람의 각성이 만인의 삶에 영향을 미칩니다.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- SmartEditor2 core loader -->
-    <script src="/public/vendor/smarteditor2/static/js/service/HuskyEZCreator.js"></script>
-    <script>
-      // Initialize SmartEditor2 directly in this page
-      (function(){
-        window.oEditors = window.oEditors || [];
-        var sLang = "ko_KR";
-        nhn.husky.EZCreator.createInIFrame({
-          oAppRef: oEditors,
-          elPlaceHolder: "ir1",
-          sSkinURI: "/public/vendor/smarteditor2/static/SmartEditor2Skin.html",
-          htParams: {
-            bUseToolbar: true,
-            bUseVerticalResizer: true,
-            bUseModeChanger: true,
-            I18N_LOCALE: sLang
-          },
-          fOnAppLoad: function(){
-            try {
-              var editor = oEditors.getById["ir1"]; // SmartEditor instance
-          document.getElementById('status').textContent = 'SmartEditor ready (click inside and type)';
-              // Focus editor to ensure immediate editability
-              try { editor.exec('FOCUS'); } catch(e) {}
-            } catch (e) {
-          document.getElementById('status').textContent = 'SmartEditor init callback error: ' + e;
-            }
-          },
-          fCreator: "createSEditor2"
-        });
-      })();
-    </script>
-  </body>
+<!-- TEACHINGS: 핵심 가르침 -->
+<section class="teachings" id="teachings">
+  <div class="wrap">
+    <p class="s-label">핵심 가르침</p>
+    <h2 class="s-title">한울사상이 가리키는<br>세 가지 길</h2>
+    <div class="s-bar"></div>
+    <div class="teach-grid">
+      <div class="teach-card">
+        <div class="t-icon">制</div>
+        <h3 class="t-name">제도 (制道)</h3>
+        <p class="t-hanja-sm">수행의 목표이자 결과물</p>
+        <p class="t-desc">
+          제도는 단순히 도를 터득하는 것이 아니라,
+          도를 삶 속에서 구현하고 세상의 질서를 바로잡는 것입니다.
+          수행의 목표는 깨달음을 넘어 세상에 대한 책임으로 완성됩니다.
+        </p>
+      </div>
+      <div class="teach-card">
+        <div class="t-icon">場</div>
+        <h3 class="t-name">생명장 (生命場)</h3>
+        <p class="t-hanja-sm">몸을 감싸는 기(氣)의 장</p>
+        <p class="t-desc">
+          생명장은 몸을 감싸고 있는 에너지 장(場)입니다.
+          이 장이 강하고 맑을수록 건강하고 밝은 삶이 펼쳐집니다.
+          생명장 수련은 이 기운을 키우고 정화하는 한울 고유의 수행법입니다.
+        </p>
+      </div>
+      <div class="teach-card">
+        <div class="t-icon">損</div>
+        <h3 class="t-name">수련 — 손지손지심</h3>
+        <p class="t-hanja-sm">損之損之心 · 채우기보다 비우는 수행</p>
+        <p class="t-desc">
+          "죄는 조이는 것이다. 자신과 상대를 무리하게 조이는 것."
+          한울의 수련은 채우는 것이 아닌 비우는 것에서 시작합니다.
+          손지손지심(損之損之心) — 덜고 또 덜어내는 마음이 수행의 핵심입니다.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTES: 법문 발췌 -->
+<section class="quotes" id="quotes">
+  <div class="wrap">
+    <p class="s-label">큰스승님 법문</p>
+    <h2 class="s-title">실제 법문에서 가져온<br>한울의 말씀</h2>
+    <div class="s-bar"></div>
+    <div class="quotes-grid" style="margin-top:60px;">
+      <div class="quote-item">
+        <div class="q-mark">"</div>
+        <p class="q-text">
+          나비가 될 번데기는 무엇인가를<br>
+          단단하게 붙잡지 않고서는<br>
+          허물을 벗고 나올 수 없다
+        </p>
+        <p class="q-attr">— 한울 법문 아카이브 수록</p>
+      </div>
+      <div class="q-divider"></div>
+      <div class="quote-item">
+        <div class="q-mark">"</div>
+        <p class="q-text">
+          죄는 조이는 것이다.<br>
+          자신과 상대를<br>
+          무리하게 조이는 것
+        </p>
+        <p class="q-attr">— 한울 법문 아카이브 수록</p>
+      </div>
+      <div class="q-divider"></div>
+      <div class="quote-item">
+        <div class="q-mark">"</div>
+        <p class="q-text">
+          우주의 모든 것은 돈다.<br>
+          자전하고 공전하는 것이<br>
+          우주의 도리
+        </p>
+        <p class="q-attr">— 한울 법문 아카이브 수록</p>
+      </div>
+    </div>
+  </div>
+  <div class="quotes-bg">法文</div>
+</section>
+
+<!-- CENTER: 여의명상센터 -->
+<section class="center" id="center">
+  <div class="wrap">
+    <div class="center-grid">
+      <div>
+        <p class="s-label">여의명상센터</p>
+        <h2 class="s-title">한울영성계발원<br>수련 프로그램</h2>
+        <div class="s-bar"></div>
+        <p class="s-body" style="margin-bottom:48px;">
+          여의명상센터 한울영성계발원은 한울사상을 직접 체험하고 실천하는
+          수련 공동체입니다. 집중수련부터 일상 수련까지, 각자의 삶에서
+          한울의 가르침을 실현하는 다양한 프로그램을 운영합니다.
+        </p>
+        <div class="programs">
+          <div class="prog-item">
+            <h4>집중수련</h4>
+            <p>한울사상의 깊이를 체험하는 집중 수련 과정</p>
+          </div>
+          <div class="prog-item">
+            <h4>생명장 수련</h4>
+            <p>몸을 감싸는 기(氣)의 장을 키우는 수련</p>
+          </div>
+          <div class="prog-item">
+            <h4>기운영</h4>
+            <p>우주의 기운을 바르게 운용하는 수행법</p>
+          </div>
+          <div class="prog-item">
+            <h4>토요법문</h4>
+            <p>매주 토요일 법문 청취 및 공동 수련</p>
+          </div>
+          <div class="prog-item">
+            <h4>지기문화답사</h4>
+            <p>우주도리를 자연 속에서 체험하는 답사</p>
+          </div>
+          <div class="prog-item">
+            <h4>공동체 활동</h4>
+            <p>한울사상을 함께 실천하는 삶의 공동체</p>
+          </div>
+        </div>
+      </div>
+      <div class="center-symbol">
+        <svg viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="190" cy="190" r="178" stroke="rgba(201,168,76,0.08)" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="162" stroke="rgba(201,168,76,0.15)" stroke-width="1"/>
+          <circle cx="190" cy="190" r="138" stroke="rgba(201,168,76,0.20)" stroke-width="1"/>
+          <circle cx="190" cy="190" r="114" stroke="rgba(201,168,76,0.26)" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="90"  stroke="rgba(201,168,76,0.30)" stroke-width="1"/>
+          <circle cx="190" cy="190" r="66"  stroke="rgba(201,168,76,0.40)" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="42"  stroke="rgba(201,168,76,0.55)" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="22"  fill="rgba(201,168,76,0.12)" stroke="rgba(201,168,76,0.7)" stroke-width="1.5"/>
+          <circle cx="190" cy="190" r="6"   fill="rgba(201,168,76,0.9)"/>
+          <line x1="190" y1="16"  x2="190" y2="364" stroke="rgba(201,168,76,0.1)" stroke-width="0.8"/>
+          <line x1="16"  y1="190" x2="364" y2="190" stroke="rgba(201,168,76,0.1)" stroke-width="0.8"/>
+          <line x1="60"  y1="60"  x2="320" y2="320" stroke="rgba(201,168,76,0.07)" stroke-width="0.8"/>
+          <line x1="320" y1="60"  x2="60"  y2="320" stroke="rgba(201,168,76,0.07)" stroke-width="0.8"/>
+          <g stroke="rgba(201,168,76,0.5)" stroke-width="1.2">
+            <line x1="190" y1="18" x2="190" y2="30"/>
+            <line x1="190" y1="350" x2="190" y2="362"/>
+            <line x1="18" y1="190" x2="30" y2="190"/>
+            <line x1="350" y1="190" x2="362" y2="190"/>
+          </g>
+          <text x="190" y="13" text-anchor="middle" font-family="serif" font-size="14" fill="rgba(201,168,76,0.65)">天</text>
+          <text x="190" y="378" text-anchor="middle" font-family="serif" font-size="14" fill="rgba(201,168,76,0.65)">地</text>
+          <text x="8"   y="195" text-anchor="middle" font-family="serif" font-size="14" fill="rgba(201,168,76,0.65)">人</text>
+          <text x="373" y="195" text-anchor="middle" font-family="serif" font-size="14" fill="rgba(201,168,76,0.65)">氣</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHIVE: 법문 아카이브 -->
+<section class="archive" id="archive">
+  <div class="wrap">
+    <p class="s-label" style="text-align:center;margin-bottom:24px;">법문 아카이브</p>
+    <div class="archive-num">10,311</div>
+    <p class="archive-sub">법문과 가르침이 수록된 아카이브</p>
+    <p class="archive-desc">
+      수십 년에 걸쳐 수집된 한울 법문 전체를 아카이빙했습니다.<br>
+      검색하고, 읽고, 당신만의 방식으로 한울사상을 만나보세요.
+    </p>
+    <a href="http://211.104.37.65:4200" class="btn-fill" target="_blank">법문 아카이브 열기</a>
+  </div>
+</section>
+
+<!-- QA: 한울 챗봇 -->
+<section class="qa-sec" id="qa">
+  <div class="qa-rings">
+    <span style="width:700px;height:700px;margin-top:-350px;margin-left:-350px;"></span>
+    <span style="width:500px;height:500px;margin-top:-250px;margin-left:-250px;"></span>
+    <span style="width:300px;height:300px;margin-top:-150px;margin-left:-150px;border-color:rgba(201,168,76,0.11);"></span>
+  </div>
+  <div class="wrap">
+    <div class="qa-inner">
+      <div class="qa-badge">Coming Soon</div>
+      <h2 class="qa-title">한울사상이 궁금하신가요?<br>무엇이든 물어보세요</h2>
+      <p class="qa-body">
+        10,311건의 법문을 학습한 한울 AI가<br>
+        당신의 질문에 답합니다.
+      </p>
+      <div class="qa-input-wrap">
+        <input class="qa-input" type="text" placeholder="예: 생명장이란 무엇인가요?" disabled />
+        <button class="qa-btn" disabled>묻기</button>
+      </div>
+      <p class="qa-coming">한울 Q&A 챗봇은 준비 중입니다</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-inner">
+    <div class="ft-brand">
+      <div class="logo">한울영성계발원</div>
+      <p>여의명상센터 · 한울사상<br>하늘의 뜻으로 사는 삶을 실천하는<br>수련 공동체</p>
+    </div>
+    <div class="ft-col">
+      <h4>한울사상</h4>
+      <ul>
+        <li><a href="#about">한울이란</a></li>
+        <li><a href="#teachings">핵심 가르침</a></li>
+        <li><a href="#quotes">법문 발췌</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>여의명상센터</h4>
+      <ul>
+        <li><a href="#center">집중수련</a></li>
+        <li><a href="#center">생명장 수련</a></li>
+        <li><a href="#center">토요법문</a></li>
+        <li><a href="#center">지기문화답사</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>법문 아카이브</h4>
+      <ul>
+        <li><a href="http://211.104.37.65:4200" target="_blank">아카이브 열기</a></li>
+        <li><a href="#qa">한울 Q&A</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-copy">
+    <span>© 2026 한울영성계발원 여의명상센터. All rights reserved.</span>
+    <span>수도자 1인은 세상자 만인이요 — 한울사상</span>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('pinned', window.scrollY > 50);
+  }, { passive: true });
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.about-card, .teach-card, .prog-item, .quote-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity .6s ease, transform .6s ease';
+    io.observe(el);
+  });
+</script>
+</body>
 </html>
