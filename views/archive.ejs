@@ -74,7 +74,7 @@
       .search-bar button{min-height:44px;padding:0 20px}
       .stats-bar{flex-wrap:wrap;gap:8px}
     }
-    @media(max-width:480px){
+    @media(max-width:640px){
       .page{padding:16px 12px}
       h1{font-size:18px}
       .post-table{display:none}
@@ -85,6 +85,9 @@
       .modal-body{max-height:calc(100dvh - 140px)}
       .site-nav{overflow-x:auto;white-space:nowrap;gap:0;padding:0 12px}
       .site-nav a{padding:0 10px;font-size:12px}
+      .search-bar{flex-direction:column;gap:6px}
+      .search-bar input,.search-bar button{width:100%;box-sizing:border-box}
+      .stats-bar{display:none}
     }
   </style>
 </head>

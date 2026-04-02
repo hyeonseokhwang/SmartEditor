@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>한울 담당관 채팅 · 여의명상센터</title>
+  <title>한울사상 AI 상담 · 여의명상센터</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -69,6 +69,23 @@
     .input-area button{padding:14px 24px;background:#2A1E10;color:#E8DCC8;border:none;cursor:pointer;font-size:13px;font-family:'Noto Serif KR',serif;white-space:nowrap;transition:background .2s;letter-spacing:.04em}
     .input-area button:hover{background:#3A2E20}
     .input-area button:disabled{opacity:.45;cursor:not-allowed}
+
+    /* SOURCES */
+    .src-bar{font-size:10px;color:#B0A890;margin-top:6px;letter-spacing:.04em}
+    .src-tag{display:inline-block;padding:2px 8px;background:#F0E8D4;border-radius:10px;margin:2px;font-size:10px;color:#7A6048}
+
+    /* MOBILE */
+    @media(max-width:640px){
+      .chat-wrap{padding:12px 0 0;max-width:100%}
+      .chat-header{border-radius:0;border-left:0;border-right:0}
+      .messages{max-height:calc(100vh - 290px)}
+      .bubble{max-width:90%;font-size:13px}
+      .sugg-area{padding:8px 12px}
+      .input-area input{padding:12px 12px;font-size:13px}
+      .input-area button{padding:12px 16px;font-size:12px}
+      .site-nav a:not(.logo){display:none}
+      .site-nav .logo{margin-right:0;border-right:none}
+    }
   </style>
 </head>
 <body>
@@ -86,8 +103,8 @@
   <div class="chat-header">
     <div class="op-avatar">한</div>
     <div class="op-info">
-      <div class="op-name">한울 담당관</div>
-      <div class="op-sub">여의명상센터 · 한울사상 안내</div>
+      <div class="op-name">한울사상 AI 상담관</div>
+      <div class="op-sub">여의선원 · 10,000건+ 아카이브 기반 답변</div>
     </div>
     <div class="op-status">
       <div class="status-dot"></div>
@@ -99,7 +116,9 @@
     <div class="msg bot">
       <div class="avatar">한</div>
       <div>
-        <div class="bubble">안녕하세요. 여의명상센터 한울 담당관입니다.<br>한울사상 수련이나 프로그램에 대해 궁금하신 점을 편하게 여쭤봐 주세요.</div>
+        <div class="bubble">안녕하세요. 여의선원 한울사상 AI 상담관입니다.<br><br>
+        생명장·수도·제도·성멸오통·집중수도 등 한울사상 전반에 대해 여의선원 경전 및 게시글 10,000건+ 기반으로 답변드립니다.<br><br>
+        아래 자주 묻는 질문을 선택하시거나, 직접 입력해 주세요.</div>
         <div class="msg-time">방금</div>
       </div>
     </div>
@@ -113,10 +132,14 @@
   <div class="sugg-area">
     <div class="sugg-label">자주 묻는 질문</div>
     <div class="suggestions">
-      <span class="sugg" onclick="ask(this.textContent)">한울사상이란 무엇인가요?</span>
-      <span class="sugg" onclick="ask(this.textContent)">수련 프로그램을 알고 싶습니다</span>
-      <span class="sugg" onclick="ask(this.textContent)">처음 명상을 시작하려고 합니다</span>
-      <span class="sugg" onclick="ask(this.textContent)">여의명상센터 위치와 일정</span>
+      <span class="sugg" onclick="ask(this.textContent)">한울사상의 핵심은 무엇인가요?</span>
+      <span class="sugg" onclick="ask(this.textContent)">생명장이란 무엇인가요?</span>
+      <span class="sugg" onclick="ask(this.textContent)">우주영제도란 무엇인가요?</span>
+      <span class="sugg" onclick="ask(this.textContent)">성멸오통에 대해 알고 싶습니다</span>
+      <span class="sugg" onclick="ask(this.textContent)">수도자 1인은 세상자 만인이요의 의미</span>
+      <span class="sugg" onclick="ask(this.textContent)">집중수도 프로그램을 알고 싶습니다</span>
+      <span class="sugg" onclick="ask(this.textContent)">처음 수련을 시작하려면 어떻게 하나요?</span>
+      <span class="sugg" onclick="ask(this.textContent)">여의명상센터 위치와 수련 일정</span>
     </div>
   </div>
 
@@ -185,7 +208,8 @@ async function sendMsg() {
         <div class="avatar">한</div>
         <div>
           <div class="bubble">${escHtml(r.answer)}</div>
-          <div class="msg-time">${nowTime()} · 한울 담당관</div>
+          ${r.sources && r.sources.length ? `<div class="src-bar">${r.sources.slice(0,3).map(s=>`<span class="src-tag">${s.book}</span>`).join('')}</div>` : ''}
+          <div class="msg-time">${nowTime()} · 한울사상 AI</div>
         </div>
       </div>`;
   } catch(e) {

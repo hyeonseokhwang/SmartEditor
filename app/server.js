@@ -240,62 +240,114 @@ app.post('/api/chat', async (req, res) => {
       .slice(0, 3);
     const mainKeyword = keywords[0] || question.replace(/[?？！!.,。、\s]/g,'').slice(0, 6);
 
-    // 3) pgvector 유사도 검색 (top 10) + posts 키워드 검색 병행 (하이브리드)
-    const postWhere = keywords.length > 1
-      ? keywords.map((_,i) => `content ILIKE $${i+1}`).join(' OR ')
-      : `content ILIKE $1`;
-    const postParams = keywords.length > 1
+    // 3) 3중 하이브리드 검색: 경전 pgvector + 게시글 pgvector + 게시글 키워드
+    const postKeywordWhere = keywords.length > 1
+      ? keywords.map((_,i) => `(content ILIKE $${i+1} OR title ILIKE $${i+1})`).join(' OR ')
+      : `(content ILIKE $1 OR title ILIKE $1)`;
+    const postKeywordParams = keywords.length > 1
       ? keywords.map(k => `%${k.replace(/[%_]/g,'\\$&')}%`)
       : [`%${mainKeyword.replace(/[%_]/g,'\\$&')}%`];
 
-    const [chunks, postResults] = await Promise.all([
+    const [chunks, postsByVec, postsByKw] = await Promise.all([
+      // (A) 경전 pgvector
       pool.query(
         `SELECT chunk_text, book_name, 1-(embedding <=> $1::vector) AS similarity
          FROM yeouiseonwon.book_chunks
-         ORDER BY embedding <=> $1::vector LIMIT 10`,
+         ORDER BY embedding <=> $1::vector LIMIT 8`,
         [vecStr]
       ),
+      // (B) 게시글 pgvector (임베딩 있는 건만)
       pool.query(
-        `SELECT title, LEFT(content, 800) AS excerpt, board, created_at
+        `SELECT title, LEFT(content, 1000) AS excerpt, board, created_at,
+                1-(embedding <=> $1::vector) AS similarity
          FROM yeouiseonwon.posts
-         WHERE (${postWhere}) AND content IS NOT NULL AND content != ''
-         ORDER BY created_at DESC LIMIT 5`,
-        postParams
+         WHERE embedding IS NOT NULL
+         ORDER BY embedding <=> $1::vector LIMIT 8`,
+        [vecStr]
+      ).catch(() => ({ rows: [] })),
+      // (C) 게시글 키워드 검색 (임베딩 유무 무관)
+      pool.query(
+        `SELECT title, LEFT(content, 1000) AS excerpt, board, created_at
+         FROM yeouiseonwon.posts
+         WHERE (${postKeywordWhere}) AND content IS NOT NULL AND content != ''
+         ORDER BY created_at DESC LIMIT 8`,
+        postKeywordParams
       ).catch(() => ({ rows: [] })),
     ]);
 
-    // 유사도 0.28 이상 청크 우선, 미달 시 상위 5개 유지
-    const goodChunks = chunks.rows.filter(r => r.similarity >= 0.28);
-    const useChunks  = goodChunks.length >= 3 ? goodChunks : chunks.rows.slice(0, 5);
+    // 경전: 유사도 0.30+ 우선, 미달 시 상위 5개
+    const goodChunks = chunks.rows.filter(r => r.similarity >= 0.30);
+    const useChunks  = goodChunks.length >= 2 ? goodChunks : chunks.rows.slice(0, 5);
+
+    // 게시글: pgvector 0.35+ 결과 + 키워드 결과 합치고, 중복 제거 후 상위 8건
+    const seenTitles = new Set();
+    const allPosts = [];
+    for (const r of postsByVec.rows) {
+      if (r.similarity >= 0.35 && !seenTitles.has(r.title)) {
+        seenTitles.add(r.title);
+        allPosts.push({ ...r, source: 'vec' });
+      }
+    }
+    for (const r of postsByKw.rows) {
+      if (!seenTitles.has(r.title)) {
+        seenTitles.add(r.title);
+        allPosts.push({ ...r, source: 'kw' });
+      }
+    }
+    const usePosts = allPosts.slice(0, 8);
 
     const chunkCtx  = useChunks.map((r,i) => `[경전${i+1}] (${r.book_name})\n${r.chunk_text}`).join('\n\n');
-    const postCtx   = postResults.rows.length
-      ? '\n\n[카페 게시글]\n' + postResults.rows.map((r,i) =>
+    const postCtx   = usePosts.length
+      ? '\n\n[카페 게시글 — 큰스승님 법문 및 수행 기록]\n' + usePosts.map((r,i) =>
           `[게시글${i+1}] (${r.board} · ${r.title})\n${r.excerpt}`
         ).join('\n\n')
       : '';
 
     const context = chunkCtx + postCtx;
 
-    // 3) GPT 답변 — 적극적 답변 유도
+    // 4) GPT 답변 — 원문 기반 정확한 답변 (gpt-4o 고품질)
     const chat = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
           content: [
-            '당신은 여의선원 한울사상 전문 안내자입니다.',
-            '아래 원문 자료(경전 구절·카페 게시글)를 최대한 활용하여 구체적이고 친절하게 답변하세요.',
-            '자료에 관련 내용이 있으면 원문을 직접 인용하며 상세히 설명하세요.',
-            '한울사상 관련 질문에는 반드시 설명을 제공하세요. "자료에서 확인하기 어렵습니다"는 자료에 전혀 없을 때만 사용하세요.',
-            '자료가 부족하면 한울사상의 핵심 개념(수도·생명장·성멸제도·성멸오통·각성·제도·기운)을 기반으로 설명을 보완하세요.',
-            '동학·시천주·인내천·천도교는 언급하지 마세요.',
-            '답변 끝에 출처(경전N / 게시글N)를 밝혀주세요.',
-          ].join(' '),
+            '당신은 여의선원(여의명상센터) 한울사상 전문 안내자입니다.',
+            '한울사상은 무견 김상국 큰스승님이 창시한 독자적인 영성 사상 체계로,',
+            '여의선원과 여의명상센터를 통해 가르쳐지고 있습니다.',
+            '',
+            '## 한울사상 핵심 개념 (이 개념에 대한 질문이 오면 반드시 아래 설명을 기반으로 답변):\n',
+            '- 한울사상: 한올들이 어울려 한울이 된다는 사상. 개체(한올)가 전체(한울)와 조화를 이루는 우주관.',
+            '- 수도(修道): 닦아가는 길. 시도→수도→제도의 단계적 수행 체계.',
+            '- 생명장(生命場): 생명체의 몸氣(몸을 운영하는 기운)와 영기(靈氣:영혼의 기운)와 지기(地氣:터전과 환경의 기운)의 조합이 이루어내는 氣의 장(場). 생명의 근원 에너지 장.',
+            '- 제도(濟度): 영격을 높이는 것. 삶은 궁극적으로 영적진화를 통해 영격을 높이는데 목적이 있음.',
+            '- 우주영제도: 개체의 영을 우주영으로 높이기 위한 제도법.',
+            '- 각성(覺醒): 유○론적 각성법. 우주 궁극의 실체를 ○으로 보는 우주관에서 개체 인식이 깨어남.',
+            '- 성멸(性滅): 사람의 성(性)을 소멸하는 수행. 성멸제도·성멸오통으로 이어짐.',
+            '- 성멸제도(性滅濟度): 사람 성·사람 정을 소멸하여 영격을 높이는 제도.',
+            '- 성멸오통(性滅五通): 성(性)에 묶이지 않고 초월하여 전체와 통하는 다섯 가지 통달.',
+            '- 큰스승님: 무견 김상국 선생님. 한울사상 창시자. 집중수도와 법문을 통해 가르침.',
+            '- 한울계시록: 큰스승님의 계시를 기록한 경전. 핵심 가르침의 원천.',
+            '- 집중수도: 큰스승님 직접 지도 하에 진행하는 집중 수행 과정.',
+            '- 기운(氣): 한울사상에서 모든 현상의 근원. 몸氣·영氣·지氣로 나뉨.',
+            '- 수도자 1인은 세상자 만인이요 중생자 억: 수도자 한 명의 영적 역량이 만인을 구제할 수 있다는 큰스승님 말씀.',
+            '',
+            '## 경전 목록:',
+            '한울말씀강론, O의실체(O의 실체), 한울수행법, 한울수도법, 한울명상록, 한울계시록',
+            '',
+            '## 답변 규칙:\n',
+            '1. 제공된 원문 자료([경전N], [게시글N])를 최우선으로 활용하여 답변하세요.',
+            '2. 원문을 직접 인용(따옴표)하며 구체적으로 설명하세요.',
+            '3. 질문에 핵심 용어가 있으면 반드시 해당 개념의 정의와 수행적 의미를 포함하세요.',
+            '4. 동학·시천주·인내천·천도교로 환원하지 마세요. 한울사상 고유 체계로만 설명하세요.',
+            '5. 자료가 부족하더라도 위의 핵심 개념 지식을 바탕으로 한울사상적 관점에서 반드시 답변을 제공하세요.',
+            '6. 답변 끝에 출처([경전N] 또는 [게시글N])를 밝히세요. 자료 없이 답변 시 "(한울사상 핵심 개념 기반)"을 표기하세요.',
+            '7. 친절하고 깊이 있게, 수행자가 실제 도움받을 수 있는 수준으로 답변하세요.',
+          ].join('\n'),
         },
-        { role: 'user', content: `참고 자료:\n${context}\n\n질문: ${question}` },
+        { role: 'user', content: `## 참고 자료\n${context}\n\n## 질문\n${question}` },
       ],
-      max_tokens: 1000,
+      max_tokens: 1800,
     });
 
     pool.query(

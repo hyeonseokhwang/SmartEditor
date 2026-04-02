@@ -221,61 +221,96 @@ app.post('/api/chat', async (req, res) => {
       .slice(0, 3);
     const mainKeyword = keywords[0] || question.replace(/[?？！!.,。、\s]/g,'').slice(0, 6);
 
-    // 3) pgvector + posts 하이브리드 검색
-    const postWhere = keywords.length > 1
-      ? keywords.map((_,i) => `content ILIKE $${i+1}`).join(' OR ')
-      : `content ILIKE $1`;
-    const postParams = keywords.length > 1
+    // 3) 3중 하이브리드 검색: 경전 pgvector + 게시글 pgvector + 게시글 키워드
+    const postKeywordWhere = keywords.length > 1
+      ? keywords.map((_,i) => `(content ILIKE $${i+1} OR title ILIKE $${i+1})`).join(' OR ')
+      : `(content ILIKE $1 OR title ILIKE $1)`;
+    const postKeywordParams = keywords.length > 1
       ? keywords.map(k => `%${k.replace(/[%_]/g,'\\$&')}%`)
       : [`%${mainKeyword.replace(/[%_]/g,'\\$&')}%`];
 
-    const [chunks, postResults] = await Promise.all([
+    const [chunks, postsByVec, postsByKw] = await Promise.all([
       pool.query(
         `SELECT chunk_text, book_name, 1-(embedding <=> $1::vector) AS similarity
          FROM yeouiseonwon.book_chunks
-         ORDER BY embedding <=> $1::vector LIMIT 10`,
+         ORDER BY embedding <=> $1::vector LIMIT 8`,
         [vecStr]
       ),
       pool.query(
-        `SELECT title, LEFT(content, 800) AS excerpt, board, created_at
+        `SELECT title, LEFT(content, 1000) AS excerpt, board, created_at,
+                1-(embedding <=> $1::vector) AS similarity
          FROM yeouiseonwon.posts
-         WHERE (${postWhere}) AND content IS NOT NULL AND content != ''
-         ORDER BY created_at DESC LIMIT 5`,
-        postParams
+         WHERE embedding IS NOT NULL
+         ORDER BY embedding <=> $1::vector LIMIT 8`,
+        [vecStr]
+      ).catch(() => ({ rows: [] })),
+      pool.query(
+        `SELECT title, LEFT(content, 1000) AS excerpt, board, created_at
+         FROM yeouiseonwon.posts
+         WHERE (${postKeywordWhere}) AND content IS NOT NULL AND content != ''
+         ORDER BY created_at DESC LIMIT 8`,
+        postKeywordParams
       ).catch(() => ({ rows: [] })),
     ]);
 
-    // 유사도 0.25 이상 청크 우선, 미달 시 상위 5개 유지
-    const goodChunks = chunks.rows.filter(r => r.similarity >= 0.25);
+    const goodChunks = chunks.rows.filter(r => r.similarity >= 0.30);
     const useChunks  = goodChunks.length >= 2 ? goodChunks : chunks.rows.slice(0, 5);
 
+    const seenTitles = new Set();
+    const allPosts = [];
+    for (const r of postsByVec.rows) {
+      if (r.similarity >= 0.35 && !seenTitles.has(r.title)) {
+        seenTitles.add(r.title);
+        allPosts.push({ ...r, source: 'vec' });
+      }
+    }
+    for (const r of postsByKw.rows) {
+      if (!seenTitles.has(r.title)) {
+        seenTitles.add(r.title);
+        allPosts.push({ ...r, source: 'kw' });
+      }
+    }
+    const usePosts = allPosts.slice(0, 8);
+
     const chunkCtx = useChunks.map((r,i) => `[경전${i+1}] (${r.book_name})\n${r.chunk_text}`).join('\n\n');
-    const postCtx  = postResults.rows.length
-      ? '\n\n[카페 게시글]\n' + postResults.rows.map((r,i) =>
+    const postCtx  = usePosts.length
+      ? '\n\n[카페 게시글 — 큰스승님 법문 및 수행 기록]\n' + usePosts.map((r,i) =>
           `[게시글${i+1}] (${r.board} · ${r.title})\n${r.excerpt}`
         ).join('\n\n')
       : '';
 
     const context = chunkCtx + postCtx;
 
-    // 4) GPT 답변
+    // 4) GPT 답변 — 원문 기반 정확한 답변
     const chat = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
           content: [
-            '당신은 여의선원 한울사상 전문 안내자입니다.',
-            '아래 원문 자료(경전 구절·카페 게시글)를 최대한 활용하여 구체적이고 친절하게 답변하세요.',
-            '자료에 관련 내용이 있으면 원문을 직접 인용하며 설명하세요.',
-            '자료에 전혀 없는 내용일 때만 "자료에서 확인하기 어렵습니다"라고 하세요.',
-            '동학·시천주·한울님·인내천·천도교는 한울사상과 별개이니 언급하지 마세요.',
-            '답변 끝에 출처(경전N / 게시글N)를 밝혀주세요.',
-          ].join(' '),
+            '당신은 여의선원(여의명상센터) 한울사상 전문 안내자입니다.',
+            '한울사상은 큰스승님(이현석 선생님)이 창시한 독자적인 사상 체계입니다.',
+            '',
+            '## 핵심 용어:',
+            '- 한울사상: 한울(하늘+울림)의 뜻. 우주와 생명의 근원 원리를 탐구하는 사상',
+            '- 수도(修道): 한울사상의 수행 체계. 시도→수도→제도 단계',
+            '- 생명장(生命場): 모든 생명이 연결된 에너지 장',
+            '- 성멸제도(性滅濟度): 성(性)을 다스려 제도(구원)에 이르는 과정',
+            '- 성멸오통(性滅五通): 성멸 수행으로 얻는 다섯 가지 통달',
+            '- 각성(覺醒): 자기 인식과 깨달음의 시작점',
+            '- 한울계시록/명상록/한울수도법/O의 실체: 핵심 경전',
+            '',
+            '## 답변 규칙:',
+            '1. 원문 자료를 직접 인용(큰따옴표)하며 구체적으로 설명하세요.',
+            '2. 질문 핵심 용어에 대해 반드시 직접적인 정의/설명을 포함하세요.',
+            '3. 동학·시천주·인내천·천도교 용어로 환원하지 마세요.',
+            '4. 답변 끝에 출처([경전N]/[게시글N])를 밝히세요.',
+            '5. "자료에서 확인하기 어렵습니다"는 절대 사용하지 마세요.',
+          ].join('\n'),
         },
-        { role: 'user', content: `참고 자료:\n${context}\n\n질문: ${question}` },
+        { role: 'user', content: `## 참고 자료\n${context}\n\n## 질문\n${question}` },
       ],
-      max_tokens: 1000,
+      max_tokens: 1200,
     });
 
     pool.query(
