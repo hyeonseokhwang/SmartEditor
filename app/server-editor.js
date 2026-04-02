@@ -1,13 +1,28 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import multer from 'multer';
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '.env') });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const UPLOADS_DIR = path.join(__dirname, '..', 'public', 'uploads');
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname) || '.png';
+    cb(null, `${uuidv4()}${ext}`);
+  },
+});
+const upload = multer({ storage, limits: { fileSize: 20 * 1024 * 1024 } });
 
 const app = express();
 const PORT = process.env.EDITOR_PORT || 8082;
@@ -79,6 +94,38 @@ app.get('/api/boards', async (req, res) => {
     const r = await pool.query('SELECT board, COUNT(*) count FROM yeouiseonwon.posts GROUP BY board ORDER BY count DESC');
     res.json(r.rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// 이미지 업로드 (multer 파일 또는 base64 dataUrl)
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+  try {
+    if (req.file) {
+      return res.json({ url: `/public/uploads/${req.file.filename}` });
+    }
+    const { dataUrl } = req.body;
+    if (!dataUrl) return res.status(400).json({ error: 'No file or dataUrl' });
+    const match = dataUrl.match(/^data:(.*?);base64,(.*)$/);
+    if (!match) return res.status(400).json({ error: 'Invalid data URL' });
+    const ext = (match[1].split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '');
+    const name = `${uuidv4()}.${ext}`;
+    fs.writeFileSync(path.join(UPLOADS_DIR, name), Buffer.from(match[2], 'base64'));
+    return res.json({ url: `/public/uploads/${name}` });
+  } catch (err) {
+    console.error('[upload]', err);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
+
+// 클립보드 디버그 로그
+app.post('/api/log/clipboard', (req, res) => {
+  console.log('[SE2][clipboard]', JSON.stringify(req.body).slice(0, 200));
+  res.json({ ok: true });
+});
+
+// 최종 저장 로그
+app.post('/api/log/final', (req, res) => {
+  console.log('[SE2][final]', JSON.stringify(req.body).slice(0, 200));
+  res.json({ verdict: 'pass' });
 });
 
 app.listen(PORT, () => {
