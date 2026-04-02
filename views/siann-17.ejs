@@ -532,9 +532,17 @@
     .hero-inner > *:nth-child(6) { animation-delay: 0.65s; }
 
     /* ── RESPONSIVE ── */
+    .nav-mobile-links { display: none; gap: 14px; align-items: center; }
+    .nav-mobile-links a { font-size: 11px; color: rgba(255,255,255,.65); text-decoration: none; letter-spacing: .04em; transition: color .2s; }
+    .nav.solid .nav-mobile-links a { color: var(--gr); }
+    .nav-mobile-links a:hover { color: var(--aL); }
+
     @media(max-width:900px){
       .nav { padding: 0 24px; }
       .nav-links { display: none; }
+      .nav-cta { display: none !important; }
+      .nav-mobile-links { display: flex; }
+      .lang-btn { font-size: 10px; padding: 4px 10px; margin-left: 4px; }
       .container { padding: 0 24px; }
       .phil-grid { grid-template-columns: 1fr; }
       .prog-grid { grid-template-columns: 1fr; }
@@ -564,11 +572,17 @@
       <li><a href="#programs" data-ko>수련</a><a href="#programs" data-en>Programs</a></li>
       <li><a href="#teachings" data-ko>가르침</a><a href="#teachings" data-en>Teachings</a></li>
       <li class="nav-sep" aria-hidden="true">|</li>
+      <li><a href="/editor" class="nav-page" data-ko>게시판</a><a href="/editor" class="nav-page" data-en>Board</a></li>
       <li><a href="/archive" class="nav-page" data-ko>아카이브</a><a href="/archive" class="nav-page" data-en>Archive</a></li>
       <li><a href="/chat" class="nav-page" data-ko>챗봇</a><a href="/chat" class="nav-page" data-en>AI Chat</a></li>
     </ul>
     <a href="#contact" class="nav-cta" data-ko>수련 신청</a>
     <a href="#contact" class="nav-cta" data-en>Join Us</a>
+    <div class="nav-mobile-links">
+      <a href="/editor" data-ko>게시판</a><a href="/editor" data-en>Board</a>
+      <a href="/archive" data-ko>아카이브</a><a href="/archive" data-en>Archive</a>
+      <a href="/chat" data-ko>챗봇</a><a href="/chat" data-en>AI Chat</a>
+    </div>
     <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">EN</button>
   </nav>
 

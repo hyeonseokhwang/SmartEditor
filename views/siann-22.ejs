@@ -409,8 +409,16 @@
       .cta-inner{padding:40px 56px}
       footer{padding:48px 44px}
     }
+    /* 모바일 전용 퀵 링크 */
+    .nav-mobile{display:none;gap:16px;align-items:center}
+    .nav-mobile a{font-size:10px;letter-spacing:.08em;color:rgba(255,255,255,.65);text-decoration:none;transition:color .2s}
+    nav.solid .nav-mobile a{color:<%= t.t2 %>}
+    .nav-mobile a:hover{color:<%= t.ac %>}
+
     @media(max-width:768px){
-      .nl,.ncta{display:none}
+      .nl,.ncta{display:none!important}
+      .nav-mobile{display:flex}
+      .lang-btn{font-size:10px;padding:4px 10px;margin-left:4px}
       .hero-body{padding:0 28px 60px}
       .about{grid-template-columns:1fr}
       .about-vis{height:260px}
@@ -451,9 +459,15 @@
     <li><a href="#programs" data-ko>프로그램</a><a href="#programs" data-en>Programs</a></li>
     <li><a href="#schedule" data-ko>일정</a><a href="#schedule" data-en>Schedule</a></li>
     <li class="nl-sep" aria-hidden="true">|</li>
+    <li><a href="/editor" class="nl-page" data-ko>게시판</a><a href="/editor" class="nl-page" data-en>Board</a></li>
     <li><a href="/archive" class="nl-page" data-ko>아카이브</a><a href="/archive" class="nl-page" data-en>Archive</a></li>
     <li><a href="/chat" class="nl-page" data-ko>챗봇</a><a href="/chat" class="nl-page" data-en>AI Chat</a></li>
   </ul>
+  <div class="nav-mobile">
+    <a href="/editor" data-ko>게시판</a><a href="/editor" data-en>Board</a>
+    <a href="/archive" data-ko>아카이브</a><a href="/archive" data-en>Archive</a>
+    <a href="/chat" data-ko>챗봇</a><a href="/chat" data-en>AI Chat</a>
+  </div>
   <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">EN</button>
   <a href="#cta" class="ncta" data-ko>참여 신청</a>
   <a href="#cta" class="ncta" data-en>Join Us</a>
@@ -487,7 +501,7 @@
   <div class="ps"><span class="ps-ko">수도</span><span data-ko>修道 · 닦아가는 길</span><span data-en>修道 · The Path of Practice</span></div>
   <div class="ps"><span class="ps-ko">제도</span><span data-ko>濟度 · 영격을 높이다</span><span data-en>濟度 · Elevate the Spirit</span></div>
   <div class="ps"><span class="ps-ko">생명장</span><span data-ko>生命場 · 생명의 공명</span><span data-en>生命場 · Field of Life</span></div>
-  <div class="ps"><span class="ps-ko">각성</span><span data-ko>覺醒 · 눈뜨는 공부</span><span data-en>覺醒 · Awakening</span></div>
+  <div class="ps"><span class="ps-ko">유○론적 각성</span><span data-ko>唯○論的 覺醒</span><span data-en>UniO Awakening</span></div>
   <div class="ps"><span class="ps-ko">성멸오통</span><span data-ko>性滅五通 · 초월하여 통하다</span><span data-en>性滅五通 · Transcend & Unite</span></div>
 </div>
 
@@ -526,10 +540,10 @@
     </div>
     <div class="panel-txt">
       <div class="p-order r">CORE TEACHING 01</div>
-      <h3 class="p-title r d1" data-ko>각성</h3>
-      <h3 class="p-title r d1" data-en>Awakening</h3>
-      <p class="p-subtitle r d1" data-ko>覺醒 · 깨어남의 길</p>
-      <p class="p-subtitle r d1" data-en>覺醒 · The Path of Inner Awakening</p>
+      <h3 class="p-title r d1" data-ko>유○론적 각성</h3>
+      <h3 class="p-title r d1" data-en>UniO Awakening</h3>
+      <p class="p-subtitle r d1" data-ko>唯○論的 覺醒 · 깨어남의 근원 원리</p>
+      <p class="p-subtitle r d1" data-en>唯○論的 覺醒 · The Foundational Principle of Awakening</p>
       <div class="divider r d2"></div>
       <p class="p-body r d2" data-ko>한울사상은 유○론적 각성법을 기반으로 합니다. 우주 궁극의 실체를 ○으로 보는 우주관이며, 개체인 한올들이 공존의 질서 위에서 서로 조화를 이루어 온전한 한울이 되어야 한다는 사상입니다. — 큰스승님 말씀</p>
       <p class="p-body r d2" data-en>Hanul Philosophy is grounded in the UniO awakening method — a cosmology that views the ultimate reality of the universe as ○. Individual souls (한올) must achieve harmony within the order of coexistence to become the complete Hanul. — Grandmaster's Teaching</p>
