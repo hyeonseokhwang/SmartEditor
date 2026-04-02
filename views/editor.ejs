@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>법문 에디터 — 한울사상</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <!-- Toast UI Editor CDN -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Noto Sans KR',sans-serif;background:#F8F6F0;color:#2A1E10}
+    .site-nav{position:fixed;top:0;left:0;right:0;height:44px;background:rgba(42,30,16,0.96);display:flex;align-items:center;gap:0;z-index:9999;padding:0 24px}
+    .site-nav a{color:#E8DCC8;text-decoration:none;font-size:13px;padding:0 14px;height:44px;display:flex;align-items:center;font-family:'Noto Sans KR',sans-serif;letter-spacing:.5px;transition:color .2s}
+    .site-nav a:hover,.site-nav a.active{color:#D4A840}
+    .site-nav .logo{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:500;color:#E8DCC8;margin-right:8px;border-right:1px solid rgba(255,255,255,.2);padding-right:18px}
+    .page{margin-top:44px;max-width:960px;margin-left:auto;margin-right:auto;padding:24px 20px}
+    h1{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:400;margin-bottom:4px}
+    .desc{font-size:13px;color:#7A6048;margin-bottom:20px}
+    .toolbar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+    .toolbar-row input[type=text]{padding:8px 12px;border:1px solid #DDD8C8;border-radius:6px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:#fff;flex:1;min-width:200px}
+    .toolbar-row select{padding:8px 10px;border:1px solid #DDD8C8;border-radius:6px;font-size:13px;background:#fff;font-family:'Noto Sans KR',sans-serif}
+    .btn{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Noto Sans KR',sans-serif;transition:background .15s}
+    .btn-primary{background:#2A1E10;color:#E8DCC8}
+    .btn-primary:hover{background:#3A2E20}
+    .btn-secondary{background:#F0E8D4;color:#5A3E18;border:1px solid #DDD0B0}
+    .btn-secondary:hover{background:#E8D8B8}
+    #editor-wrap{background:#fff;border:1px solid #DDD8C8;border-radius:8px;overflow:hidden}
+    .toastui-editor-defaultUI{border:none!important}
+    .status-msg{font-size:12px;color:#7A6048;padding:4px 0}
+    .status-msg.ok{color:#4A7A2A}
+    .status-msg.err{color:#c00}
+    .recent-posts{margin-top:28px}
+    .recent-posts h3{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;margin-bottom:12px;color:#5A3E18}
+    .rpost-item{background:#fff;border:1px solid #DDD8C8;border-radius:6px;padding:12px 16px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+    .rpost-item:hover{background:#F8F2E4}
+    .rpost-title{font-size:14px;color:#2A1E10}
+    .rpost-meta{font-size:11px;color:#9A8870}
+  </style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="/" class="logo">한울사상</a>
+  <a href="/">홈 (A팀)</a>
+  <a href="/v2">홈 (B팀)</a>
+  <a href="/archive">아카이브</a>
+  <a href="/chat">AI 챗봇</a>
+  <a href="/editor" class="active">에디터</a>
+</nav>
+
+<div class="page">
+  <h1>법문·말씀 에디터</h1>
+  <p class="desc">Toast UI Editor WYSIWYG · 게시글 직접 편집·저장</p>
+
+  <div class="toolbar-row">
+    <input type="text" id="post-id-input" placeholder="게시글 ID (post_id) 입력 후 불러오기…">
+    <button class="btn btn-secondary" onclick="loadPost()">불러오기</button>
+    <button class="btn btn-primary" onclick="savePost()">저장</button>
+    <span class="status-msg" id="status"></span>
+  </div>
+
+  <div id="editor-wrap">
+    <div id="editor"></div>
+  </div>
+
+  <div class="recent-posts">
+    <h3>최근 게시글 (클릭하여 편집)</h3>
+    <div id="recent-list">불러오는 중…</div>
+  </div>
+</div>
+
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+let currentPostId = null;
+
+const editor = new toastui.Editor({
+  el: document.getElementById('editor'),
+  height: '500px',
+  initialEditType: 'wysiwyg',
+  previewStyle: 'vertical',
+  placeholder: '법문·말씀 내용을 입력하세요…',
+  toolbarItems: [
+    ['heading', 'bold', 'italic', 'strike'],
+    ['hr', 'quote'],
+    ['ul', 'ol', 'task'],
+    ['table', 'image', 'link'],
+    ['code', 'codeblock'],
+    ['scrollSync'],
+  ],
+  hooks: {
+    async addImageBlobHook(blob, cb) {
+      const form = new FormData();
+      form.append('file', blob);
+      const r = await fetch('/api/upload', { method: 'POST', body: form }).then(r=>r.json());
+      cb(r.url, blob.name);
+    }
+  }
+});
+
+async function loadPost() {
+  const pid = document.getElementById('post-id-input').value.trim();
+  if (!pid) return;
+  setStatus('불러오는 중…');
+  try {
+    const d = await fetch('/api/posts/' + encodeURIComponent(pid)).then(r=>r.json());
+    if (d.error) { setStatus('오류: ' + d.error, true); return; }
+    currentPostId = d.post_id;
+    editor.setHTML(d.content_html || `<p>${(d.content||'').replace(/\n/g,'<br>')}</p>`);
+    setStatus(`"${d.title}" 불러옴`, false, true);
+  } catch(e) { setStatus('오류: ' + e.message, true); }
+}
+
+async function savePost() {
+  if (!currentPostId) { setStatus('먼저 게시글을 불러오세요', true); return; }
+  setStatus('저장 중…');
+  try {
+    const html = editor.getHTML();
+    const r = await fetch('/api/posts/' + encodeURIComponent(currentPostId), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content_html: html }),
+    }).then(r=>r.json());
+    setStatus(r.ok ? '저장 완료' : '오류: ' + r.error, !r.ok, r.ok);
+  } catch(e) { setStatus('오류: ' + e.message, true); }
+}
+
+function setStatus(msg, isErr=false, isOk=false) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-msg' + (isErr?' err':isOk?' ok':'');
+}
+
+async function loadRecent() {
+  const data = await fetch('/api/posts?limit=10&page=1').then(r=>r.json());
+  const el = document.getElementById('recent-list');
+  if (!data.posts?.length) { el.textContent = '게시글 없음'; return; }
+  el.innerHTML = data.posts.map(p=>`
+    <div class="rpost-item" onclick="selectPost('${escJs(p.post_id)}','${escJs(p.title)}')">
+      <span class="rpost-title">${escHtml(p.title||'(제목없음)')}</span>
+      <span class="rpost-meta">${escHtml(p.board||'')} · ${p.created_at?new Date(p.created_at).toLocaleDateString('ko'):''}</span>
+    </div>`).join('');
+}
+
+function selectPost(pid, title) {
+  document.getElementById('post-id-input').value = pid;
+  loadPost();
+}
+
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\n/g,''); }
+
+loadRecent();
+</script>
+</body>
+</html>

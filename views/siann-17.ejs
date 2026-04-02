@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한울사랑 여의명상센터 — <%= themeId %>번 테마</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    <%
+    const themes={
+      1: {n:'Ivory Sage',    ac:'#7A6845', aL:'#9A8860', bg:'#FAF7F0', tx:'#2A1E10', gr:'#8A7860', dark:'#3A2E18', mid:'#F0EBD8', lite:'#FBF9F2', hl:'#C8B870'},
+      2: {n:'Forest Still',  ac:'#4A7A3A', aL:'#6A9A58', bg:'#F0F8EE', tx:'#141E10', gr:'#6A8860', dark:'#1E3818', mid:'#DCF0D8', lite:'#F4FAF2', hl:'#78B858'},
+      3: {n:'Cream Temple',  ac:'#5A5040', aL:'#7A7058', bg:'#F8F6F0', tx:'#1E1A14', gr:'#8A8070', dark:'#2A2418', mid:'#EAE6D8', lite:'#FAF8F4', hl:'#A89870'},
+      4: {n:'Amber Dawn',    ac:'#C07028', aL:'#E09048', bg:'#FCF6EC', tx:'#221408', gr:'#907850', dark:'#5A3010', mid:'#F0D8B8', lite:'#FEF8F0', hl:'#E09848'},
+      5: {n:'Lotus Blue',    ac:'#4A7898', aL:'#6A98B8', bg:'#F0F6FC', tx:'#0E1E2E', gr:'#6A8898', dark:'#1A3850', mid:'#C8DCF0', lite:'#F4F8FE', hl:'#6898C8'},
+      6: {n:'Sacred Violet', ac:'#7A5A90', aL:'#9A7AB0', bg:'#F6F0FA', tx:'#1A0E22', gr:'#8A7098', dark:'#3A1A50', mid:'#DCC8F0', lite:'#FAF4FE', hl:'#9A68C0'},
+      7: {n:'Bamboo Morning',ac:'#6A7840', aL:'#8A9860', bg:'#F6F8EC', tx:'#161E0A', gr:'#7A8868', dark:'#283010', mid:'#D8E0C0', lite:'#F8FAF0', hl:'#8AA858'},
+      8: {n:'Stone Silence', ac:'#606870', aL:'#808890', bg:'#F4F4F2', tx:'#141618', gr:'#7A8088', dark:'#282A2E', mid:'#D0D4D8', lite:'#F8F8F6', hl:'#889098'},
+      9: {n:'Teal Shrine',   ac:'#2A8888', aL:'#48A8A8', bg:'#EEF8F8', tx:'#0A1A1A', gr:'#5A8888', dark:'#0E3838', mid:'#B8E0E0', lite:'#F2FAFA', hl:'#48A8A8'},
+      10:{n:'Amber Monk',    ac:'#C88020', aL:'#E8A040', bg:'#FCF8EE', tx:'#1E1604', gr:'#9A8040', dark:'#583010', mid:'#F0D898', lite:'#FEF9F0', hl:'#E0A030'},
+      11:{n:'Ocean Deep',    ac:'#3A6898', aL:'#5A88B8', bg:'#ECF4FC', tx:'#0A1828', gr:'#5A7898', dark:'#102840', mid:'#BDD4EE', lite:'#F0F6FE', hl:'#5A88C0'},
+      12:{n:'Warm Linen',    ac:'#8A6038', aL:'#AA8050', bg:'#FAF4E8', tx:'#221608', gr:'#8A7860', dark:'#3C2010', mid:'#EDD8B8', lite:'#FDF8F0', hl:'#B88040'},
+      13:{n:'Moss Green',    ac:'#6A9840', aL:'#88B858', bg:'#EEF8E8', tx:'#121E08', gr:'#6A8850', dark:'#203010', mid:'#C8E8B8', lite:'#F2FAF0', hl:'#80B848'},
+      14:{n:'Midnight Blue', ac:'#5A70C8', aL:'#7A90E8', bg:'#ECEEFC', tx:'#0A0E28', gr:'#5A6898', dark:'#141830', mid:'#C0C8F0', lite:'#F0F2FE', hl:'#7080E0'},
+      15:{n:'Parchment',     ac:'#7A5020', aL:'#9A7038', bg:'#F8F2E4', tx:'#1E1408', gr:'#8A7060', dark:'#3A2008', mid:'#E8D8B8', lite:'#FBF7EE', hl:'#A87838'},
+      16:{n:'Rose Dusk',     ac:'#C07080', aL:'#E090A0', bg:'#FCF0F4', tx:'#221018', gr:'#907080', dark:'#502030', mid:'#F0C8D4', lite:'#FEF4F8', hl:'#D080A0'},
+      17:{n:'Gold Obsidian', ac:'#C8A030', aL:'#E8C050', bg:'#FCF8EA', tx:'#1E1A04', gr:'#887840', dark:'#503800', mid:'#F0D880', lite:'#FEFAF0', hl:'#E0B840'},
+      18:{n:'Jade Calm',     ac:'#5A9898', aL:'#7AB8B8', bg:'#ECF8F8', tx:'#0E1A1A', gr:'#5A8888', dark:'#163030', mid:'#B8E0E0', lite:'#F2FAFA', hl:'#70B0B0'},
+      19:{n:'Winter Pure',   ac:'#3A5888', aL:'#5A78A8', bg:'#F0F4FC', tx:'#0C1428', gr:'#6A7898', dark:'#142040', mid:'#C0CEEC', lite:'#F4F8FE', hl:'#5878B0'},
+      20:{n:'Copper Dusk',   ac:'#B07040', aL:'#D09060', bg:'#FAF2EA', tx:'#1E1008', gr:'#887060', dark:'#482010', mid:'#E8C8A0', lite:'#FDF7F0', hl:'#C88050'}
+    };
+    const t = themes[themeId] || themes[1];
+    // color-mix() 대체 — 구형 브라우저 호환
+    function mh(h1,h2,w){
+      const p=s=>parseInt(s,16);
+      const r1=p(h1.slice(1,3)),g1=p(h1.slice(3,5)),b1=p(h1.slice(5,7));
+      const r2=p(h2.slice(1,3)),g2=p(h2.slice(3,5)),b2=p(h2.slice(5,7));
+      return '#'+[r1*w+r2*(1-w),g1*w+g2*(1-w),b1*w+b2*(1-w)].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+    }
+    const heroMid = mh(t.dark, t.ac, 0.7);
+    const heroEnd = mh(t.ac, '#1a1a0a', 0.6);
+    const quoteBg = mh(t.dark, t.ac, 0.8);
+    const ctaEnd  = mh(t.ac, t.dark, 0.7);
+    %>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ac: <%= t.ac %>;
+      --aL: <%= t.aL %>;
+      --bg: <%= t.bg %>;
+      --tx: <%= t.tx %>;
+      --gr: <%= t.gr %>;
+      --dk: <%= t.dark %>;
+      --md: <%= t.mid %>;
+      --lt: <%= t.lite %>;
+      --hl: <%= t.hl %>;
+      --serif: 'Noto Serif KR', serif;
+      --sans: 'Noto Sans KR', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--tx);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+      background: transparent;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    .nav.solid {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.08);
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 18px; font-weight: 600;
+      color: #fff; letter-spacing: 0.08em;
+      transition: color 0.4s;
+      text-decoration: none;
+    }
+    .nav.solid .nav-logo { color: var(--dk); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-size: 13px; font-weight: 400; letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.85); text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav.solid .nav-links a { color: var(--gr); }
+    .nav-links a:hover { color: var(--aL); }
+    .nav-sep { color: rgba(255,255,255,0.2); font-size:10px; user-select:none; }
+    .nav.solid .nav-sep { color: var(--gr); opacity:0.3; }
+    .nav-page { border-bottom: 1px solid transparent; transition: color 0.3s, border-color 0.3s !important; }
+    .nav-page:hover { border-bottom-color: var(--aL) !important; }
+    .nav-cta {
+      font-size: 12px; font-weight: 500; letter-spacing: 0.1em;
+      padding: 8px 22px; border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.5);
+      color: #fff; background: transparent;
+      cursor: pointer; transition: all 0.3s;
+      text-decoration: none;
+    }
+    .nav.solid .nav-cta { border-color: var(--ac); color: var(--ac); }
+    .nav-cta:hover { background: var(--ac); color: #fff; border-color: var(--ac); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      background: linear-gradient(155deg, <%= t.dark %> 0%, <%= heroMid %> 45%, <%= heroEnd %> 100%);
+    }
+    .hero-bg-glyph {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-family: var(--serif); font-size: clamp(240px, 40vw, 560px);
+      font-weight: 200; line-height: 1;
+      color: rgba(255,255,255,0.04);
+      letter-spacing: -0.05em;
+      pointer-events: none; user-select: none;
+      white-space: nowrap;
+    }
+    .hero-lines {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    .hero-lines::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(560px, 80vw); height: min(560px, 80vw);
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .hero-lines::after {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(360px, 55vw); height: min(360px, 55vw);
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+    .hero-inner {
+      position: relative; z-index: 2;
+      text-align: center; padding: 120px 24px 80px;
+      max-width: 840px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; letter-spacing: 0.22em; font-weight: 400;
+      color: var(--hl); text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+    .hero-badge::before, .hero-badge::after {
+      content: ''; display: block;
+      width: 32px; height: 1px; background: var(--hl); opacity: 0.6;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(44px, 8vw, 88px);
+      font-weight: 300; line-height: 1.15;
+      color: #fff; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .hero-title em {
+      font-style: normal; font-weight: 600;
+      color: var(--hl);
+    }
+    .hero-sub-hanja {
+      font-family: var(--serif); font-size: 16px;
+      color: rgba(255,255,255,0.35); letter-spacing: 0.4em;
+      margin-bottom: 28px;
+    }
+    .hero-desc {
+      font-size: 16px; font-weight: 300;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.9; max-width: 540px; margin: 0 auto 48px;
+      letter-spacing: 0.02em;
+    }
+    .hero-btn {
+      display: inline-block;
+      font-size: 13px; font-weight: 500; letter-spacing: 0.14em;
+      padding: 16px 44px;
+      background: var(--ac); color: #fff;
+      border: none; border-radius: 2px;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .hero-btn:hover { background: var(--aL); transform: translateY(-2px); }
+    .hero-scroll {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.35); font-size: 10px; letter-spacing: 0.18em;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3));
+      animation: scroll-line 2s ease-in-out infinite;
+    }
+    @keyframes scroll-line {
+      0%,100%{ opacity:0.2; transform:scaleY(0.7); }
+      50%{ opacity:0.8; transform:scaleY(1); }
+    }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 100px 0; }
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 48px; }
+    .sec-label {
+      font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--ac); font-weight: 500;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .sec-label::after { content: ''; flex: 0 0 40px; height: 1px; background: var(--ac); opacity: 0.4; }
+    .sec-title {
+      font-family: var(--serif);
+      font-size: clamp(28px, 4vw, 46px);
+      font-weight: 300; line-height: 1.3; letter-spacing: -0.01em;
+      color: var(--dk); margin-bottom: 20px;
+    }
+    .sec-desc {
+      font-size: 15px; color: var(--gr); line-height: 1.9;
+      max-width: 560px; font-weight: 300;
+    }
+
+    /* ── PHILOSOPHY ── */
+    .philosophy { background: var(--lt); }
+    .phil-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0; margin-top: 72px;
+    }
+    .phil-item {
+      padding: 56px 48px; position: relative;
+      border: 1px solid rgba(0,0,0,0.06);
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .phil-item:hover { background: var(--md); }
+    .phil-glyph {
+      position: absolute; right: 24px; bottom: -8px;
+      font-family: var(--serif); font-size: 120px;
+      font-weight: 700; line-height: 1;
+      color: var(--ac); opacity: 0.06;
+      user-select: none;
+    }
+    .phil-num {
+      font-size: 10px; letter-spacing: 0.2em; color: var(--ac);
+      font-weight: 500; margin-bottom: 20px;
+    }
+    .phil-name {
+      font-family: var(--serif);
+      font-size: 28px; font-weight: 500;
+      color: var(--dk); margin-bottom: 6px;
+      letter-spacing: 0.06em;
+    }
+    .phil-hanja {
+      font-family: var(--serif); font-size: 13px;
+      color: var(--ac); letter-spacing: 0.3em;
+      margin-bottom: 20px; opacity: 0.8;
+    }
+    .phil-text {
+      font-size: 14px; color: var(--gr); line-height: 1.85;
+      font-weight: 300; position: relative; z-index: 1;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px; background: linear-gradient(to right, transparent, var(--ac), transparent);
+      opacity: 0.2; margin: 0;
+    }
+
+    /* ── PROGRAMS ── */
+    .programs { background: var(--bg); }
+    .prog-intro { display: flex; gap: 100px; align-items: flex-end; margin-bottom: 72px; }
+    .prog-intro-left { flex: 1; }
+    .prog-intro-right { flex: 0 0 320px; }
+    .prog-stat-big {
+      font-family: var(--serif); font-size: 72px; font-weight: 200;
+      color: var(--ac); line-height: 1; margin-bottom: 8px;
+    }
+    .prog-stat-text { font-size: 13px; color: var(--gr); letter-spacing: 0.06em; }
+    .prog-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: rgba(0,0,0,0.07);
+    }
+    .prog-card {
+      background: var(--lt); padding: 44px 36px;
+      position: relative; overflow: hidden;
+      transition: background 0.35s, transform 0.25s;
+      cursor: default;
+    }
+    .prog-card:hover { background: var(--md); transform: translateY(-4px); }
+    .prog-card-accent {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: linear-gradient(to right, var(--ac), var(--aL));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+    .prog-card:hover .prog-card-accent { transform: scaleX(1); }
+    .prog-icon {
+      width: 44px; height: 44px; margin-bottom: 28px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .prog-icon svg { width: 100%; height: 100%; }
+    .prog-num {
+      position: absolute; top: 28px; right: 28px;
+      font-family: var(--serif); font-size: 32px; font-weight: 200;
+      color: var(--ac); opacity: 0.2;
+    }
+    .prog-title {
+      font-family: var(--serif); font-size: 20px; font-weight: 500;
+      color: var(--dk); margin-bottom: 12px;
+    }
+    .prog-text { font-size: 13px; color: var(--gr); line-height: 1.8; font-weight: 300; }
+    .prog-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 20px; font-size: 11px; letter-spacing: 0.1em;
+      color: var(--ac); text-decoration: none;
+      transition: gap 0.2s;
+    }
+    .prog-link:hover { gap: 10px; }
+
+    /* ── QUOTE ── */
+    .quote-sec {
+      background: linear-gradient(160deg, <%= t.dark %> 0%, <%= quoteBg %> 100%);
+      padding: 120px 0;
+    }
+    .quote-inner {
+      max-width: 820px; margin: 0 auto; text-align: center; padding: 0 48px;
+    }
+    .quote-mark {
+      font-family: var(--serif); font-size: 96px; font-weight: 700;
+      color: var(--hl); opacity: 0.3; line-height: 0.5;
+      display: block; margin-bottom: 32px;
+    }
+    .quote-text {
+      font-family: var(--serif);
+      font-size: clamp(22px, 3.5vw, 38px);
+      font-weight: 300; line-height: 1.6;
+      color: rgba(255,255,255,0.92);
+      letter-spacing: 0.02em; margin-bottom: 36px;
+    }
+    .quote-source {
+      font-size: 12px; letter-spacing: 0.22em; color: var(--hl);
+      text-transform: uppercase; opacity: 0.7;
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+    }
+    .quote-source::before, .quote-source::after {
+      content: ''; display: block; width: 28px; height: 1px;
+      background: var(--hl); opacity: 0.5;
+    }
+
+    /* ── TEACHINGS ── */
+    .teachings { background: var(--md); }
+    .teach-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 80px; align-items: start; }
+    .teach-sticky { position: sticky; top: 100px; }
+    .teach-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+    .teach-item {
+      padding: 36px 0; border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .teach-item:first-child { padding-top: 0; border-top: 1px solid rgba(0,0,0,0.08); }
+    .teach-num { font-size: 10px; letter-spacing: 0.2em; color: var(--ac); margin-bottom: 12px; }
+    .teach-title {
+      font-family: var(--serif); font-size: 22px; font-weight: 400;
+      color: var(--dk); margin-bottom: 12px;
+    }
+    .teach-body { font-size: 14px; color: var(--gr); line-height: 1.85; font-weight: 300; }
+
+    /* ── STATS ── */
+    .stats { background: var(--lt); padding: 80px 0; }
+    .stats-row { display: flex; gap: 0; }
+    .stat-item {
+      flex: 1; text-align: center; padding: 48px 24px;
+      border-right: 1px solid rgba(0,0,0,0.07);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--serif); font-size: clamp(40px, 5vw, 64px);
+      font-weight: 200; color: var(--ac); line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-unit { font-size: 18px; color: var(--aL); }
+    .stat-label { font-size: 12px; letter-spacing: 0.1em; color: var(--gr); }
+
+    /* ── SECOND QUOTE ── */
+    .quote2-sec { background: var(--bg); padding: 100px 0; }
+    .quote2-inner { max-width: 760px; margin: 0 auto; text-align: center; padding: 0 48px; }
+    .quote2-line {
+      width: 1px; height: 60px; background: linear-gradient(to bottom, transparent, var(--ac));
+      margin: 0 auto 40px; opacity: 0.4;
+    }
+    .quote2-text {
+      font-family: var(--serif);
+      font-size: clamp(20px, 3vw, 32px);
+      font-weight: 300; line-height: 1.65;
+      color: var(--dk); letter-spacing: 0.03em; margin-bottom: 32px;
+    }
+    .quote2-author { font-size: 12px; letter-spacing: 0.2em; color: var(--ac); }
+
+    /* ── CTA ── */
+    .cta-sec {
+      background: linear-gradient(135deg, <%= t.ac %> 0%, <%= ctaEnd %> 100%);
+      padding: 100px 0;
+    }
+    .cta-inner { text-align: center; padding: 0 48px; }
+    .cta-title {
+      font-family: var(--serif);
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 300; color: #fff;
+      margin-bottom: 16px; letter-spacing: 0.01em;
+    }
+    .cta-sub { font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 44px; line-height: 1.7; }
+    .cta-btn {
+      display: inline-block;
+      font-size: 13px; font-weight: 500; letter-spacing: 0.14em;
+      padding: 18px 52px;
+      background: #fff; color: var(--ac);
+      border: none; border-radius: 2px;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .cta-btn:hover { background: var(--lt); transform: translateY(-2px); }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--dk); padding: 64px 0 40px;
+    }
+    .footer-inner { display: flex; gap: 80px; padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .footer-brand { flex: 0 0 280px; }
+    .footer-logo {
+      font-family: var(--serif); font-size: 22px; font-weight: 600;
+      color: #fff; margin-bottom: 16px;
+    }
+    .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.7; }
+    .footer-cols { flex: 1; display: flex; gap: 60px; }
+    .footer-col-title {
+      font-size: 11px; letter-spacing: 0.18em; font-weight: 500;
+      color: var(--hl); text-transform: uppercase; margin-bottom: 20px;
+    }
+    .footer-col-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col-list a { font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+    .footer-col-list a:hover { color: rgba(255,255,255,0.8); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 28px; }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.25); }
+    .footer-theme { font-size: 11px; color: rgba(255,255,255,0.2); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-inner > * { animation: fade-up 0.9s ease both; }
+    .hero-inner > *:nth-child(1) { animation-delay: 0.1s; }
+    .hero-inner > *:nth-child(2) { animation-delay: 0.25s; }
+    .hero-inner > *:nth-child(3) { animation-delay: 0.35s; }
+    .hero-inner > *:nth-child(4) { animation-delay: 0.45s; }
+    .hero-inner > *:nth-child(5) { animation-delay: 0.55s; }
+    .hero-inner > *:nth-child(6) { animation-delay: 0.65s; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px){
+      .nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .container { padding: 0 24px; }
+      .phil-grid { grid-template-columns: 1fr; }
+      .prog-grid { grid-template-columns: 1fr; }
+      .prog-intro { flex-direction: column; gap: 32px; }
+      .teach-grid { grid-template-columns: 1fr; gap: 40px; }
+      .teach-sticky { position: static; }
+      .stats-row { flex-wrap: wrap; }
+      .stat-item { flex: 1 1 50%; border-bottom: 1px solid rgba(0,0,0,0.07); }
+      .footer-inner { flex-direction: column; gap: 40px; }
+      .footer-cols { flex-wrap: wrap; gap: 36px; }
+    }
+  </style>
+  <% if (locals.showNav) { %>
+  <style>
+    #unified-site-nav{position:fixed;top:0;left:0;right:0;height:38px;background:rgba(15,10,5,0.92);display:flex;align-items:center;gap:0;z-index:99999;padding:0 20px;backdrop-filter:blur(4px)}
+    #unified-site-nav a{color:rgba(232,220,200,0.85);text-decoration:none;font-size:12px;padding:0 12px;height:38px;display:flex;align-items:center;font-family:'Noto Sans KR',sans-serif;letter-spacing:.3px;transition:color .2s;white-space:nowrap}
+    #unified-site-nav a:hover{color:#D4A840}
+    #unified-site-nav .unav-logo{font-size:13px;font-weight:500;color:#E8DCC8;border-right:1px solid rgba(255,255,255,.15);padding-right:16px;margin-right:4px}
+    #unified-site-nav .unav-divider{width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 4px}
+    #unified-site-nav .unav-label{font-size:10px;color:#D4A840;padding:2px 8px;background:rgba(212,168,64,.15);border-radius:10px;margin-left:4px}
+    body{padding-top:38px}
+  </style>
+  <% } %>
+</head>
+<body>
+<% if (locals.showNav) { %>
+<div id="unified-site-nav">
+  <span class="unav-logo">한울사상</span>
+  <a href="/">홈 A팀</a>
+  <a href="/v2" style="color:#D4A840">홈 <span class="unav-label">B팀</span></a>
+  <div class="unav-divider"></div>
+  <a href="/archive">아카이브</a>
+  <a href="/chat">AI 챗봇</a>
+  <a href="/editor">에디터</a>
+</div>
+<% } %>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="#" class="nav-logo">한울사랑</a>
+    <ul class="nav-links">
+      <li><a href="#philosophy">사상</a></li>
+      <li><a href="#programs">수련</a></li>
+      <li><a href="#teachings">가르침</a></li>
+      <li class="nav-sep" aria-hidden="true">|</li>
+      <li><a href="/archive" class="nav-page">아카이브</a></li>
+      <li><a href="/chat" class="nav-page">챗봇</a></li>
+      <li><a href="/editor" class="nav-page">에디터</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">수련 신청</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-glyph">한울</div>
+    <div class="hero-lines"></div>
+    <div class="hero-inner">
+      <div class="hero-badge">Hanul Sarang · Since 1992</div>
+      <h1 class="hero-title">
+        하늘과 땅 사이,<br><em>그 침묵 속에</em><br>내가 있다
+      </h1>
+      <p class="hero-sub-hanja">天 · 地 · 人</p>
+      <p class="hero-desc">
+        한울사랑 여의명상센터는 한울사상의 뿌리 위에서<br>
+        몸과 마음이 쉬고, 깨어나는 공간입니다.
+      </p>
+      <a href="#programs" class="hero-btn">수련 과정 보기</a>
+    </div>
+    <div class="hero-scroll">
+      <div class="hero-scroll-line"></div>
+      <span>scroll</span>
+    </div>
+  </section>
+
+  <!-- PHILOSOPHY -->
+  <section class="philosophy" id="philosophy">
+    <div class="container">
+      <div class="sec-label">한울사상 · Philosophy</div>
+      <h2 class="sec-title">네 가지 뿌리</h2>
+      <p class="sec-desc">한울사상은 도·손·장·책의 네 원리로 삶의 균형을 회복합니다.</p>
+    </div>
+    <div class="phil-grid" style="max-width:1140px;margin:0 auto;padding:0 48px;margin-top:0;">
+      <% const philData = [
+        {n:'01', name:'道  도', hanja:'길을 걷다', text:'모든 존재는 저마다의 길이 있습니다. 한울의 도는 강요가 아닌 자연스러운 흐름을 따라가는 삶의 방식입니다. 길을 찾는 것이 아니라, 이미 길 위에 있음을 아는 것.'},
+        {n:'02', name:'損  손', hanja:'덜어내다', text:'쌓는 것이 아닌 덜어냄의 지혜. 욕망과 집착을 내려놓을 때 비로소 진정한 자유가 시작됩니다. 비어있음이 곧 충만함입니다.'},
+        {n:'03', name:'場  장', hanja:'마당을 만들다', text:'개인이 아닌 공동체. 한울사랑은 혼자가 아닌 함께 수련하는 장(場)입니다. 나의 깨어남이 주변을 깨우고, 공동의 장이 더 깊은 수련을 가능하게 합니다.'},
+        {n:'04', name:'責  책', hanja:'책임지다', text:'깨달음은 세상으로 향합니다. 내면의 성장은 사회적 책임으로 이어집니다. 한울사상은 수련의 결실이 더불어 사는 삶으로 표현되어야 한다고 가르칩니다.'}
+      ]; %>
+      <% philData.forEach(p => { %>
+      <div class="phil-item">
+        <div class="phil-glyph"><%= p.name.split('  ')[0] %></div>
+        <div class="phil-num"><%= p.n %></div>
+        <div class="phil-name"><%= p.name %></div>
+        <div class="phil-hanja"><%= p.hanja %></div>
+        <p class="phil-text"><%= p.text %></p>
+      </div>
+      <% }); %>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROGRAMS -->
+  <section class="programs" id="programs">
+    <div class="container">
+      <div class="prog-intro">
+        <div class="prog-intro-left">
+          <div class="sec-label">수련 과정 · Programs</div>
+          <h2 class="sec-title">몸과 마음을 위한<br>여섯 가지 길</h2>
+        </div>
+        <div class="prog-intro-right">
+          <div class="prog-stat-big">6</div>
+          <div class="prog-stat-text">전문 수련 과정 · 연중 운영</div>
+        </div>
+      </div>
+      <div class="prog-grid">
+        <% const progs = [
+          {icon:'☽', title:'새벽 명상', sub:'Dawn Meditation', text:'하루의 시작을 고요 속에서. 새벽 5시, 가장 맑은 의식으로 내면을 만납니다.'},
+          {icon:'○', title:'기(氣) 수련', sub:'Qi Practice', text:'동양 전통 기수련으로 몸의 에너지 흐름을 조율하고 생명력을 회복합니다.'},
+          {icon:'◇', title:'한울 요가', sub:'Hanul Yoga', text:'한울사상과 요가 철학의 만남. 몸의 정렬을 통해 마음의 정렬을 경험합니다.'},
+          {icon:'∞', title:'집중 수련', sub:'Intensive Retreat', text:'3박 4일 침묵 수련. 디지털과 단절하고 진정한 자신과 대면합니다.'},
+          {icon:'◎', title:'걷기 명상', sub:'Walking Meditation', text:'한 걸음 한 걸음에 의식을 담아. 숲과 땅과 함께 하는 동적 명상.'},
+          {icon:'〇', title:'공동 수련', sub:'Community Practice', text:'함께하는 수련의 힘. 공동체 안에서 더 깊은 내면의 변화를 경험합니다.'}
+        ]; %>
+        <% progs.forEach((p, i) => { %>
+        <div class="prog-card">
+          <div class="prog-card-accent"></div>
+          <div class="prog-num">0<%= i+1 %></div>
+          <div class="prog-icon" style="font-size:28px; color:var(--ac);"><%= p.icon %></div>
+          <div class="prog-title"><%= p.title %></div>
+          <p class="prog-text"><%= p.text %></p>
+          <a href="#contact" class="prog-link">자세히 보기 →</a>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE 1 -->
+  <section class="quote-sec">
+    <div class="quote-inner">
+      <span class="quote-mark">"</span>
+      <p class="quote-text">
+        세상이 너를 타게 하지 말고,<br>네가 세상을 타라
+      </p>
+      <div class="quote-source">한울사상 핵심 가르침</div>
+    </div>
+  </section>
+
+  <!-- TEACHINGS -->
+  <section class="teachings" id="teachings">
+    <div class="container">
+      <div class="teach-grid">
+        <div class="teach-sticky">
+          <div class="sec-label">가르침 · Teachings</div>
+          <h2 class="sec-title">삶이 곧<br>수련입니다</h2>
+          <p class="sec-desc" style="margin-top:16px;">한울사랑의 가르침은 수련원 안에 머물지 않고 일상으로 흘러갑니다.</p>
+        </div>
+        <ul class="teach-list">
+          <% const teaches = [
+            {n:'01', title:'지금 이 순간', body:'과거의 기억도 미래의 불안도 아닌, 오직 지금 여기. 현재에 뿌리를 두는 것이 모든 수련의 출발입니다.'},
+            {n:'02', title:'몸이 스승이다', body:'몸은 가장 정직한 거울입니다. 긴장, 통증, 호흡의 리듬 — 몸이 보내는 신호에 귀를 기울이는 법을 배웁니다.'},
+            {n:'03', title:'침묵의 언어', body:'말이 멈출 때 비로소 들립니다. 규칙적인 침묵 수련으로 내면의 소리와 연결되는 능력을 키웁니다.'},
+            {n:'04', title:'관계가 수련이다', body:'나 혼자의 깨달음은 완전하지 않습니다. 타인과의 관계 속에서, 갈등과 용서 안에서 수련은 깊어집니다.'}
+          ]; %>
+          <% teaches.forEach(t2 => { %>
+          <li class="teach-item">
+            <div class="teach-num"><%= t2.n %></div>
+            <div class="teach-title"><%= t2.title %></div>
+            <p class="teach-body"><%= t2.body %></p>
+          </li>
+          <% }); %>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="container">
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-num">32<span class="stat-unit">년</span></div>
+          <div class="stat-label">수련원 역사</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">1,200<span class="stat-unit">+</span></div>
+          <div class="stat-label">수련 이수자</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">12<span class="stat-unit">종</span></div>
+          <div class="stat-label">정규 수련 과정</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">365</div>
+          <div class="stat-label">연중 수련 가능</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE 2 -->
+  <section class="quote2-sec">
+    <div class="quote2-inner">
+      <div class="quote2-line"></div>
+      <p class="quote2-text">
+        하늘의 뜻을 알고 싶다면<br>
+        먼저 내 안의 하늘을 찾으라
+      </p>
+      <div class="quote2-author">한울사상 · 수련 지침서</div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-sec" id="contact">
+    <div class="cta-inner">
+      <h2 class="cta-title">지금, 여정을 시작하세요</h2>
+      <p class="cta-sub">
+        첫 발걸음이 가장 어렵습니다.<br>
+        한울사랑 수련팀이 당신의 수련을 함께 설계합니다.
+      </p>
+      <a href="#contact" class="cta-btn">수련 상담 신청하기</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logo">한울사랑</div>
+          <p class="footer-tagline">
+            한울사상의 정신 위에<br>
+            몸과 마음이 만나는 공간.<br>
+            1992년부터 함께합니다.
+          </p>
+        </div>
+        <div class="footer-cols">
+          <div>
+            <div class="footer-col-title">수련 과정</div>
+            <ul class="footer-col-list">
+              <li><a href="#">새벽 명상</a></li>
+              <li><a href="#">기(氣) 수련</a></li>
+              <li><a href="#">집중 수련</a></li>
+              <li><a href="#">걷기 명상</a></li>
+            </ul>
+          </div>
+          <div>
+            <div class="footer-col-title">안내</div>
+            <ul class="footer-col-list">
+              <li><a href="#">수련원 소개</a></li>
+              <li><a href="#">오시는 길</a></li>
+              <li><a href="#">수련 신청</a></li>
+              <li><a href="#">공지사항</a></li>
+            </ul>
+          </div>
+          <div>
+            <div class="footer-col-title">연락처</div>
+            <ul class="footer-col-list">
+              <li><a href="#">문의 전화 안내</a></li>
+              <li><a href="#">contact@yeouimyeongsan.kr</a></li>
+              <li><a href="#">서울특별시 영등포구 여의도</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">© 2026 한울사랑 여의명상센터. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // NAV scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('solid', window.scrollY > 60);
+    }, { passive: true });
+  </script>
+</body>
+</html>
