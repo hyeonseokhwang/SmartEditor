@@ -135,7 +135,7 @@ app.get('/api/posts', async (req, res) => {
     if (search) { where.push(`(p.title ILIKE $${idx} OR p.content ILIKE $${idx})`); params.push(`%${search}%`); idx++; }
 
     const wc = where.length ? 'WHERE ' + where.join(' AND ') : '';
-    const total = parseInt((await pool.query(`SELECT COUNT(*) FROM yeouiseonwon.posts ${wc}`, params)).rows[0].count);
+    const total = parseInt((await pool.query(`SELECT COUNT(*) FROM yeouiseonwon.posts p ${wc}`, params)).rows[0].count);
     const rows  = (await pool.query(
       `SELECT p.id, p.post_id, p.board, p.title, p.author,
               LEFT(p.content, 200) as preview, p.created_at, p.image_urls,
