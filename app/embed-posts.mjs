@@ -12,8 +12,11 @@ const pool = new pg.Pool({
   database: 'hanul_thought', user: 'postgres', password: 'postgres',
 });
 
+import dotenv from 'dotenv';
+dotenv.config({ path: new URL('../.env', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1') });
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'REMOVED',
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const BATCH = 20;
