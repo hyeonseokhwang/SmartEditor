@@ -12,44 +12,13 @@
     :root{
       --bg:#FAFAF7;--bg2:#F4F0E8;--bg3:#E8E0CE;
       --ac:#7A5230;--tx:#1A1410;--t2:#4A3828;--gr:#8A7868;
-      --bd:rgba(122,82,48,0.15);--nav-bg:rgba(26,16,8,0.97);
-      --foot:#12100E
+      --bd:rgba(122,82,48,0.15)
     }
     html{scroll-behavior:smooth}
     body{font-family:'Noto Sans KR',sans-serif;font-weight:300;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased}
 
-    /* ── NAV ── */
-    .site-nav{
-      position:fixed;top:0;left:0;right:0;z-index:900;
-      height:68px;display:flex;align-items:center;gap:0;
-      background:var(--nav-bg);backdrop-filter:blur(20px);
-      padding:0 clamp(16px,4vw,80px);
-      box-shadow:0 1px 0 rgba(122,82,48,0.2)
-    }
-    .site-nav .logo{
-      font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;
-      color:rgba(255,255,255,.9);letter-spacing:.06em;text-decoration:none;
-      margin-right:20px;padding-right:20px;
-      border-right:1px solid rgba(255,255,255,.12)
-    }
-    .site-nav .logo:hover{color:var(--ac)}
-    .nav-links{display:flex;gap:0;list-style:none}
-    .nav-links a{
-      font-size:11px;letter-spacing:.09em;color:rgba(255,255,255,.5);
-      text-decoration:none;padding:0 14px;height:68px;display:flex;align-items:center;
-      transition:color .2s;border-bottom:2px solid transparent
-    }
-    .nav-links a:hover{color:rgba(255,255,255,.85)}
-    .nav-links a.active{color:var(--ac);border-bottom-color:var(--ac)}
-
     /* ── PAGE ── */
-    .page{margin-top:68px;max-width:1040px;margin-left:auto;margin-right:auto;padding:48px 24px 80px}
-
-    /* ── PAGE HEADER ── */
-    .page-header{margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid var(--bd)}
-    .page-eyebrow{display:block;font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--ac);margin-bottom:14px}
-    .page-title{font-family:'Noto Serif KR',serif;font-size:clamp(1.6rem,2.8vw,2.2rem);font-weight:200;color:var(--tx);line-height:1.3;margin-bottom:8px}
-    .page-desc{font-size:13px;color:var(--gr);letter-spacing:.04em;line-height:1.9}
+    .page{margin-top:24px;max-width:1040px;margin-left:auto;margin-right:auto;padding:48px 24px 80px}
 
     /* ── TOOLBAR ── */
     .toolbar-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -79,13 +48,6 @@
     .btn-primary:hover{background:transparent;color:var(--ac)}
     .btn-secondary{background:var(--bg2);color:var(--t2);border:1px solid var(--bd)}
     .btn-secondary:hover{background:var(--bg3)}
-    .btn-back{
-      display:inline-flex;align-items:center;gap:6px;
-      font-size:11px;letter-spacing:.1em;color:var(--gr);
-      text-decoration:none;margin-bottom:24px;
-      transition:color .2s;border:none;background:none;cursor:pointer;padding:0;font-family:'Noto Sans KR',sans-serif
-    }
-    .btn-back:hover{color:var(--ac)}
 
     /* ── STATUS ── */
     .status-msg{font-size:12px;color:var(--gr);letter-spacing:.04em;padding:4px 0}
@@ -124,28 +86,7 @@
   </style>
 </head>
 <body>
-<nav class="site-nav">
-  <a href="/" class="logo" id="nav-home">한울사상</a>
-  <ul class="nav-links">
-    <li><a href="/" id="nav-home-a">홈</a></li>
-    <li><a href="/archive" id="nav-archive">아카이브</a></li>
-    <li><a href="/chat" id="nav-chat">AI 챗봇</a></li>
-    <li><a href="/editor" class="active">에디터</a></li>
-  </ul>
-</nav>
-
 <div class="page">
-  <a href="/" class="btn-back">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
-    메인으로 돌아가기
-  </a>
-
-  <div class="page-header">
-    <span class="page-eyebrow">DHARMA EDITOR · 법문 관리</span>
-    <h1 class="page-title">법문·말씀 에디터</h1>
-    <p class="page-desc">SmartEditor2 WYSIWYG · 게시글 직접 편집·저장</p>
-  </div>
-
   <!-- 게시판 필터 + 검색 -->
   <div class="toolbar-row">
     <select id="board-select" onchange="filterByBoard()" style="max-width:170px">
