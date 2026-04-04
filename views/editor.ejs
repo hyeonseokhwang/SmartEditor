@@ -12,13 +12,37 @@
     :root{
       --bg:#FAFAF7;--bg2:#F4F0E8;--bg3:#E8E0CE;
       --ac:#7A5230;--tx:#1A1410;--t2:#4A3828;--gr:#8A7868;
-      --bd:rgba(122,82,48,0.15)
+      --bd:rgba(122,82,48,0.15);--nav-bg:rgba(26,16,8,0.97)
     }
     html{scroll-behavior:smooth}
     body{font-family:'Noto Sans KR',sans-serif;font-weight:300;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased}
 
+    /* ── NAV ── */
+    .site-nav{
+      position:fixed;top:0;left:0;right:0;z-index:900;
+      height:68px;display:flex;align-items:center;gap:0;
+      background:var(--nav-bg);backdrop-filter:blur(20px);
+      padding:0 clamp(16px,4vw,80px);
+      box-shadow:0 1px 0 rgba(122,82,48,0.2)
+    }
+    .site-nav .logo{
+      font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;
+      color:rgba(255,255,255,.9);letter-spacing:.06em;text-decoration:none;
+      margin-right:20px;padding-right:20px;
+      border-right:1px solid rgba(255,255,255,.12)
+    }
+    .site-nav .logo:hover{color:var(--ac)}
+    .nav-links{display:flex;gap:0;list-style:none}
+    .nav-links a{
+      font-size:11px;letter-spacing:.09em;color:rgba(255,255,255,.5);
+      text-decoration:none;padding:0 14px;height:68px;display:flex;align-items:center;
+      transition:color .2s;border-bottom:2px solid transparent
+    }
+    .nav-links a:hover{color:rgba(255,255,255,.85)}
+    .nav-links a.active{color:var(--ac);border-bottom-color:var(--ac)}
+
     /* ── PAGE ── */
-    .page{margin-top:24px;max-width:1040px;margin-left:auto;margin-right:auto;padding:48px 24px 80px}
+    .page{margin-top:68px;max-width:1040px;margin-left:auto;margin-right:auto;padding:48px 24px 80px}
 
     /* ── TOOLBAR ── */
     .toolbar-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -30,13 +54,6 @@
     }
     .toolbar-row input[type=text]:focus{border-color:var(--ac)}
     .toolbar-row input[type=text]::placeholder{color:var(--gr)}
-    .toolbar-row select{
-      padding:9px 11px;border:1px solid var(--bd);border-radius:0;
-      font-size:12px;background:#fff;color:var(--t2);
-      font-family:'Noto Sans KR',sans-serif;outline:none;cursor:pointer;
-      transition:border-color .2s
-    }
-    .toolbar-row select:focus{border-color:var(--ac)}
 
     /* ── BUTTONS ── */
     .btn{
@@ -61,41 +78,23 @@
     }
     #se-iframe{width:100%;height:520px;border:none;display:block}
 
-    /* ── SECTION DIVIDER ── */
-    .sec-divider{display:flex;align-items:center;gap:16px;margin:32px 0 20px}
-    .sec-divider-label{font-family:'Noto Serif KR',serif;font-size:13px;font-weight:400;color:var(--t2);letter-spacing:.06em;white-space:nowrap}
-    .sec-divider-line{flex:1;height:1px;background:var(--bd)}
-
-    /* ── POST LIST ── */
-    .recent-posts{margin-top:0}
-    .rpost-item{
-      background:#fff;border:1px solid var(--bd);border-bottom:none;
-      padding:13px 18px;cursor:pointer;
-      display:flex;justify-content:space-between;align-items:center;
-      transition:background .15s
-    }
-    .rpost-item:last-of-type{border-bottom:1px solid var(--bd)}
-    .rpost-item:hover{background:var(--bg2)}
-    .rpost-title{font-size:13.5px;color:var(--tx);font-weight:300}
-    .rpost-meta{font-size:11px;color:var(--gr);white-space:nowrap;margin-left:14px;flex-shrink:0;letter-spacing:.03em}
-
     @media(max-width:768px){
       .page{padding:32px 16px 60px}
-      .page-title{font-size:1.4rem}
     }
   </style>
 </head>
 <body>
-<div class="page">
-  <!-- 게시판 필터 + 검색 -->
-  <div class="toolbar-row">
-    <select id="board-select" onchange="filterByBoard()" style="max-width:170px">
-      <option value="">전체 게시판</option>
-    </select>
-    <input type="text" id="search-input" placeholder="제목 검색…" onkeydown="if(event.key==='Enter')doSearch()" style="max-width:220px">
-    <button class="btn btn-secondary" onclick="doSearch()">검색</button>
-  </div>
+<nav class="site-nav">
+  <a href="javascript:void(0)" class="logo">한울사상</a>
+  <ul class="nav-links">
+    <li><a href="javascript:void(0)">홈</a></li>
+    <li><a href="javascript:void(0)">아카이브</a></li>
+    <li><a href="javascript:void(0)">AI 챗봇</a></li>
+    <li><a href="javascript:void(0)" class="active">에디터</a></li>
+  </ul>
+</nav>
 
+<div class="page">
   <!-- 게시글 선택 + 저장 -->
   <div class="toolbar-row">
     <input type="text" id="post-id-input" placeholder="게시글 ID 입력 후 불러오기…">
@@ -107,16 +106,6 @@
   <!-- SmartEditor2 iframe -->
   <div class="se-frame-wrap">
     <iframe id="se-iframe" src="/public/se-wrapper.html" title="SmartEditor2 법문 에디터"></iframe>
-  </div>
-
-  <!-- 최근 게시글 목록 -->
-  <div class="sec-divider">
-    <span class="sec-divider-label">최근 게시글</span>
-    <div class="sec-divider-line"></div>
-    <span style="font-size:11px;color:var(--gr);letter-spacing:.06em">클릭하여 편집</span>
-  </div>
-  <div class="recent-posts">
-    <div id="recent-list" style="color:var(--gr);font-size:13px;padding:16px 0">불러오는 중…</div>
   </div>
 </div>
 
@@ -191,61 +180,7 @@ function setStatus(msg, isErr = false, isOk = false) {
   el.className = 'status-msg' + (isErr ? ' err' : isOk ? ' ok' : '');
 }
 
-let editorState = { board: '', search: '', page: 1 };
-
-async function loadBoards() {
-  const boards = await fetch('/api/boards').then(r => r.json());
-  const sel = document.getElementById('board-select');
-  sel.innerHTML = '<option value="">전체 게시판</option>' +
-    boards.map(b => `<option value="${escHtml(b.board)}">${escHtml(b.board)} (${b.count})</option>`).join('');
-}
-
-function filterByBoard() {
-  editorState.board = document.getElementById('board-select').value;
-  editorState.page = 1;
-  loadRecent();
-}
-
-function doSearch() {
-  editorState.search = document.getElementById('search-input').value;
-  editorState.page = 1;
-  loadRecent();
-}
-
-async function loadRecent() {
-  const params = new URLSearchParams({ limit: 20, page: editorState.page });
-  if (editorState.board) params.set('board', editorState.board);
-  if (editorState.search) params.set('search', editorState.search);
-  const data = await fetch('/api/posts?' + params).then(r => r.json());
-  const el = document.getElementById('recent-list');
-  if (!data.posts?.length) { el.innerHTML = '<p style="color:var(--gr);padding:12px 0">게시글 없음</p>'; return; }
-  el.innerHTML = data.posts.map(p => `
-    <div class="rpost-item" onclick="selectPost('${escJs(p.post_id)}','${escJs(p.title)}')">
-      <span class="rpost-title">${escHtml(p.title || '(제목없음)')}</span>
-      <span class="rpost-meta">${escHtml(p.board || '')} · ${p.created_at ? new Date(p.created_at).toLocaleDateString('ko') : ''}</span>
-    </div>`).join('');
-  const total = data.totalPages || 1;
-  const cur = data.page || 1;
-  if (total > 1) {
-    const pages = [];
-    for (let i = Math.max(1, cur - 2); i <= Math.min(total, cur + 2); i++)
-      pages.push(`<button onclick="goEditorPage(${i})" style="padding:5px 10px;border:1px solid var(--bd);background:${i === cur ? 'var(--ac)' : '#fff'};color:${i === cur ? '#fff' : 'var(--t2)'};cursor:pointer;font-size:11px;font-family:'Noto Sans KR',sans-serif;letter-spacing:.04em">${i}</button>`);
-    el.innerHTML += `<div style="display:flex;gap:4px;margin-top:12px;justify-content:center">${pages.join('')}</div>`;
-  }
-}
-
-function goEditorPage(n) { editorState.page = n; loadRecent(); }
-
-function selectPost(pid) {
-  document.getElementById('post-id-input').value = pid;
-  loadPost();
-}
-
 function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function escJs(s) { return String(s || '').replace(/'/g, "\\'").replace(/\n/g, ''); }
-
-loadBoards();
-loadRecent();
 </script>
 </body>
 </html>
