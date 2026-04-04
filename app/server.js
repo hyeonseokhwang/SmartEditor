@@ -131,7 +131,7 @@ app.get('/archive', (req, res) => res.render('archive'));
 // /chat → AI 챗봇 페이지
 app.get('/chat', (req, res) => res.render('chat'));
 
-// /editor → Toast UI 스마트에디터
+// /editor → SmartEditor2 (standalone 편집 전용 — 메인은 siann-22 통합)
 app.get('/editor', (req, res) => res.render('editor'));
 
 // ════════════════════════════════════════════════════════════════
@@ -550,5 +550,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('  /v2      — B팀 홈페이지 (siann-17)');
   console.log('  /archive — 아카이브');
   console.log('  /chat    — AI 챗봇');
-  console.log('  /editor  — 스마트에디터');
+  console.log('  /editor  — SmartEditor2 standalone (포트 8082는 server-editor.js)');
 });
