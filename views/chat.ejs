@@ -69,8 +69,9 @@
     .input-area{display:flex;background:#fff;border:1px solid #DDD8C8;border-top:1px solid #EDE8D8;border-radius:0 0 10px 10px;overflow:hidden}
     .input-area input{flex:1;padding:14px 18px;border:none;font-size:14px;background:transparent;font-family:'Noto Sans KR',sans-serif;outline:none;color:#2A1E10}
     .input-area input::placeholder{color:#BDB5A5}
-    .input-area button{padding:14px 24px;background:#2A1E10;color:#E8DCC8;border:none;cursor:pointer;font-size:13px;font-family:'Noto Serif KR',serif;white-space:nowrap;transition:background .2s;letter-spacing:.04em}
+    .input-area button{padding:14px 24px;background:#2A1E10;color:#E8DCC8;border:none;cursor:pointer;font-size:13px;font-family:'Noto Serif KR',serif;white-space:nowrap;transition:background .2s;letter-spacing:.04em;min-height:44px;touch-action:manipulation}
     .input-area button:hover{background:#3A2E20}
+    .input-area button:active:not(:disabled){background:#3A2E20}
     .input-area button:disabled{opacity:.45;cursor:not-allowed}
 
     /* SOURCES */
@@ -87,8 +88,9 @@
 
     /* QUICK QUESTIONS (2줄) */
     .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-    .quick-btn{padding:8px 12px;background:#F4EFE4;color:#5A3E18;border:1px solid #DDD0B0;border-radius:8px;font-size:12px;cursor:pointer;text-align:left;transition:background .15s;font-family:'Noto Sans KR',sans-serif;line-height:1.4}
+    .quick-btn{padding:8px 12px;background:#F4EFE4;color:#5A3E18;border:1px solid #DDD0B0;border-radius:8px;font-size:12px;cursor:pointer;text-align:left;transition:background .15s;font-family:'Noto Sans KR',sans-serif;line-height:1.4;min-height:44px;touch-action:manipulation}
     .quick-btn:hover{background:#EDE0C8}
+    .quick-btn:active{background:#E0D0B0}
 
     /* MOBILE */
     @media(max-width:640px){
@@ -118,8 +120,8 @@
       .quick-btn{font-size:11px;padding:7px 10px}
       .sugg-area{padding:6px 10px}
       .sugg-label{font-size:9px}
-      .input-area input{font-size:14px;padding:10px}
-      .input-area button{padding:10px 14px;font-size:12px}
+      .input-area input{font-size:14px;padding:10px;min-height:44px}
+      .input-area button{padding:10px 14px;font-size:12px;min-height:44px}
     }
   </style>
 </head>
