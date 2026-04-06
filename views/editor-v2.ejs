@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>법문 에디터 — 한울사상</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500&family=Noto+Sans+KR:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#FAFAF7;--bg2:#F4F0E8;--bg3:#E8E0CE;
+      --ac:#7A5230;--tx:#1A1410;--t2:#4A3828;--gr:#8A7868;
+      --bd:rgba(122,82,48,0.15);--nav-bg:rgba(26,16,8,0.97)
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Noto Sans KR',sans-serif;font-weight:300;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased}
+
+    /* ── NAV ── */
+    .site-nav{
+      position:fixed;top:0;left:0;right:0;z-index:900;
+      height:68px;display:flex;align-items:center;gap:0;
+      background:var(--nav-bg);backdrop-filter:blur(20px);
+      padding:0 clamp(16px,4vw,80px);
+      box-shadow:0 1px 0 rgba(122,82,48,0.2)
+    }
+    .site-nav .logo{
+      font-family:'Noto Serif KR',serif;font-size:15px;font-weight:400;
+      color:rgba(255,255,255,.9);letter-spacing:.06em;text-decoration:none;
+      margin-right:20px;padding-right:20px;
+      border-right:1px solid rgba(255,255,255,.12)
+    }
+    .site-nav .logo:hover{color:var(--ac)}
+    .nav-links{display:flex;gap:0;list-style:none}
+    .nav-links a{
+      font-size:11px;letter-spacing:.09em;color:rgba(255,255,255,.5);
+      text-decoration:none;padding:0 14px;height:68px;display:flex;align-items:center;
+      transition:color .2s;border-bottom:2px solid transparent
+    }
+    .nav-links a:hover{color:rgba(255,255,255,.85)}
+    .nav-links a.active{color:var(--ac);border-bottom-color:var(--ac)}
+
+    /* ── PAGE ── */
+    .page{margin-top:68px;max-width:100%;margin-left:auto;margin-right:auto;padding:16px 24px 24px}
+
+    /* ── TOOLBAR ── */
+    .toolbar-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .toolbar-row input[type=text]{
+      padding:9px 13px;border:1px solid var(--bd);border-radius:0;
+      font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:300;
+      background:#fff;flex:1;min-width:180px;color:var(--tx);
+      outline:none;transition:border-color .2s
+    }
+    .toolbar-row input[type=text]:focus{border-color:var(--ac)}
+    .toolbar-row input[type=text]::placeholder{color:var(--gr)}
+
+    /* ── BUTTONS ── */
+    .btn{
+      padding:9px 20px;border:none;border-radius:0;cursor:pointer;
+      font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:400;
+      letter-spacing:.1em;transition:.2s;white-space:nowrap
+    }
+    .btn-primary{background:var(--ac);color:#fff;border:1px solid var(--ac)}
+    .btn-primary:hover{background:transparent;color:var(--ac)}
+    .btn-secondary{background:var(--bg2);color:var(--t2);border:1px solid var(--bd)}
+    .btn-secondary:hover{background:var(--bg3)}
+
+    /* ── STATUS ── */
+    .status-msg{font-size:12px;color:var(--gr);letter-spacing:.04em;padding:4px 0}
+    .status-msg.ok{color:#4A7A2A}
+    .status-msg.err{color:#A03030}
+
+    /* ── EDITOR FRAME ── */
+    .se-frame-wrap{
+      background:#fff;border:1px solid var(--bd);
+      overflow:hidden;width:100%;margin-bottom:24px
+    }
+    #se-iframe{width:100%;height:calc(100vh - 160px);border:none;display:block}
+
+    @media(max-width:768px){
+      .page{padding:12px 12px 24px}
+    }
+  </style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="javascript:void(0)" class="logo">한울사상</a>
+  <ul class="nav-links">
+    <li><a href="javascript:void(0)">홈</a></li>
+    <li><a href="javascript:void(0)">아카이브</a></li>
+    <li><a href="javascript:void(0)">AI 챗봇</a></li>
+    <li><a href="javascript:void(0)" class="active">에디터</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <!-- 게시글 선택 + 저장 -->
+  <div class="toolbar-row">
+    <input type="text" id="post-id-input" placeholder="게시글 ID 입력 후 불러오기…">
+    <button class="btn btn-secondary" onclick="loadPost()">불러오기</button>
+    <button class="btn btn-primary" onclick="savePost()">저장</button>
+    <span class="status-msg" id="status"></span>
+  </div>
+
+  <!-- SmartEditor2 iframe -->
+  <div class="se-frame-wrap">
+    <iframe id="se-iframe" src="/public/se-wrapper.html" title="SmartEditor2 법문 에디터"></iframe>
+  </div>
+</div>
+
+<!-- se-init-v2.js: paste/drop 이미지 업로드 핸들러 (순차 업로드 + 프로그레스 바) -->
+<script src="/public/js/se-init-v2.js"></script>
+
+<script>
+let currentPostId = null;
+
+function getSeEditor() {
+  try {
+    const cw = document.getElementById('se-iframe').contentWindow;
+    return cw && cw.oEditors && cw.oEditors.getById && cw.oEditors.getById['ir1'];
+  } catch { return null; }
+}
+
+function getSeHTML() {
+  const ed = getSeEditor();
+  if (!ed) return '';
+  try { ed.exec('UPDATE_CONTENTS_FIELD', []); } catch {}
+  try {
+    const cw = document.getElementById('se-iframe').contentWindow;
+    return cw.document.getElementById('ir1').value || '';
+  } catch { return ''; }
+}
+
+function setSeHTML(html) {
+  const ed = getSeEditor();
+  if (!ed) { setTimeout(() => setSeHTML(html), 300); return; }
+  try {
+    ed.exec('SET_IR_VALUE', [html || '']);
+  } catch {
+    try {
+      const cw = document.getElementById('se-iframe').contentWindow;
+      const ta = cw.document.getElementById('ir1');
+      if (ta) ta.value = html || '';
+    } catch {}
+  }
+}
+
+async function loadPost() {
+  const pid = document.getElementById('post-id-input').value.trim();
+  if (!pid) return;
+  setStatus('불러오는 중…');
+  try {
+    const d = await fetch('/api/posts/' + encodeURIComponent(pid)).then(r => r.json());
+    if (d.error) { setStatus('오류: ' + d.error, true); return; }
+    currentPostId = d.post_id;
+    const html = d.content_html || `<p>${(d.content || '').replace(/\n/g, '<br>')}</p>`;
+    setSeHTML(html);
+    setStatus(`"${d.title}" 불러옴`, false, true);
+  } catch (e) { setStatus('오류: ' + e.message, true); }
+}
+
+async function savePost() {
+  if (!currentPostId) { setStatus('먼저 게시글을 불러오세요', true); return; }
+  setStatus('저장 중…');
+  try {
+    const html = getSeHTML();
+    const r = await fetch('/api/posts/' + encodeURIComponent(currentPostId), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content_html: html }),
+    }).then(r => r.json());
+    setStatus(r.ok ? '저장 완료' : '오류: ' + r.error, !r.ok, r.ok);
+  } catch (e) { setStatus('오류: ' + e.message, true); }
+}
+
+function setStatus(msg, isErr = false, isOk = false) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-msg' + (isErr ? ' err' : isOk ? ' ok' : '');
+}
+
+function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+</script>
+</body>
+</html>
