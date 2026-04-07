@@ -148,7 +148,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 
     if (hasCloudinary) {
       const r = await cloudinary.uploader.upload(dataUrl, {
-        folder: 'Hanwool', public_id: uuidv4(), resource_type: 'image',
+        folder: 'Hanwool', public_id: uuidv4(), resource_type: 'auto',
       });
       return res.json({ url: r.secure_url });
     }

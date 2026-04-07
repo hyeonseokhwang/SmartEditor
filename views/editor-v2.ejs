@@ -174,15 +174,33 @@ async function loadPost() {
 }
 
 // blob: URL → dataUrl 변환 (서버는 blob URL 처리 불가 — 클라이언트에서 변환 필수)
+// EMF/WMF 등 비표준 형식은 canvas PNG 변환 fallback 적용
 async function blobUrlToDataUrl(blobUrl) {
   const res = await fetch(blobUrl);
   const blob = await res.blob();
-  return new Promise((resolve, reject) => {
+  const dataUrl = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
+  // 표준 웹 이미지가 아니면 canvas로 PNG 변환 시도
+  if (!dataUrl.startsWith('data:image/jpeg') && !dataUrl.startsWith('data:image/png') &&
+      !dataUrl.startsWith('data:image/gif') && !dataUrl.startsWith('data:image/webp')) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth || 800;
+        c.height = img.naturalHeight || 600;
+        c.getContext('2d').drawImage(img, 0, 0);
+        resolve(c.toDataURL('image/png'));
+      };
+      img.onerror = () => resolve(dataUrl); // 변환 실패 시 원본 반환
+      img.src = blobUrl;
+    });
+  }
+  return dataUrl;
 }
 
 // img src 분류: uploaded(http/https) / pending(data:/blob:/file:) / broken(src없음)
