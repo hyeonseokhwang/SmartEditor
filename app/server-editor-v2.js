@@ -214,6 +214,41 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+// 클립보드 분석 데이터 수신 — Lucas 직접 지시: 에이전트가 클립보드 데이터를 읽을 수 있도록
+const CLIP_LOG_DIR = path.join(__dirname, '..', 'public', 'clipboard-logs');
+if (!fs.existsSync(CLIP_LOG_DIR)) fs.mkdirSync(CLIP_LOG_DIR, { recursive: true });
+
+app.post('/api/log/clipboard', express.json({ limit: '50mb' }), (req, res) => {
+  try {
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `clip-${ts}.json`;
+    const data = {
+      timestamp: new Date().toISOString(),
+      ...req.body,
+    };
+    fs.writeFileSync(path.join(CLIP_LOG_DIR, filename), JSON.stringify(data, null, 2), 'utf8');
+    console.log('[clipboard] logged:', filename, '| htmlLen:', req.body.htmlLen, '| rtfLen:', req.body.rtfLen, '| images:', req.body.fileImgCount);
+    res.json({ ok: true, filename });
+  } catch (err) {
+    console.error('[clipboard]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/log/clipboard', (req, res) => {
+  try {
+    const files = fs.readdirSync(CLIP_LOG_DIR).filter(f => f.endsWith('.json')).sort().reverse();
+    if (req.query.latest) {
+      if (!files.length) return res.json({ error: 'no logs' });
+      const data = JSON.parse(fs.readFileSync(path.join(CLIP_LOG_DIR, files[0]), 'utf8'));
+      return res.json(data);
+    }
+    res.json({ files, count: files.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 이미지 감사 API — GET /api/posts/:postId/image-audit
 app.get('/api/posts/:postId/image-audit', async (req, res) => {
   try {
@@ -241,10 +276,72 @@ app.get('/api/posts/:postId/image-audit', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// 클립보드 디버그 로그
+// 클립보드 디버그 로그 — 전체 데이터 메모리 저장 + 파일 백업
+const CLIPBOARD_LOG_DIR = path.join(__dirname, '..', 'public', 'clipboard-logs');
+fs.mkdirSync(CLIPBOARD_LOG_DIR, { recursive: true });
+let lastClipboardData = null;
+
 app.post('/api/log/clipboard', (req, res) => {
-  console.log('[SE2][clipboard]', JSON.stringify(req.body).slice(0, 200));
-  res.json({ ok: true });
+  const body = req.body;
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  lastClipboardData = { ts, ...body };
+  // 파일 저장 (base64 데이터 포함 전체)
+  const fpath = path.join(CLIPBOARD_LOG_DIR, `clipboard-${ts}.json`);
+  try { fs.writeFileSync(fpath, JSON.stringify(lastClipboardData, null, 2)); } catch(e) {}
+  console.log('[SE2][clipboard]', ts, '| htmlLen:', body.htmlLen, '| rtfLen:', body.rtfLen,
+    '| fileImgs:', body.fileImgCount, '| hwpJson:', body.hwpJsonImages,
+    '| rtf:', body.rtfImages, '| htmlData:', body.htmlDataImages,
+    '| hwpMeta:', body.hwpMeta ? `bidt:${Object.keys(body.hwpMeta.bidtKeys||{}).length} srOrder:${(body.hwpMeta.srOrder||[]).length}` : 'none');
+  res.json({ ok: true, saved: fpath });
+});
+
+// 클립보드 분석 조회 — GET /api/debug/clipboard
+app.get('/api/debug/clipboard', (req, res) => {
+  if (!lastClipboardData) {
+    // 파일에서 가장 최근 것 로드
+    try {
+      const files = fs.readdirSync(CLIPBOARD_LOG_DIR).filter(f => f.endsWith('.json')).sort();
+      if (files.length) {
+        const latest = path.join(CLIPBOARD_LOG_DIR, files[files.length - 1]);
+        lastClipboardData = JSON.parse(fs.readFileSync(latest, 'utf8'));
+      }
+    } catch(e) {}
+  }
+  if (!lastClipboardData) return res.status(404).json({ error: 'No clipboard data recorded yet' });
+  const d = lastClipboardData;
+  const meta = d.hwpMeta || {};
+  const bidtKeys = Object.keys(meta.bidtKeys || {});
+  const srOrder = meta.srOrder || [];
+  const missingInBidt = srOrder.filter(sr => !meta.bidtKeys || meta.bidtKeys[sr] === undefined);
+  res.json({
+    ts: d.ts,
+    htmlLen: d.htmlLen,
+    rtfLen: d.rtfLen,
+    fileImgCount: d.fileImgCount,
+    fileUrlNames: d.fileUrlNames || [],
+    sources: {
+      hwpJson: d.hwpJsonImages,
+      rtf: d.rtfImages,
+      htmlData: d.htmlDataImages,
+      clipboardFiles: d.clipboardFiles,
+    },
+    hwpMeta: {
+      bidtKeyCount: bidtKeys.length,
+      srOrderCount: srOrder.length,
+      matched: meta.matched,
+      missingInBidt,
+      bidtKeys,
+      srOrder,
+    },
+    analysis: {
+      shortfall: (d.fileImgCount || 0) - (d.hwpJsonImages || 0),
+      reason: missingInBidt.length > 0
+        ? `HWP JSON bidt에 ${missingInBidt.length}개 키 없음 → file:/// 만 존재`
+        : (d.fileImgCount || 0) > (d.hwpJsonImages || 0)
+          ? 'HWP JSON 이미지 수 < file:/// 태그 수 — 대량 복사 한계'
+          : 'OK',
+    }
+  });
 });
 
 // 최종 저장 로그
