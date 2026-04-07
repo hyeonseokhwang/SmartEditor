@@ -229,7 +229,21 @@ async function savePost() {
     const pendingList = details.filter(d => d.status === 'pending');
     if (total > 0) setStatus(`이미지 총 ${total}개 — 미업로드 ${pendingList.length}개`);
 
-    // ── 2. 미업로드 이미지 순차 업로드 (프로그레스 바 표시) ──
+    // ── 2. 이미지 상태바 표시 (pending 유무 관계없이 이미지 있으면 항상 표시) ──
+    if (total > 0) {
+      showProgress(true);
+      if (pendingList.length === 0) {
+        // 붙여넣기 시 이미 업로드 완료된 경우 → 즉시 100% 표시
+        document.getElementById('save-progress-label').textContent =
+          `이미지 ${total}개 전체 업로드 확인 완료 (${total}/${total})`;
+        document.getElementById('save-progress-bar-inner').style.width = '100%';
+        document.getElementById('save-progress-detail').textContent =
+          `업로드 완료 ${total}건`;
+        await new Promise(function(r){ setTimeout(r, 900); });
+        showProgress(false);
+      }
+    }
+
     if (pendingList.length > 0) {
       showProgress(true);
       document.getElementById('save-progress-label').textContent =
