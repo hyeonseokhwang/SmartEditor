@@ -57,10 +57,10 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dataUrl: dataUrl })
       }).then(function(r){
-          // 4xx 클라이언트 에러는 즉시 실패 — retry 무의미 (400 Bad Request 등)
+          // 4xx 클라이언트 에러는 즉시 실패 — retry 무의미 (Cloudinary 400 등)
           if (r.status >= 400 && r.status < 500) {
             warn('upload attempt', attempt, 'HTTP', r.status, '— client error, no retry');
-            return r.json().catch(function(){ return null; });
+            return { __noRetry: true, url: null };
           }
           // 5xx 서버 에러는 retry 대상
           if (!r.ok && attempt < MAX_RETRY) {
@@ -70,7 +70,7 @@
           return r.json();
         })
         .then(function(j) {
-          if (!j) return j;
+          if (!j || j.__noRetry) return { url: null }; // 4xx or null — no retry, immediate fail
           if (j && j.url) return j;
           // url 없는 응답 → retry (5xx 후 빈 응답 등)
           if (attempt < MAX_RETRY) {
