@@ -283,13 +283,16 @@
   }
 
   // Extract from HWP JSON comment embedded in HTML
+  // HTML 순서 기반 매핑: fn(파일명) 필드로 file:/// URL 순서와 1:1 매핑
   function collectFromHwpJson(html) {
     try {
       var m = html && html.match(/<!--\[data-hwpjson\]\s*(\{[\s\S]*?\})\s*-->/i);
       if (!m) return [];
       var root = JSON.parse(m[1]);
       var bidt = {};
-      var srOrder = [];
+      var fnToBi = {}; // 파일명 → bi key 매핑 (HTML 순서 기반 정렬용)
+      var srOrder = []; // JSON DFS 순서 (fallback)
+
       var collect = function(obj) {
         if (!obj || typeof obj !== 'object') return;
         if (obj.bidt && typeof obj.bidt === 'object') {
@@ -297,33 +300,74 @@
             if (typeof obj.bidt[k] === 'string' && obj.bidt[k].length > 50) bidt[k] = obj.bidt[k];
           }
         }
-        // seen 중복체크 제거 — 같은 이미지가 여러 번 참조되는 경우 srOrder에 모두 포함 (CTO 지시)
-        if (typeof obj.bi === 'string') { srOrder.push(obj.bi); }
+        // bi 참조 수집 (fn 파일명 포함)
+        if (typeof obj.bi === 'string') {
+          srOrder.push(obj.bi);
+          // fn 필드: HWP가 생성하는 파일명 (EMBxxxxxxxx.jpg 등)
+          var fn = obj.fn || obj.name || obj.fileName || null;
+          if (fn) { fnToBi[fn.split('/').pop().split('\\').pop()] = obj.bi; }
+        }
         if (Array.isArray(obj.bi)) {
           for (var i = 0; i < obj.bi.length; i++) {
             var it = obj.bi[i];
-            if (it && typeof it.sr === 'string') { srOrder.push(it.sr); }
+            if (it && typeof it.sr === 'string') {
+              srOrder.push(it.sr);
+              var fn2 = it.fn || it.name || it.fileName || null;
+              if (fn2) { fnToBi[fn2.split('/').pop().split('\\').pop()] = it.sr; }
+            }
           }
         }
         for (var key in obj) if (Object.prototype.hasOwnProperty.call(obj, key)) collect(obj[key]);
       };
       collect(root);
+
       var bidtKeys = Object.keys(bidt);
-      log('HWP JSON: bidt keys:', bidtKeys.length, '| srOrder:', srOrder.length);
+      var fnKeys = Object.keys(fnToBi);
+      log('HWP JSON: bidt keys:', bidtKeys.length, '| srOrder:', srOrder.length, '| fnToBi:', fnKeys.length);
+
+      // HTML에서 file:/// URL 순서 추출
+      var htmlFileNames = [];
+      var fre = /<img\b[^>]*\bsrc\s*=\s*["']?(file:\/\/\/[^"'>\s]+)/gi;
+      var fu;
+      while ((fu = fre.exec(html)) !== null) {
+        htmlFileNames.push(fu[1].split('/').pop());
+      }
+      log('HWP JSON: htmlFileNames:', htmlFileNames.length, fnKeys.length > 0 ? '→ fn매핑 사용' : '→ JSON순서 fallback');
+
       var dataUrls = [];
-      var missing = [];
-      for (var si = 0; si < srOrder.length; si++) {
-        var b64 = bidt[srOrder[si]];
-        if (b64) {
-          dataUrls.push('data:image/png;base64,' + b64);
-        } else {
-          missing.push(srOrder[si]);
+      if (htmlFileNames.length > 0 && fnKeys.length > 0) {
+        // fn 매핑 기반: HTML 파일명 순서로 bi key 조회
+        var missing = [];
+        for (var fi = 0; fi < htmlFileNames.length; fi++) {
+          var htmlFn = htmlFileNames[fi];
+          var biKey = fnToBi[htmlFn];
+          if (!biKey) {
+            // 부분 매칭 (tmpXXXX.jpg 등은 fn 없을 수 있음)
+            for (var fk in fnToBi) {
+              if (htmlFn.indexOf(fk) !== -1 || fk.indexOf(htmlFn) !== -1) { biKey = fnToBi[fk]; break; }
+            }
+          }
+          var b64 = biKey ? bidt[biKey] : null;
+          if (b64) {
+            dataUrls.push('data:image/png;base64,' + b64);
+          } else {
+            dataUrls.push(null); // 매핑 실패 → filePath fallback에서 처리
+            missing.push(htmlFn + '(biKey=' + (biKey || 'none') + ')');
+          }
+        }
+        if (missing.length > 0) warn('HWP JSON fn-mapped missing:', missing.length, missing.slice(0,5));
+      } else {
+        // fn 필드 없음 — JSON DFS 순서로 fallback
+        log('HWP JSON: fn 필드 없음, JSON DFS 순서 사용');
+        for (var si = 0; si < srOrder.length; si++) {
+          var b64f = bidt[srOrder[si]];
+          if (b64f) dataUrls.push('data:image/png;base64,' + b64f);
+          else { dataUrls.push(null); warn('HWP JSON: missing bidt for', srOrder[si]); }
         }
       }
-      if (missing.length > 0) {
-        warn('HWP JSON: missing bidt data for', missing.length, 'images:', missing);
-        log('HWP JSON: available bidt keys:', bidtKeys.join(', '));
-      }
+
+      var valid = dataUrls.filter(function(x){ return x !== null; }).length;
+      log('HWP JSON: total', dataUrls.length, 'slots,', valid, 'valid');
       return dataUrls;
     } catch(e) { warn('HWP JSON parse error:', e); return []; }
   }
@@ -425,6 +469,14 @@
             results[idx] = cachedUrl;
             topProgress.update(idx+1, total, success, fail);
             log('upload ' + (idx+1) + '/' + total + ' CACHE HIT: ' + cachedUrl.substring(0,60));
+            return;
+          }
+          // null dataUrl → filePath fallback에서 처리 (fn 매핑 실패 시)
+          if (!dataUrls[idx]) {
+            fail++;
+            results[idx] = null;
+            topProgress.update(idx+1, total, success, fail);
+            log('upload ' + (idx+1) + '/' + total + ' SKIP(null→filePath fallback)');
             return;
           }
           log('uploading ' + (idx+1) + '/' + total + '...');
