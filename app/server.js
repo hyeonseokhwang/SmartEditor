@@ -318,9 +318,17 @@ app.post('/api/chat', async (req, res) => {
 
     const context = chunkCtx + postCtx;
 
-    // 4) GPT 답변 — 원문 기반 정확한 답변 (gpt-4o 고품질)
-    const chat = await openai.chat.completions.create({
+    // 4) GPT 답변 — SSE 스트리밍 (gpt-4o 고품질)
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const sources = useChunks.map(r => ({ book: r.book_name, similarity: r.similarity }));
+    res.write(`data: ${JSON.stringify({ type: 'sources', sources })}\n\n`);
+
+    const stream = await openai.chat.completions.create({
       model: 'gpt-4o',
+      stream: true,
       messages: [
         {
           role: 'system',
@@ -382,14 +390,20 @@ app.post('/api/chat', async (req, res) => {
       [question]
     ).catch(() => {});
 
-    const answer = chat.choices[0].message.content;
-    res.json({
-      answer,
-      sources: useChunks.map(r => ({ book: r.book_name, similarity: r.similarity })),
-    });
+    for await (const part of stream) {
+      const delta = part.choices[0]?.delta?.content;
+      if (delta) res.write(`data: ${JSON.stringify({ type: 'token', text: delta })}\n\n`);
+    }
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    res.end();
   } catch (e) {
     console.error('[chat]', e.message);
-    res.status(500).json({ error: e.message });
+    if (!res.headersSent) {
+      res.status(500).json({ error: e.message });
+    } else {
+      res.write(`data: ${JSON.stringify({ type: 'error', message: e.message })}\n\n`);
+      res.end();
+    }
   }
 });
 
