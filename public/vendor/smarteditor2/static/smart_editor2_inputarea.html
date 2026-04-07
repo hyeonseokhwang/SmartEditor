@@ -290,7 +290,6 @@
       var root = JSON.parse(m[1]);
       var bidt = {};
       var srOrder = [];
-      var seen = {};
       var collect = function(obj) {
         if (!obj || typeof obj !== 'object') return;
         if (obj.bidt && typeof obj.bidt === 'object') {
@@ -408,20 +407,31 @@
   };
 
   // Upload array of data URLs SEQUENTIALLY (1개씩 순차 — 동시 업로드 금지, Lucas 직접 지시)
+  // 동일 base64 캐시 — 같은 이미지 재사용 시 중복 업로드 방지 (CTO 지시)
   function uploadAll(dataUrls) {
     var total = dataUrls.length;
     var results = [];
     var success = 0, fail = 0;
+    var uploadCache = {}; // dataUrl → uploaded URL 캐시
     var chain = Promise.resolve();
     for (var i = 0; i < total; i++) {
       (function(idx) {
         chain = chain.then(function() {
           topProgress.update(idx, total, success, fail);
+          // 캐시 히트: 동일 dataUrl이 이미 업로드된 경우 재사용
+          if (uploadCache[dataUrls[idx]]) {
+            var cachedUrl = uploadCache[dataUrls[idx]];
+            success++;
+            results[idx] = cachedUrl;
+            topProgress.update(idx+1, total, success, fail);
+            log('upload ' + (idx+1) + '/' + total + ' CACHE HIT: ' + cachedUrl.substring(0,60));
+            return;
+          }
           log('uploading ' + (idx+1) + '/' + total + '...');
           return uploadDataUrl(dataUrls[idx])
             .then(function(j){
               var url = (j && j.url) ? j.url : null;
-              if (url) success++; else fail++;
+              if (url) { success++; uploadCache[dataUrls[idx]] = url; } else fail++;
               results[idx] = url;
               topProgress.update(idx+1, total, success, fail);
               log('upload ' + (idx+1) + '/' + total + (url ? ' OK: ' + url.substring(0,60) : ' FAIL'));
