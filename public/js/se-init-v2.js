@@ -81,9 +81,20 @@
   // fn receives: update(current, total, successCount, failCount)
   async function withOverlay(doc, totalCount, fn) {
     const d = doc || document;
+    // 메인 페이지 외부 progress bar 직접 연동 (IIFE 클로저 내부에서 직접 접근)
+    const extWrap    = window.document.getElementById('save-progress-wrap');
+    const extLabel   = window.document.getElementById('save-progress-label');
+    const extBarInner= window.document.getElementById('save-progress-bar-inner');
+    const extDetail  = window.document.getElementById('save-progress-detail');
     let overlay;
     try {
       window.PASTE_BUSY = true;
+      if (extWrap) {
+        extWrap.style.display = 'block';
+        if (extLabel)    extLabel.textContent    = `이미지 ${totalCount}개 업로드 중…`;
+        if (extBarInner) extBarInner.style.width = '0%';
+        if (extDetail)   extDetail.textContent   = '준비 중…';
+      }
       overlay = d.createElement('div');
       Object.assign(overlay.style, {
         position: 'fixed', left: '0', top: '0', width: '100%', height: '100%',
@@ -125,11 +136,19 @@
         const s = typeof successCount === 'number' ? successCount : current;
         const f = typeof failCount === 'number' ? failCount : 0;
         statusEl.textContent = `${current}/${total} 완료 — 성공 ${s}건${f > 0 ? ` / 실패 ${f}건` : ''}`;
+        // 외부 progress bar 동시 갱신
+        if (extWrap) {
+          if (extLabel)    extLabel.textContent    = `이미지 업로드 중… ${current} / ${total}개 (${pct}%)`;
+          if (extBarInner) extBarInner.style.width = pct + '%';
+          if (extDetail)   extDetail.textContent   = `성공 ${s}건${f > 0 ? ' / 실패 ' + f + '건' : ''}`;
+        }
       };
       return await fn(update);
     } finally {
       try { overlay && overlay.remove(); } catch {}
       window.PASTE_BUSY = false;
+      // 외부 progress bar 완료 후 숨김
+      if (extWrap) setTimeout(() => { extWrap.style.display = 'none'; if (extBarInner) extBarInner.style.width = '0%'; }, 1500);
     }
   }
 
