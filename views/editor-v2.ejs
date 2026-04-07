@@ -255,11 +255,13 @@ async function savePost() {
   setStatus('이미지 감사 중…');
   try {
     let html = getSeHTML();
+    console.log('[savePost] HTML length:', html.length, 'preview:', html.substring(0, 200));
 
     // ── 1. 이미지 감사 ──────────────────────────────────────────
     const details = auditImgSrcs(html);
     const total = details.length;
     const pendingList = details.filter(d => d.status === 'pending');
+    console.log('[savePost] 이미지 총', total, '개 / 미업로드', pendingList.length, '개', pendingList.map(d=>d.src.substring(0,40)));
     if (total > 0) setStatus(`이미지 총 ${total}개 — 미업로드 ${pendingList.length}개`);
 
     // ── 2. 이미지 상태바 표시 (pending 유무 관계없이 이미지 있으면 항상 표시) ──

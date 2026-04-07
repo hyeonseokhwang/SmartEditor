@@ -86,6 +86,7 @@
     const extLabel   = window.document.getElementById('save-progress-label');
     const extBarInner= window.document.getElementById('save-progress-bar-inner');
     const extDetail  = window.document.getElementById('save-progress-detail');
+    console.log('[withOverlay] 이미지', totalCount, '개 업로드 시작. extWrap:', !!extWrap, 'window:', typeof window);
     let overlay;
     try {
       window.PASTE_BUSY = true;
@@ -136,6 +137,7 @@
         const s = typeof successCount === 'number' ? successCount : current;
         const f = typeof failCount === 'number' ? failCount : 0;
         statusEl.textContent = `${current}/${total} 완료 — 성공 ${s}건${f > 0 ? ` / 실패 ${f}건` : ''}`;
+        console.log('[upload] ' + current + '/' + total + ' (' + pct + '%) 성공:' + s + ' 실패:' + f);
         // 외부 progress bar 동시 갱신
         if (extWrap) {
           if (extLabel)    extLabel.textContent    = `이미지 업로드 중… ${current} / ${total}개 (${pct}%)`;
