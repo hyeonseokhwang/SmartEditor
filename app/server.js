@@ -284,7 +284,7 @@ app.post('/api/chat', async (req, res) => {
       ),
       // (B) 게시글 pgvector (임베딩 있는 건만)
       pool.query(
-        `SELECT title, LEFT(content, 1000) AS excerpt, board, created_at,
+        `SELECT id, title, LEFT(content, 1000) AS excerpt, board, created_at,
                 1-(embedding <=> $1::vector) AS similarity
          FROM yeouiseonwon.posts
          WHERE embedding IS NOT NULL
@@ -293,7 +293,7 @@ app.post('/api/chat', async (req, res) => {
       ).catch(() => ({ rows: [] })),
       // (C) 게시글 키워드 검색 (임베딩 유무 무관)
       pool.query(
-        `SELECT title, LEFT(content, 1000) AS excerpt, board, created_at
+        `SELECT id, title, LEFT(content, 1000) AS excerpt, board, created_at
          FROM yeouiseonwon.posts
          WHERE (${postKeywordWhere}) AND content IS NOT NULL AND content != ''
          ORDER BY created_at DESC LIMIT 8`,
@@ -339,7 +339,10 @@ app.post('/api/chat', async (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    const sources = useChunks.map(r => ({ book: r.book_name, similarity: r.similarity }));
+    const sources = [
+      ...useChunks.map(r => ({ type: 'book', book: r.book_name, similarity: r.similarity })),
+      ...usePosts.slice(0, 3).map(r => ({ type: 'post', id: r.id, title: r.title, board: r.board })),
+    ];
     res.write(`data: ${JSON.stringify({ type: 'sources', sources })}\n\n`);
 
     const stream = await openai.chat.completions.create({

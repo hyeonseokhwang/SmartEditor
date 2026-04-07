@@ -77,6 +77,8 @@
     /* SOURCES */
     .src-bar{font-size:10px;color:#B0A890;margin-top:6px;letter-spacing:.04em}
     .src-tag{display:inline-block;padding:2px 8px;background:#F0E8D4;border-radius:10px;margin:2px;font-size:10px;color:#7A6048}
+    .src-tag-link{display:inline-block;padding:2px 8px;background:#EAF0E4;border-radius:10px;margin:2px;font-size:10px;color:#3A6040;text-decoration:none;border:1px solid #C8D8C0;transition:background .15s}
+    .src-tag-link:hover{background:#D0E8C0;text-decoration:underline}
 
     /* MARKDOWN rendered in bubble */
     .bubble h3,.bubble h4{font-family:'Noto Serif KR',serif;margin:.8em 0 .3em;font-size:1em}
@@ -88,9 +90,10 @@
 
     /* QUICK QUESTIONS (2줄) */
     .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-    .quick-btn{padding:8px 12px;background:#F4EFE4;color:#5A3E18;border:1px solid #DDD0B0;border-radius:8px;font-size:12px;cursor:pointer;text-align:left;transition:background .15s;font-family:'Noto Sans KR',sans-serif;line-height:1.4;min-height:44px;touch-action:manipulation}
-    .quick-btn:hover{background:#EDE0C8}
-    .quick-btn:active{background:#E0D0B0}
+    .quick-btn{padding:8px 12px;background:#F4EFE4;color:#5A3E18;border:1px solid #DDD0B0;border-radius:8px;font-size:12px;cursor:pointer;text-align:left;transition:background .15s,box-shadow .15s,transform .1s;font-family:'Noto Sans KR',sans-serif;line-height:1.4;min-height:44px;touch-action:manipulation}
+    .quick-btn:hover{background:#EDE0C8;box-shadow:0 2px 8px rgba(122,82,48,.15);transform:translateY(-1px)}
+    .quick-btn:active{background:#E0D0B0;transform:translateY(0)}
+    .quick-icon{font-size:13px;margin-right:5px;vertical-align:middle}
 
     /* MOBILE */
     @media(max-width:640px){
@@ -170,12 +173,12 @@
   <div class="sugg-area">
     <div class="sugg-label">빠른 질문</div>
     <div class="quick-grid">
-      <button class="quick-btn" onclick="ask(this.textContent)">생명장이란 무엇인가요?</button>
-      <button class="quick-btn" onclick="ask(this.textContent)">성멸오통이란 무엇인가요?</button>
-      <button class="quick-btn" onclick="ask(this.textContent)">우주영제도는 무엇인가요?</button>
-      <button class="quick-btn" onclick="ask(this.textContent)">집중수도는 어떻게 하나요?</button>
-      <button class="quick-btn" onclick="ask(this.textContent)">수도자 1인은 세상자 만인의 의미는?</button>
-      <button class="quick-btn" onclick="ask(this.textContent)">한울사상의 핵심은 무엇인가요?</button>
+      <button class="quick-btn" onclick="ask('생명장이란 무엇인가요?')"><span class="quick-icon">🌱</span>생명장이란 무엇인가요?</button>
+      <button class="quick-btn" onclick="ask('성멸오통이란 무엇인가요?')"><span class="quick-icon">✨</span>성멸오통이란 무엇인가요?</button>
+      <button class="quick-btn" onclick="ask('우주영제도는 무엇인가요?')"><span class="quick-icon">🌌</span>우주영제도는 무엇인가요?</button>
+      <button class="quick-btn" onclick="ask('집중수도는 어떻게 하나요?')"><span class="quick-icon">🧘</span>집중수도는 어떻게 하나요?</button>
+      <button class="quick-btn" onclick="ask('수도자 1인은 세상자 만인의 의미는?')"><span class="quick-icon">🌏</span>수도자 1인은 세상자 만인의 의미는?</button>
+      <button class="quick-btn" onclick="ask('한울사상의 핵심은 무엇인가요?')"><span class="quick-icon">☯</span>한울사상의 핵심은 무엇인가요?</button>
     </div>
   </div>
 
@@ -188,6 +191,49 @@
 
 <script>
 let busy = false;
+const HISTORY_KEY = 'hanul_chat_history';
+const MAX_HISTORY = 20;
+
+// ── 대화 기록 저장/복원 ────────────────────────────────────────────────────
+function saveHistory(q, answer, sources) {
+  try {
+    const arr = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    arr.push({ q, answer, sources, time: Date.now() });
+    if (arr.length > MAX_HISTORY) arr.splice(0, arr.length - MAX_HISTORY);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+  } catch(e) {}
+}
+
+function renderSourcesHtml(sources) {
+  if (!sources || !sources.length) return '';
+  return ' · <span class="src-bar">' + sources.map(s => {
+    if (s.type === 'post' && s.id) {
+      return `<a class="src-tag-link" href="/archive?post_id=${s.id}" title="${escHtml(s.board||'')}">📄 ${escHtml((s.title||'').slice(0,20))}</a>`;
+    }
+    return `<span class="src-tag">📖 ${escHtml(s.book||s.title||'')}</span>`;
+  }).join('') + '</span>';
+}
+
+function restoreHistory() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    if (!arr.length) return;
+    const msgs = document.getElementById('messages');
+    for (const item of arr) {
+      msgs.innerHTML += `
+        <div class="msg user"><div class="avatar">나</div><div>
+          <div class="bubble">${escHtml(item.q)}</div>
+          <div class="msg-time">${new Date(item.time).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}</div>
+        </div></div>`;
+      msgs.innerHTML += `
+        <div class="msg bot"><div class="avatar">한</div><div>
+          <div class="bubble">${renderMd(item.answer)}</div>
+          <div class="msg-time">${new Date(item.time).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} · 한울사상 AI${renderSourcesHtml(item.sources)}</div>
+        </div></div>`;
+    }
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch(e) {}
+}
 
 function ask(text) {
   document.getElementById('q').value = text;
@@ -276,7 +322,8 @@ async function sendMsg() {
             if (bubbleEl) { bubbleEl.innerHTML = renderMd(fullText); msgs.scrollTop = msgs.scrollHeight; }
           } else if (data.type === 'done') {
             const timeEl = document.getElementById(`${typingId}-time`);
-            if (timeEl) timeEl.innerHTML = `${nowTime()} · 한울사상 AI${sources && sources.length ? ' · <span class="src-bar">' + sources.slice(0,3).map(s=>`<span class="src-tag">${escHtml(s.book)}</span>`).join('') + '</span>' : ''}`;
+            if (timeEl) timeEl.innerHTML = `${nowTime()} · 한울사상 AI${renderSourcesHtml(sources)}`;
+            saveHistory(q, fullText, sources);
           } else if (data.type === 'error') {
             throw new Error(data.message);
           }
@@ -302,6 +349,9 @@ async function sendMsg() {
 }
 
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// 페이지 로드 시 히스토리 복원
+document.addEventListener('DOMContentLoaded', restoreHistory);
 
 function renderMd(s) {
   return escHtml(s)
