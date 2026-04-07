@@ -20,20 +20,12 @@
 
     <script>
       (async function(){
-        function headOk(url){
-          return fetch(url, { method: 'HEAD' }).then(r => r.ok).catch(() => false);
-        }
         function loadScript(url){
           return new Promise((res, rej) => { const s = document.createElement('script'); s.src = url; s.onload = res; s.onerror = rej; document.head.appendChild(s);});
         }
-        // Prefer dist; fallback to static
-        const baseDist = '/public/vendor/smarteditor2/dist';
-        const baseStatic = '/public/vendor/smarteditor2/static';
-        const distJS = baseDist + '/js/service/HuskyEZCreator.js';
-        const staticJS = baseStatic + '/js/service/HuskyEZCreator.js';
-        const useDist = await headOk(distJS);
-        const base = useDist ? baseDist : baseStatic;
-        const jsUrl = useDist ? distJS : staticJS;
+        // static 경로 직접 사용 (dist 폴더 없음 확인됨 — Inspector 2026-04-08)
+        const base = '/public/vendor/smarteditor2/static';
+        const jsUrl = base + '/js/service/HuskyEZCreator.js';
         try {
           await loadScript(jsUrl);
         } catch (e) {
@@ -65,4 +57,4 @@
       })();
     </script>
   </body>
-  </html>
+</html>
