@@ -499,6 +499,7 @@
         DBG.log('paste: counts', { imageItems: imageItems.length, htmlLen: (clipHTML || '').length, rtfLen: (clipRTF || '').length, hasFileUrls });
 
         if (imageItems.length) {
+          console.log('[paste] path1: imageItems=', imageItems.length);
           event.preventDefault();
           await withOverlay(doc, imageItems.length, async (update) => {
             let tasks = [];
@@ -517,6 +518,7 @@
           });
           return;
         } else if (clipHTML && /data:image\//i.test(clipHTML)) {
+          console.log('[paste] path2: dataUrl in HTML, count=', collectDataUrlsFromHTML(clipHTML).length);
           event.preventDefault();
           const duList = collectDataUrlsFromHTML(clipHTML);
           await withOverlay(doc, duList.length, async (update) => {
@@ -536,6 +538,7 @@
           });
           return;
         } else if (hasFileUrls) {
+          console.log('[paste] path3: file:// URLs detected');
           event.preventDefault();
           const duListPre = collectDataUrlsFromHTML(clipHTML);
           const hwpDusPre = parseHwpJsonForDataUrls(clipHTML);
@@ -593,6 +596,7 @@
           });
           return;
         } else {
+          console.log('[paste] path4: else fallback — HWP/텍스트 경로 (imageItems=0, data:image 없음, file:// 없음)');
           setTimeout(async () => {
             try {
               const sel = (doc.getSelection && doc.getSelection()) || (doc.selection && doc.selection);
@@ -601,21 +605,46 @@
                 const container = doc.createElement('div');
                 container.appendChild(range.cloneContents());
                 const candidateImgs = Array.from(container.querySelectorAll('img'));
-                for (const cimg of candidateImgs) {
-                  const src = cimg.getAttribute('src') || '';
-                  if (!src) continue;
-                  try {
-                    if (src.startsWith('data:image/')) {
-                      const res = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dataUrl: src }) });
-                      const data = await res.json();
-                      if (data.url) editor.exec('PASTE_HTML', [`<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`]);
-                    } else if (!isHttpUrl(src)) {
-                      const r = await fetch(src);
-                      const b = await r.blob();
-                      const data = await uploadBlob(b, 'pasted.png');
-                      if (data.url) editor.exec('PASTE_HTML', [`<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`]);
+                console.log('[paste] path4: candidateImgs=', candidateImgs.length);
+                if (candidateImgs.length > 0) {
+                  await withOverlay(doc, candidateImgs.length, async (update) => {
+                    let done = 0;
+                    for (const cimg of candidateImgs) {
+                      const src = cimg.getAttribute('src') || '';
+                      if (!src) { done++; update(done, candidateImgs.length, done, 0); continue; }
+                      try {
+                        if (src.startsWith('data:image/')) {
+                          const res = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dataUrl: src }) });
+                          const data = await res.json();
+                          if (data.url) editor.exec('PASTE_HTML', [`<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`]);
+                        } else if (!isHttpUrl(src)) {
+                          const r = await fetch(src);
+                          const b = await r.blob();
+                          const data = await uploadBlob(b, 'pasted.png');
+                          if (data.url) editor.exec('PASTE_HTML', [`<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`]);
+                        }
+                      } catch (e) { /* ignore */ }
+                      done++;
+                      update(done, candidateImgs.length, done, 0);
                     }
-                  } catch (e) { /* ignore */ }
+                  });
+                } else {
+                  for (const cimg of candidateImgs) {
+                    const src = cimg.getAttribute('src') || '';
+                    if (!src) continue;
+                    try {
+                      if (src.startsWith('data:image/')) {
+                        const res = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dataUrl: src }) });
+                        const data = await res.json();
+                        if (data.url) editor.exec('PASTE_HTML', [`<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`]);
+                      } else if (!isHttpUrl(src)) {
+                        const r = await fetch(src);
+                        const b = await r.blob();
+                        const data = await uploadBlob(b, 'pasted.png');
+                        if (data.url) editor.exec('PASTE_HTML', [`<img src="${data.url}" style="max-width:100%;" alt="pasted-image" />`]);
+                      }
+                    } catch (e) { /* ignore */ }
+                  }
                 }
               }
             } catch (e) { /* ignore */ }
