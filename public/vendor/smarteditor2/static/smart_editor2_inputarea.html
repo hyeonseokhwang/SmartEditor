@@ -133,27 +133,112 @@
     } catch(e) { return []; }
   }
 
-  // Show overlay while uploading
+  // Show overlay while uploading (inside iframe)
   function showOverlay(msg) {
     var ov = document.createElement('div');
     ov.id = '__paste_overlay';
     ov.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;z-index:999999;font-family:sans-serif;font-size:14px;';
     ov.innerHTML = '<div style="padding:16px 20px;background:#fff;border:1px solid #ddd;border-radius:8px;font-weight:600;">' + (msg || 'uploading...') + '</div>';
     document.body.appendChild(ov);
+    // 외부(editor-v2.ejs) 프로그레스바도 표시
+    topProgress.show(msg);
     return ov;
   }
   function removeOverlay() {
     var ov = document.getElementById('__paste_overlay');
     if (ov) ov.remove();
+    topProgress.hide();
   }
 
-  // Upload array of data URLs, return array of remote URLs
-  function uploadAll(dataUrls) {
-    var promises = [];
-    for (var i = 0; i < dataUrls.length; i++) {
-      promises.push(uploadDataUrl(dataUrls[i]).then(function(j){ return (j && j.url) ? j.url : null; }).catch(function(){ return null; }));
+  // ── window.top 프로그레스바 연동 (editor-v2.ejs #save-progress-wrap) ──
+  var topProgress = {
+    _top: function() {
+      try { return window.top.document; } catch(e) { return null; }
+    },
+    show: function(msg) {
+      var d = this._top(); if (!d) return;
+      try {
+        var wrap = d.getElementById('save-progress-wrap');
+        if (wrap) wrap.style.display = 'block';
+        var label = d.getElementById('save-progress-label');
+        if (label) label.textContent = msg || '이미지 업로드 중…';
+        var bar = d.getElementById('save-progress-bar-inner');
+        if (bar) bar.style.width = '0%';
+        var detail = d.getElementById('save-progress-detail');
+        if (detail) detail.textContent = '';
+        var btn = d.getElementById('save-btn');
+        if (btn) btn.disabled = true;
+        // PASTE_BUSY 플래그 설정
+        try { window.top.PASTE_BUSY = true; } catch(e2){}
+      } catch(e) { warn('topProgress.show error', e); }
+    },
+    update: function(current, total, successCount, failCount) {
+      var d = this._top(); if (!d) return;
+      try {
+        var pct = total > 0 ? Math.round((current / total) * 100) : 0;
+        var bar = d.getElementById('save-progress-bar-inner');
+        if (bar) bar.style.width = pct + '%';
+        var label = d.getElementById('save-progress-label');
+        if (label) label.textContent = '이미지 업로드 중… ' + current + ' / ' + total + '개 (' + pct + '%)';
+        var detail = d.getElementById('save-progress-detail');
+        var f = typeof failCount === 'number' ? failCount : 0;
+        if (detail) detail.textContent = '성공 ' + successCount + '건' + (f > 0 ? ' / 실패 ' + f + '건' : '');
+      } catch(e) { warn('topProgress.update error', e); }
+    },
+    done: function(total, success, fail) {
+      var d = this._top(); if (!d) return;
+      try {
+        var bar = d.getElementById('save-progress-bar-inner');
+        if (bar) bar.style.width = '100%';
+        var label = d.getElementById('save-progress-label');
+        if (label) label.textContent = '업로드 완료 — ' + success + ' / ' + total + '개 성공' + (fail > 0 ? ' (실패 ' + fail + '건)' : '');
+        var detail = d.getElementById('save-progress-detail');
+        if (detail) detail.textContent = fail > 0 ? '⚠️ ' + fail + '개 이미지 업로드 실패' : '✅ 전체 업로드 성공';
+        // 3초 후 자동 숨김
+        setTimeout(function() { topProgress.hide(); }, 3000);
+        try { window.top.PASTE_BUSY = false; } catch(e2){}
+      } catch(e) { warn('topProgress.done error', e); }
+    },
+    hide: function() {
+      var d = this._top(); if (!d) return;
+      try {
+        var wrap = d.getElementById('save-progress-wrap');
+        if (wrap) wrap.style.display = 'none';
+        var btn = d.getElementById('save-btn');
+        if (btn) btn.disabled = false;
+        try { window.top.PASTE_BUSY = false; } catch(e2){}
+      } catch(e) {}
     }
-    return Promise.all(promises);
+  };
+
+  // Upload array of data URLs, return array of remote URLs (with progress tracking)
+  function uploadAll(dataUrls) {
+    var total = dataUrls.length;
+    var done = 0, success = 0, fail = 0;
+    var promises = [];
+    for (var i = 0; i < total; i++) {
+      promises.push(
+        uploadDataUrl(dataUrls[i])
+          .then(function(j){
+            done++;
+            var url = (j && j.url) ? j.url : null;
+            if (url) success++; else fail++;
+            topProgress.update(done, total, success, fail);
+            log('upload ' + done + '/' + total + (url ? ' OK' : ' FAIL'));
+            return url;
+          })
+          .catch(function(e){
+            done++; fail++;
+            topProgress.update(done, total, success, fail);
+            warn('upload ' + done + '/' + total + ' ERROR', e);
+            return null;
+          })
+      );
+    }
+    return Promise.all(promises).then(function(results) {
+      topProgress.done(total, success, fail);
+      return results;
+    });
   }
 
   // Replace file:/// img srcs in-place with uploaded URLs (preserving position)
@@ -225,12 +310,24 @@
     if (imageFiles.length && !hasFileUrls) {
       event.preventDefault();
       BUSY = true;
-      var ov = showOverlay('이미지 ' + imageFiles.length + '개 업로드 중…');
+      var totalBlobs = imageFiles.length;
+      var blobDone = 0, blobSuc = 0, blobFail = 0;
+      var ov = showOverlay('이미지 ' + totalBlobs + '개 업로드 중…');
       var uploads = [];
       for (var fi = 0; fi < imageFiles.length; fi++) {
         uploads.push(uploadBlob(imageFiles[fi], imageFiles[fi].name || 'pasted.png')
-          .then(function(j){ return (j && j.url) ? j.url : null; })
-          .catch(function(){ return null; }));
+          .then(function(j){
+            blobDone++;
+            var url = (j && j.url) ? j.url : null;
+            if (url) blobSuc++; else blobFail++;
+            topProgress.update(blobDone, totalBlobs, blobSuc, blobFail);
+            return url;
+          })
+          .catch(function(){
+            blobDone++; blobFail++;
+            topProgress.update(blobDone, totalBlobs, blobSuc, blobFail);
+            return null;
+          }));
       }
       Promise.all(uploads).then(function(urls) {
         var html = '';
@@ -238,6 +335,7 @@
           if (urls[u]) html += '<img src="' + urls[u] + '" style="max-width:100%;" alt="pasted-image" />';
         }
         if (html) insertHTML(html);
+        topProgress.done(totalBlobs, blobSuc, blobFail);
         removeOverlay();
         BUSY = false;
         log('blob upload done', urls.filter(Boolean).length, 'images');
@@ -252,6 +350,7 @@
       var duList = collectDataUrls(clipHTML);
       if (!duList.length) { BUSY = false; return; }
       var ov2 = showOverlay('이미지 ' + duList.length + '개 업로드 중…');
+      topProgress.update(0, duList.length, 0, 0);
       uploadAll(duList).then(function(urls) {
         var result = clipHTML;
         for (var d = 0; d < duList.length; d++) {
@@ -309,8 +408,11 @@
       log('file:/// img tags in HTML:', fileImgCount);
 
       if (allDataUrls.length > 0) {
-        log('uploading', allDataUrls.length, 'extracted images');
+        log('uploading', allDataUrls.length, 'extracted images for', fileImgCount, 'file:/// img tags');
+        topProgress.update(0, allDataUrls.length, 0, 0);
         uploadAll(allDataUrls).then(function(urls) {
+          var successUrls = urls.filter(Boolean).length;
+          log('HWP upload results:', successUrls, '/', allDataUrls.length, 'success');
           // Replace file:/// img srcs in their original positions
           var result = replaceFileImgsInPlace(clipHTML, urls);
           // Also replace any remaining data:image URLs that were in the HTML
@@ -323,19 +425,32 @@
           insertHTML(result);
           removeOverlay();
           BUSY = false;
-          log('HWP upload done', urls.filter(Boolean).length, 'images in-place');
+          log('HWP upload done', successUrls, 'images in-place');
         });
       } else if (imageFiles.length) {
         // Fall back to blob upload
+        var bfTotal = imageFiles.length, bfDone = 0, bfSuc = 0, bfFail = 0;
+        topProgress.update(0, bfTotal, 0, 0);
         var blobUploads = [];
         for (var bi = 0; bi < imageFiles.length; bi++) {
           blobUploads.push(uploadBlob(imageFiles[bi], 'hwp-image.png')
-            .then(function(j){ return (j && j.url) ? j.url : null; })
-            .catch(function(){ return null; }));
+            .then(function(j){
+              bfDone++;
+              var url = (j && j.url) ? j.url : null;
+              if (url) bfSuc++; else bfFail++;
+              topProgress.update(bfDone, bfTotal, bfSuc, bfFail);
+              return url;
+            })
+            .catch(function(){
+              bfDone++; bfFail++;
+              topProgress.update(bfDone, bfTotal, bfSuc, bfFail);
+              return null;
+            }));
         }
         Promise.all(blobUploads).then(function(urls) {
           var result = replaceFileImgsInPlace(clipHTML, urls);
           insertHTML(result);
+          topProgress.done(bfTotal, bfSuc, bfFail);
           removeOverlay();
           BUSY = false;
           log('HWP blob fallback done', urls.filter(Boolean).length, 'images in-place');
