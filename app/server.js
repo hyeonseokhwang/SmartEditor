@@ -57,6 +57,26 @@ function getOpenAI() {
   return _openai;
 }
 
+// ── 임베딩 캐시 (Map, 1시간 TTL, 최대 1000건) ──────────────────
+const EMB_CACHE_TTL = 60 * 60_000; // 1시간
+const EMB_CACHE_MAX = 1000;
+const _embCache = new Map(); // question → { vec, ts }
+
+async function getEmbedding(question) {
+  const cached = _embCache.get(question);
+  if (cached && Date.now() - cached.ts < EMB_CACHE_TTL) return cached.vec;
+  const openai = getOpenAI();
+  const res = await openai.embeddings.create({ model: 'text-embedding-3-small', input: question });
+  const vec = '[' + res.data[0].embedding.join(',') + ']';
+  // 상한 초과 시 가장 오래된 항목 삭제
+  if (_embCache.size >= EMB_CACHE_MAX) {
+    const oldest = _embCache.keys().next().value;
+    _embCache.delete(oldest);
+  }
+  _embCache.set(question, { vec, ts: Date.now() });
+  return vec;
+}
+
 // ── Cloudinary ─────────────────────────────────────────────────
 const hasCloudinary = process.env.CLOUDINARY_URL || (
   process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET
@@ -229,12 +249,8 @@ app.post('/api/chat', async (req, res) => {
 
     const openai = getOpenAI();
 
-    // 1) 임베딩
-    const embRes = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: question,
-    });
-    const vecStr = '[' + embRes.data[0].embedding.join(',') + ']';
+    // 1) 임베딩 (캐시 우선 — Map 1시간 TTL, 최대 1000건)
+    const vecStr = await getEmbedding(question);
 
     // 2) 키워드 추출 — 단어 단위 접미사 제거 + 질문용 불용어 제거
     const suffixRe = /(이란|란|이란요|이에요|입니까|합니까|인가요|이죠|이냐|이며|이고|이지|이다|이에|에서|으로|이요|가요|까요|이가|이는|이를|은요|는요|을까|이란말|란게|란말)$/;
@@ -564,5 +580,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('  /v2      — B팀 홈페이지 (siann-17)');
   console.log('  /archive — 아카이브');
   console.log('  /chat    — AI 챗봇');
+  console.log(`[EmbCache] 초기화 완료 — TTL=${EMB_CACHE_TTL/60000}분 / 최대 ${EMB_CACHE_MAX}건`);
   console.log('  /editor  — SmartEditor2 standalone (포트 8082는 server-editor.js)');
 });
