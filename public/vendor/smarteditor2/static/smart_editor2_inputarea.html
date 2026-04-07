@@ -532,27 +532,41 @@
         log('source D (clipboard files):', imageFiles.length);
       }
 
-      // 최적 소스 선택: fileImgCount에 가장 가까운(≥) 소스 사용
-      // RTF가 모든 이미지를 포함할 가능성 높음 (HWP JSON은 일부 누락 가능)
+      // 소스 선택: HWP JSON 우선 (PNG/JPEG 정상 포맷)
+      // RTF는 WMF/EMF 메타파일을 반환하여 Cloudinary 400 에러 발생 — 보충용으로만 사용
       var allDataUrls = [];
-      if (rtfDus.length >= fileImgCount) {
-        allDataUrls = rtfDus;
-        log('using RTF source (' + rtfDus.length + ' images, covers all ' + fileImgCount + ' file:/// tags)');
-      } else if (hwpDus.length >= fileImgCount) {
-        allDataUrls = hwpDus;
-        log('using HWP JSON source (' + hwpDus.length + ' images, covers all ' + fileImgCount + ' file:/// tags)');
-      } else {
-        // 어느 소스도 충분하지 않으면 가장 많은 것 선택
-        var best = htmlDus;
-        var bestName = 'HTML data:image';
-        if (hwpDus.length > best.length) { best = hwpDus; bestName = 'HWP JSON'; }
-        if (rtfDus.length > best.length) { best = rtfDus; bestName = 'RTF'; }
-        allDataUrls = best;
-        log('using best source: ' + bestName + ' (' + best.length + '/' + fileImgCount + ' images)');
-        // 부족분 경고
-        if (allDataUrls.length < fileImgCount) {
-          warn('image shortfall:', fileImgCount - allDataUrls.length, 'images cannot be extracted from clipboard');
+
+      // 1순위: HWP JSON (정상 PNG/JPEG base64)
+      if (hwpDus.length > 0) {
+        allDataUrls = hwpDus.slice();
+        log('primary source: HWP JSON (' + hwpDus.length + ' images)');
+      }
+
+      // 2순위: HTML inline data:image
+      if (allDataUrls.length < fileImgCount && htmlDus.length > allDataUrls.length) {
+        allDataUrls = htmlDus.slice();
+        log('switched to HTML data:image source (' + htmlDus.length + ' images)');
+      }
+
+      // RTF 보충: HWP JSON이 부족하면 RTF에서 추가 (단, 유효 이미지만)
+      if (allDataUrls.length < fileImgCount && rtfDus.length > 0) {
+        var supplemented = 0;
+        for (var ri = 0; ri < rtfDus.length && allDataUrls.length < fileImgCount; ri++) {
+          // WMF/EMF 필터: data:image 크기가 너무 작으면(< 10KB base64) 스킵 — WMF 벡터 placeholder
+          var b64Len = rtfDus[ri].length - rtfDus[ri].indexOf(',') - 1;
+          if (b64Len < 13000) { // ~10KB raw
+            log('RTF image', ri+1, 'skipped (too small:', Math.round(b64Len*3/4), 'bytes, likely WMF placeholder)');
+            continue;
+          }
+          allDataUrls.push(rtfDus[ri]);
+          supplemented++;
         }
+        if (supplemented > 0) log('RTF supplemented', supplemented, 'additional images');
+      }
+
+      log('final image count:', allDataUrls.length, '/', fileImgCount, 'file:/// tags');
+      if (allDataUrls.length < fileImgCount) {
+        warn('image shortfall:', fileImgCount - allDataUrls.length, '— some images may be missing');
       }
 
       if (allDataUrls.length > 0) {
