@@ -71,31 +71,116 @@
     return unique;
   }
 
-  // Extract images from RTF \pict blocks
+  // Extract images from RTF \pict blocks — indexOf 기반 (55MB+ 대용량 RTF 대응)
   function collectFromRTF(rtf) {
     try {
-      if (!rtf || rtf.indexOf('\\pict') === -1) return [];
-      var pictRe = /\\pict[\s\S]*?\}/g;
-      var matches = rtf.match(pictRe) || [];
+      if (!rtf) return [];
+      var searchKey = '\\pict';
+      var firstPict = rtf.indexOf(searchKey);
+      if (firstPict === -1) { log('RTF: no \\pict found in', rtf.length, 'bytes'); return []; }
+      log('RTF: parsing', rtf.length, 'bytes, first \\pict at', firstPict);
+
       var out = [];
-      for (var mi = 0; mi < matches.length; mi++) {
-        var block = matches[mi];
-        var isPng = /\\pngblip/.test(block);
-        var isJpg = /\\jpegblip/.test(block) || /\\jpgblip/.test(block);
-        if (!isPng && !isJpg) continue;
-        var mime = isPng ? 'image/png' : 'image/jpeg';
-        var hex = block.replace(/[^0-9A-Fa-f]/g, '');
-        if (!hex || hex.length < 40) continue;
-        var bytes = new Uint8Array(hex.length / 2);
-        for (var i = 0; i < hex.length; i += 2) bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
-        if (bytes.length < 512) continue;
-        var bin = '';
-        for (var j = 0; j < bytes.length; j++) bin += String.fromCharCode(bytes[j]);
-        var b64 = btoa(bin);
-        if (b64) out.push('data:' + mime + ';base64,' + b64);
+      var pos = firstPict;
+      var maxImages = 50; // safety limit
+
+      while (pos !== -1 && out.length < maxImages) {
+        // Find the header area (control words before hex data)
+        // Look ahead up to 500 chars for format flags
+        var headerEnd = Math.min(pos + 500, rtf.length);
+        var header = rtf.substring(pos, headerEnd);
+
+        var isPng = header.indexOf('\\pngblip') !== -1;
+        var isJpg = header.indexOf('\\jpegblip') !== -1 || header.indexOf('\\jpgblip') !== -1;
+        var isEmf = header.indexOf('\\emfblip') !== -1;
+        var isWmf = header.indexOf('\\wmetafile') !== -1;
+
+        if (!isPng && !isJpg && !isEmf && !isWmf) {
+          log('RTF: skipping \\pict at', pos, '(unknown format)');
+          pos = rtf.indexOf(searchKey, pos + 5);
+          continue;
+        }
+
+        var mime = isPng ? 'image/png' : (isJpg ? 'image/jpeg' : 'image/png'); // EMF/WMF → treat as png for now
+
+        // Find start of hex data: skip control words, find first run of hex chars
+        // The hex data starts after the last control word (\\xxx or space)
+        var hexStart = pos + 5; // skip \pict
+        // Skip control words
+        while (hexStart < rtf.length) {
+          if (rtf[hexStart] === '\\') {
+            // skip control word
+            hexStart++;
+            while (hexStart < rtf.length && rtf[hexStart] !== ' ' && rtf[hexStart] !== '\\' && rtf[hexStart] !== '\n' && rtf[hexStart] !== '\r' && rtf[hexStart] !== '}') hexStart++;
+            if (hexStart < rtf.length && rtf[hexStart] === ' ') hexStart++; // skip trailing space
+          } else if (rtf[hexStart] === ' ' || rtf[hexStart] === '\n' || rtf[hexStart] === '\r') {
+            hexStart++;
+          } else {
+            break; // start of hex data
+          }
+        }
+
+        // Collect hex chars until } (matching brace)
+        var depth = 0;
+        var hexChars = [];
+        var ci = hexStart;
+        while (ci < rtf.length) {
+          var ch = rtf[ci];
+          if (ch === '{') { depth++; ci++; continue; }
+          if (ch === '}') {
+            if (depth > 0) { depth--; ci++; continue; }
+            break; // matching close brace
+          }
+          // Collect only hex characters
+          if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')) {
+            hexChars.push(ch);
+          }
+          ci++;
+        }
+
+        var hex = hexChars.join('');
+        log('RTF: \\pict at', pos, 'format:', isPng?'png':isJpg?'jpg':isEmf?'emf':'wmf', 'hex bytes:', hex.length/2);
+
+        if (hex.length >= 80) { // at least 40 bytes
+          // Convert hex to base64
+          var bytes = new Uint8Array(hex.length / 2);
+          for (var i = 0; i < hex.length; i += 2) bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+
+          if (bytes.length >= 512) {
+            // For EMF/WMF: detect actual format from magic bytes
+            if (isEmf || isWmf) {
+              // Check if it's actually JPEG (starts with FF D8 FF)
+              if (bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF) {
+                mime = 'image/jpeg';
+              }
+              // Check PNG magic (89 50 4E 47)
+              else if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) {
+                mime = 'image/png';
+              }
+              // Otherwise try as PNG (canvas will handle conversion)
+            }
+            // Convert to base64 in chunks to avoid stack overflow
+            var binParts = [];
+            for (var j = 0; j < bytes.length; j += 8192) {
+              var chunk = bytes.subarray(j, Math.min(j + 8192, bytes.length));
+              var str = '';
+              for (var k = 0; k < chunk.length; k++) str += String.fromCharCode(chunk[k]);
+              binParts.push(str);
+            }
+            var b64 = btoa(binParts.join(''));
+            if (b64) {
+              out.push('data:' + mime + ';base64,' + b64);
+              log('RTF: extracted image', out.length, '(' + mime + ',', bytes.length, 'bytes)');
+            }
+          }
+        }
+
+        // Find next \pict
+        pos = rtf.indexOf(searchKey, ci > pos ? ci : pos + 5);
       }
+      log('RTF: total extracted', out.length, 'images');
       return out;
-    } catch(e) { return []; }
+    } catch(e) { warn('collectFromRTF error', e); return []; }
   }
 
   // Extract from HWP JSON comment embedded in HTML
@@ -383,38 +468,46 @@
       var ov3 = showOverlay('HWP 이미지 추출 및 업로드 중…');
       log('HWP paste: extracting images from clipboard data');
 
-      // Try multiple extraction methods
-      var allDataUrls = [];
-
-      // 3a: data:image URLs already in HTML
-      var htmlDus = collectDataUrls(clipHTML);
-      if (htmlDus.length) {
-        log('found', htmlDus.length, 'data:image URLs in HTML');
-        allDataUrls = allDataUrls.concat(htmlDus);
-      }
-
-      // 3b: HWP JSON embedded images
-      var hwpDus = collectFromHwpJson(clipHTML);
-      if (hwpDus.length) {
-        log('found', hwpDus.length, 'images from HWP JSON');
-        allDataUrls = allDataUrls.concat(hwpDus);
-      }
-
-      // 3c: RTF \pict embedded images
-      var rtfDus = collectFromRTF(clipRTF);
-      if (rtfDus.length) {
-        log('found', rtfDus.length, 'images from RTF \\pict');
-        allDataUrls = allDataUrls.concat(rtfDus);
-      }
-
-      // 3d: Image file items as fallback
-      if (imageFiles.length) {
-        log('found', imageFiles.length, 'image files in clipboard');
-      }
-
       // Count file:/// img tags in HTML to know how many we need
       var fileImgCount = (clipHTML.match(/<img\b[^>]*\bsrc\s*=\s*['"]?file:\/\//gi) || []).length;
       log('file:/// img tags in HTML:', fileImgCount);
+
+      // Try multiple extraction methods — 가장 많이 추출한 소스 사용
+      var htmlDus = collectDataUrls(clipHTML);
+      log('source A (data:image in HTML):', htmlDus.length);
+
+      var hwpDus = collectFromHwpJson(clipHTML);
+      log('source B (HWP JSON):', hwpDus.length);
+
+      var rtfDus = collectFromRTF(clipRTF);
+      log('source C (RTF \\pict):', rtfDus.length);
+
+      if (imageFiles.length) {
+        log('source D (clipboard files):', imageFiles.length);
+      }
+
+      // 최적 소스 선택: fileImgCount에 가장 가까운(≥) 소스 사용
+      // RTF가 모든 이미지를 포함할 가능성 높음 (HWP JSON은 일부 누락 가능)
+      var allDataUrls = [];
+      if (rtfDus.length >= fileImgCount) {
+        allDataUrls = rtfDus;
+        log('using RTF source (' + rtfDus.length + ' images, covers all ' + fileImgCount + ' file:/// tags)');
+      } else if (hwpDus.length >= fileImgCount) {
+        allDataUrls = hwpDus;
+        log('using HWP JSON source (' + hwpDus.length + ' images, covers all ' + fileImgCount + ' file:/// tags)');
+      } else {
+        // 어느 소스도 충분하지 않으면 가장 많은 것 선택
+        var best = htmlDus;
+        var bestName = 'HTML data:image';
+        if (hwpDus.length > best.length) { best = hwpDus; bestName = 'HWP JSON'; }
+        if (rtfDus.length > best.length) { best = rtfDus; bestName = 'RTF'; }
+        allDataUrls = best;
+        log('using best source: ' + bestName + ' (' + best.length + '/' + fileImgCount + ' images)');
+        // 부족분 경고
+        if (allDataUrls.length < fileImgCount) {
+          warn('image shortfall:', fileImgCount - allDataUrls.length, 'images cannot be extracted from clipboard');
+        }
+      }
 
       if (allDataUrls.length > 0) {
         log('uploading', allDataUrls.length, 'extracted images for', fileImgCount, 'file:/// img tags');
