@@ -141,8 +141,18 @@ function getSeHTML() {
   try { ed.exec('UPDATE_CONTENTS_FIELD', []); } catch {}
   try {
     const cw = document.getElementById('se-iframe').contentWindow;
-    return cw.document.getElementById('ir1').value || '';
-  } catch { return ''; }
+    const val = cw.document.getElementById('ir1').value;
+    if (val) return val;
+  } catch {}
+  // ir1.value 비어있을 때 SE2 편집 iframe(elIRFrame) body에서 직접 가져옴
+  try {
+    if (ed.elIRFrame) {
+      const editWin = ed.elIRFrame.contentWindow || ed.elIRFrame.contentDocument;
+      const editDoc = editWin.document || editWin;
+      return editDoc.body ? editDoc.body.innerHTML : '';
+    }
+  } catch {}
+  return '';
 }
 
 function setSeHTML(html) {
