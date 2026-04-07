@@ -505,6 +505,36 @@
       hasDataImages: hasDataImages
     });
 
+    // 클립보드 분석 데이터 서버 전송 — 개발자 진단용 (Lucas 직접 지시)
+    (function sendClipboardLog() {
+      try {
+        var fileImgTagCount = (clipHTML.match(/<img\b[^>]*\bsrc\s*=\s*['"]?file:\/\//gi) || []).length;
+        var sourceA = (clipHTML.match(/data:image\/[a-zA-Z0-9.+-]+;base64,/g) || []).length;
+        var sourceB_raw = (clipHTML.match(/"bidt"\s*:/g) || []).length; // HWP JSON bidt 키 간이카운트
+        var sourceC_pict = (clipRTF.match(/\\pict/g) || []).length;
+        var clipTypes = [];
+        try { for (var ti = 0; ti < items.length; ti++) clipTypes.push(items[ti].type); } catch(e) {}
+        var fileUrlNames = [];
+        var fre2 = /<img\b[^>]*\bsrc\s*=\s*["']?(file:\/\/\/[^"'\s>]+)/gi; var fm2;
+        while ((fm2 = fre2.exec(clipHTML)) !== null) fileUrlNames.push(fm2[1].split('/').pop());
+        var payload = {
+          htmlLen: clipHTML.length,
+          rtfLen: clipRTF.length,
+          fileImgCount: fileImgTagCount,
+          sourceA_htmlDataImg: sourceA,
+          sourceB_hwpJsonBidt: sourceB_raw,
+          sourceC_rtfPict: sourceC_pict,
+          sourceD_clipFiles: imageFiles.length,
+          clipTypes: clipTypes,
+          fileUrls: fileUrlNames.slice(0, 20)
+        };
+        fetch('/api/log/clipboard', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(function() {});
+      } catch (ex) {}
+    })();
+
     // CASE 1: Direct image blobs in clipboard (screenshot, image copy) — 순차 업로드
     if (imageFiles.length && !hasFileUrls) {
       event.preventDefault();
@@ -595,6 +625,55 @@
       if (imageFiles.length) {
         log('source D (clipboard files):', imageFiles.length);
       }
+
+      // 클립보드 분석 데이터 서버 전송 — Lucas 직접 지시
+      try {
+        var fileUrlList = [];
+        var fuRe = /<img\b[^>]*\bsrc\s*=\s*["']?(file:\/\/\/[^"'\s>]+)/gi;
+        var fuM;
+        while ((fuM = fuRe.exec(clipHTML)) !== null) fileUrlList.push(fuM[1].split('/').pop());
+        // HWP JSON 메타데이터 (base64 데이터 제외)
+        var hwpMeta = null;
+        try {
+          var jm = clipHTML.match(/<!--\[data-hwpjson\]\s*(\{[\s\S]*?\})\s*-->/i);
+          if (jm) {
+            var jr = JSON.parse(jm[1]);
+            var jBidt = {};
+            var jSr = [];
+            var jSeen = {};
+            (function jCollect(o) {
+              if (!o || typeof o !== 'object') return;
+              if (o.bidt && typeof o.bidt === 'object') {
+                for (var k in o.bidt) jBidt[k] = typeof o.bidt[k] === 'string' ? o.bidt[k].length : 0;
+              }
+              if (typeof o.bi === 'string' && !jSeen[o.bi]) { jSr.push(o.bi); jSeen[o.bi] = true; }
+              if (Array.isArray(o.bi)) {
+                for (var ii = 0; ii < o.bi.length; ii++) {
+                  var it = o.bi[ii];
+                  if (it && typeof it.sr === 'string' && !jSeen[it.sr]) { jSr.push(it.sr); jSeen[it.sr] = true; }
+                }
+              }
+              for (var kk in o) if (Object.prototype.hasOwnProperty.call(o, kk)) jCollect(o[kk]);
+            })(jr);
+            hwpMeta = { bidtKeys: jBidt, srOrder: jSr, matched: hwpDus.length, total: jSr.length };
+          }
+        } catch(e2) {}
+        fetch('/api/log/clipboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            htmlLen: clipHTML.length,
+            rtfLen: clipRTF.length,
+            fileImgCount: fileImgCount,
+            fileUrlNames: fileUrlList,
+            hwpJsonImages: hwpDus.length,
+            rtfImages: rtfDus.length,
+            htmlDataImages: htmlDus.length,
+            clipboardFiles: imageFiles.length,
+            hwpMeta: hwpMeta
+          })
+        }).catch(function(){});
+      } catch(e3) {}
 
       // 소스 선택: HWP JSON 우선 (PNG/JPEG 정상 포맷)
       // RTF는 WMF/EMF 메타파일을 반환하여 Cloudinary 400 에러 발생 — 보충용으로만 사용
