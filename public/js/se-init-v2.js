@@ -363,39 +363,37 @@
   }
 
   // Attach to SmartEditor instance (with retry for iframe not yet loaded)
-  window.seInitAttachToEditor = function (editor, _retryCount) {
+  window.seInitAttachToEditor = function (editor, _retryCount, _injectedDoc) {
     const retryCount = _retryCount || 0;
     try {
-      // SE2 구조: editor-v2.ejs → #se-iframe(se-wrapper.html) → skin iframe(SmartEditor2Skin.html) → iframe.se2_input_wysiwyg
-      const seWrapperEl = document.getElementById('se-iframe');
-      const wrapperDoc = seWrapperEl && (seWrapperEl.contentDocument || seWrapperEl.contentWindow?.document);
-      let iframe = null;
-      if (wrapperDoc) {
-        // se-wrapper.html의 모든 iframe 탐색 (depth 1)
-        const wIframes = Array.from(wrapperDoc.querySelectorAll('iframe'));
-        if (retryCount === 0) DBG.log('[seInit] wrapperDoc iframes:', wIframes.length, wIframes.map(f=>f.className||f.src?.split('/').pop()).join(','));
-        iframe = wrapperDoc.querySelector('iframe.se2_input_wysiwyg');
-        if (!iframe) {
+      // _injectedDoc: se-wrapper.html fOnAppLoad에서 직접 전달 (최우선)
+      let doc = _injectedDoc || null;
+      if (doc) {
+        DBG.log('[seInit] injectedDoc 직접 사용 ✓');
+      } else {
+        // fallback: se-iframe → skinFrame → se2_input_wysiwyg 탐색
+        const seWrapperEl = document.getElementById('se-iframe');
+        const wrapperDoc = seWrapperEl && (seWrapperEl.contentDocument || seWrapperEl.contentWindow?.document);
+        let iframe = null;
+        if (wrapperDoc) {
+          const wIframes = Array.from(wrapperDoc.querySelectorAll('iframe'));
+          if (retryCount === 0) DBG.log('[seInit] wrapperDoc iframes:', wIframes.length, wIframes.map(f=>f.className||f.src?.split('/').pop()).join(','));
           for (const skinFrame of wIframes) {
             try {
               const skinDoc = skinFrame.contentDocument || skinFrame.contentWindow?.document;
-              if (retryCount === 0) DBG.log('[seInit] skinFrame src:', skinFrame.src?.split('/').pop(), 'skinDoc:', !!skinDoc);
               if (skinDoc) {
-                const sIframes = Array.from(skinDoc.querySelectorAll('iframe'));
-                if (retryCount === 0) DBG.log('[seInit] skinDoc iframes:', sIframes.length, sIframes.map(f=>f.className||f.src?.split('/').pop()).join(','));
                 iframe = skinDoc.querySelector('iframe.se2_input_wysiwyg');
                 if (iframe) break;
               }
-            } catch (e) { if (retryCount === 0) DBG.warn('[seInit] skinFrame access err:', e.message); }
+            } catch (e) {}
           }
         }
+        doc = iframe && (iframe.contentDocument || iframe.contentWindow?.document);
       }
-      if (!iframe) iframe = editor && editor.elIRFrame;
-      const doc = iframe && (iframe.contentDocument || iframe.contentWindow?.document);
       if (!doc) {
         if (retryCount < 30) {
           DBG.log('editor document not ready, retry', retryCount + 1, '/ 30');
-          setTimeout(() => window.seInitAttachToEditor(editor, retryCount + 1), 500);
+          setTimeout(() => window.seInitAttachToEditor(editor, retryCount + 1, null), 500);
           return;
         }
         DBG.warn('no editor document after 30 retries');
