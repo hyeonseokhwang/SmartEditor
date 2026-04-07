@@ -308,13 +308,24 @@
         for (var key in obj) if (Object.prototype.hasOwnProperty.call(obj, key)) collect(obj[key]);
       };
       collect(root);
+      var bidtKeys = Object.keys(bidt);
+      log('HWP JSON: bidt keys:', bidtKeys.length, '| srOrder:', srOrder.length);
       var dataUrls = [];
+      var missing = [];
       for (var si = 0; si < srOrder.length; si++) {
         var b64 = bidt[srOrder[si]];
-        if (b64) dataUrls.push('data:image/png;base64,' + b64);
+        if (b64) {
+          dataUrls.push('data:image/png;base64,' + b64);
+        } else {
+          missing.push(srOrder[si]);
+        }
+      }
+      if (missing.length > 0) {
+        warn('HWP JSON: missing bidt data for', missing.length, 'images:', missing);
+        log('HWP JSON: available bidt keys:', bidtKeys.join(', '));
       }
       return dataUrls;
-    } catch(e) { return []; }
+    } catch(e) { warn('HWP JSON parse error:', e); return []; }
   }
 
   // Show overlay while uploading (inside iframe)
