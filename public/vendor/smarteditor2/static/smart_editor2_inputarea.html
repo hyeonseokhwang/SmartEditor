@@ -342,8 +342,10 @@
     }
   };
 
-  // Upload array of data URLs SEQUENTIALLY (1개씩 순차 — 동시 업로드 금지, Lucas 직접 지시)
+  // Upload array of data URLs SEQUENTIALLY with retry (1개씩 순차, 실패 시 최대 5회 retry — Lucas 직접 지시)
   function uploadAll(dataUrls) {
+    var MAX_RETRY = 5;
+    var RETRY_DELAY_MS = 1000;
     var total = dataUrls.length;
     var results = [];
     var success = 0, fail = 0;
@@ -353,20 +355,40 @@
         chain = chain.then(function() {
           topProgress.update(idx, total, success, fail);
           log('uploading ' + (idx+1) + '/' + total + '...');
-          return uploadDataUrl(dataUrls[idx])
-            .then(function(j){
-              var url = (j && j.url) ? j.url : null;
-              if (url) success++; else fail++;
-              results[idx] = url;
-              topProgress.update(idx+1, total, success, fail);
-              log('upload ' + (idx+1) + '/' + total + (url ? ' OK: ' + url.substring(0,60) : ' FAIL'));
-            })
-            .catch(function(e){
-              fail++;
-              results[idx] = null;
-              topProgress.update(idx+1, total, success, fail);
-              warn('upload ' + (idx+1) + '/' + total + ' ERROR', e);
-            });
+          var attempt = 0;
+          function tryOne() {
+            attempt++;
+            return uploadDataUrl(dataUrls[idx])
+              .then(function(j) {
+                var url = (j && j.url) ? j.url : null;
+                if (url) {
+                  success++;
+                  results[idx] = url;
+                  topProgress.update(idx+1, total, success, fail);
+                  log('upload ' + (idx+1) + '/' + total + ' OK(try' + attempt + '): ' + url.substring(0,60));
+                  return;
+                }
+                if (attempt < MAX_RETRY) {
+                  warn('upload ' + (idx+1) + '/' + total + ' no URL, retry ' + attempt + '/' + MAX_RETRY);
+                  return new Promise(function(res){ setTimeout(res, RETRY_DELAY_MS); }).then(tryOne);
+                }
+                fail++;
+                results[idx] = null;
+                topProgress.update(idx+1, total, success, fail);
+                warn('upload ' + (idx+1) + '/' + total + ' FAIL after ' + MAX_RETRY + ' retries');
+              })
+              .catch(function(e) {
+                if (attempt < MAX_RETRY) {
+                  warn('upload ' + (idx+1) + '/' + total + ' ERROR retry ' + attempt + '/' + MAX_RETRY, e);
+                  return new Promise(function(res){ setTimeout(res, RETRY_DELAY_MS); }).then(tryOne);
+                }
+                fail++;
+                results[idx] = null;
+                topProgress.update(idx+1, total, success, fail);
+                warn('upload ' + (idx+1) + '/' + total + ' ERROR after ' + MAX_RETRY + ' retries', e);
+              });
+          }
+          return tryOne();
         });
       })(i);
     }
