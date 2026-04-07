@@ -194,12 +194,29 @@
   }
 
   function replaceDataUrlsInHTMLWithMap(html, map) {
+    // split/join: regex보다 안정적 (긴 base64 URL 교체 시 형태 오류 방지)
     let out = html;
     for (const [du, url] of map.entries()) {
-      const esc = du.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      out = out.replace(new RegExp(esc, 'g'), url);
+      out = out.split(du).join(url);
     }
     return out;
+  }
+
+  // 업로드된 이미지 URL에서 실제 크기(px) 조회
+  async function getDimensions(url) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+      img.onerror = () => resolve({ w: 0, h: 0 });
+      img.src = url;
+      setTimeout(() => resolve({ w: 0, h: 0 }), 5000);
+    });
+  }
+
+  // URL + 크기 → img 태그 문자열
+  function makeImgTag(u, dim, alt) {
+    const wh = (dim && dim.w > 0 && dim.h > 0) ? ` width="${dim.w}" height="${dim.h}"` : '';
+    return `<img src="${u}"${wh} style="max-width:100%;height:auto;" alt="${alt || 'pasted-image'}" />`;
   }
 
   function collectDataUrlsFromRTF(clipRTF) {
@@ -470,7 +487,9 @@
             // Restore original order for rendering
             const byOrig = new Array(total).fill(null);
             tasks.forEach((t, idx) => { if (typeof t.origIndex === 'number') byOrig[t.origIndex] = urls[idx]; });
-            const html = byOrig.filter(Boolean).map(u => `<img src="${u}" style="max-width:100%;" alt="pasted-image" />`).join('');
+            const validUrls = byOrig.filter(Boolean);
+            const dims = await Promise.all(validUrls.map(u => getDimensions(u)));
+            const html = validUrls.map((u, i) => makeImgTag(u, dims[i], 'pasted-image')).join('');
             if (html) editor.exec('PASTE_HTML', [html]);
             setTimeout(reportFinalContent, 50);
           });
@@ -625,7 +644,9 @@
           if (tasks.length) {
             await withOverlay(doc, tasks.length, async (update) => {
               const urls = await uploadQueue(tasks, 1, (done, tot, suc, fail) => update(done, tot, suc, fail));
-              const html = urls.filter(Boolean).map(u => `<img src="${u}" style="max-width:100%;" alt="dropped-image" />`).join('');
+              const validDropUrls = urls.filter(Boolean);
+              const dropDims = await Promise.all(validDropUrls.map(u => getDimensions(u)));
+              const html = validDropUrls.map((u, i) => makeImgTag(u, dropDims[i], 'dropped-image')).join('');
               if (html) editor.exec('PASTE_HTML', [html]);
               setTimeout(reportFinalContent, 50);
             });

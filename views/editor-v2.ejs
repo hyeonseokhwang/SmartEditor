@@ -71,6 +71,13 @@
     .status-msg.ok{color:#4A7A2A}
     .status-msg.err{color:#A03030}
 
+    /* ── PROGRESS BAR ── */
+    #save-progress-wrap{display:none;margin-top:8px}
+    #save-progress-label{font-size:12px;color:var(--t2);margin-bottom:4px;letter-spacing:.04em}
+    #save-progress-bar-outer{height:10px;background:#e0e0e0;border-radius:5px;overflow:hidden;width:100%}
+    #save-progress-bar-inner{height:100%;width:0%;background:var(--ac);border-radius:5px;transition:width .2s}
+    #save-progress-detail{font-size:11px;color:var(--gr);margin-top:3px}
+
     /* ── EDITOR FRAME ── */
     .se-frame-wrap{
       background:#fff;border:1px solid var(--bd);
@@ -99,8 +106,14 @@
   <div class="toolbar-row">
     <input type="text" id="post-id-input" placeholder="게시글 ID 입력 후 불러오기…">
     <button class="btn btn-secondary" onclick="loadPost()">불러오기</button>
-    <button class="btn btn-primary" onclick="savePost()">저장</button>
+    <button class="btn btn-primary" id="save-btn" onclick="savePost()">저장</button>
     <span class="status-msg" id="status"></span>
+  </div>
+  <!-- 이미지 업로드 진행 상태바 -->
+  <div id="save-progress-wrap">
+    <div id="save-progress-label">이미지 업로드 준비 중…</div>
+    <div id="save-progress-bar-outer"><div id="save-progress-bar-inner"></div></div>
+    <div id="save-progress-detail"></div>
   </div>
 
   <!-- SmartEditor2 iframe -->
@@ -160,6 +173,18 @@ async function loadPost() {
   } catch (e) { setStatus('오류: ' + e.message, true); }
 }
 
+// blob: URL → dataUrl 변환 (서버는 blob URL 처리 불가 — 클라이언트에서 변환 필수)
+async function blobUrlToDataUrl(blobUrl) {
+  const res = await fetch(blobUrl);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 // img src 분류: uploaded(http/https) / pending(data:/blob:/file:) / broken(src없음)
 function auditImgSrcs(html) {
   const details = [];
@@ -177,6 +202,21 @@ function auditImgSrcs(html) {
   return details;
 }
 
+function showProgress(visible) {
+  document.getElementById('save-progress-wrap').style.display = visible ? 'block' : 'none';
+  document.getElementById('save-btn').disabled = visible;
+}
+
+function updateProgress(current, total, successCount, failCount) {
+  const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+  document.getElementById('save-progress-bar-inner').style.width = pct + '%';
+  document.getElementById('save-progress-label').textContent =
+    `이미지 업로드 중… ${current} / ${total}개 (${pct}%)`;
+  const f = typeof failCount === 'number' ? failCount : 0;
+  document.getElementById('save-progress-detail').textContent =
+    `성공 ${successCount}건${f > 0 ? ' / 실패 ' + f + '건' : ''}`;
+}
+
 async function savePost() {
   if (!currentPostId) { setStatus('먼저 게시글을 불러오세요', true); return; }
   setStatus('이미지 감사 중…');
@@ -187,48 +227,67 @@ async function savePost() {
     const details = auditImgSrcs(html);
     const total = details.length;
     const pendingList = details.filter(d => d.status === 'pending');
-    if (total > 0) setStatus(`이미지 ${total}개 확인 — 업로드 필요 ${pendingList.length}개`);
+    if (total > 0) setStatus(`이미지 총 ${total}개 — 미업로드 ${pendingList.length}개`);
 
-    // ── 2. 미업로드 이미지 순차 업로드 (concurrency=1, 3회 재시도) ──
+    // ── 2. 미업로드 이미지 순차 업로드 (프로그레스 바 표시) ──
     if (pendingList.length > 0) {
-      const overlayFn = window.SE2_withOverlay;
+      showProgress(true);
+      document.getElementById('save-progress-label').textContent =
+        `이미지 업로드 시작… 0 / ${pendingList.length}개 (0%)`;
+      document.getElementById('save-progress-bar-inner').style.width = '0%';
+
       const uploadFn  = window.SE2_uploadQueue;
       const replaceFn = window.SE2_replaceDataUrls;
 
-      if (overlayFn && uploadFn && replaceFn) {
-        const tasks = pendingList.map(d => ({ kind: 'dataUrl', dataUrl: d.src, key: d.src }));
-        const htmlSnap = html;
-        html = await overlayFn(document, pendingList.length, async (update) => {
-          const urls = await uploadFn(tasks, 1, update);
-          const map = new Map();
-          tasks.forEach((t, i) => { if (urls[i]) map.set(t.key, urls[i]); });
-          return replaceFn(htmlSnap, map);
-        });
+      // blob URL 포함 tasks 빌드 (blob: → dataUrl 변환 후 서버 전송)
+      const tasks = [];
+      for (const d of pendingList) {
+        let dataUrl = d.src;
+        if (d.src.startsWith('blob:')) {
+          try { dataUrl = await blobUrlToDataUrl(d.src); } catch { dataUrl = null; }
+        }
+        tasks.push({ kind: 'dataUrl', dataUrl, key: d.src });
+      }
+
+      if (uploadFn && replaceFn) {
+        const urls = await uploadFn(tasks, 1, updateProgress);
+        const map = new Map();
+        tasks.forEach((t, i) => { if (urls[i]) map.set(t.key, urls[i]); });
+        html = replaceFn(html, map);  // split/join 방식 (se-init-v2.js 수정됨)
       } else {
-        // fallback: 오버레이 없이 순차 업로드
-        for (let i = 0; i < pendingList.length; i++) {
-          setStatus(`저장 전 이미지 업로드 중… (${i + 1}/${pendingList.length})`);
-          const src = pendingList[i].src;
+        // fallback: 기본 순차 업로드 (split/join으로 안정적 교체)
+        let suc = 0; let fail = 0;
+        for (let i = 0; i < tasks.length; i++) {
+          updateProgress(i, tasks.length, suc, fail);
+          const t = tasks[i];
+          if (!t.dataUrl) { fail++; continue; }
           let uploaded = null;
           for (let attempt = 0; attempt < 3; attempt++) {
             try {
               const r = await fetch('/api/upload', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dataUrl: src }),
+                body: JSON.stringify({ dataUrl: t.dataUrl }),
               });
               const j = await r.json();
               if (j && j.url) { uploaded = j.url; break; }
             } catch { if (attempt === 2) break; }
           }
-          if (uploaded) {
-            const esc = src.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            html = html.replace(new RegExp(esc, 'g'), uploaded);
-          }
+          if (uploaded) { html = html.split(t.key).join(uploaded); suc++; } else fail++;
         }
+        updateProgress(tasks.length, tasks.length, suc, fail);
       }
+      showProgress(false);
     }
 
-    // ── 3. PUT 저장 ─────────────────────────────────────────────
+    // ── 3. 저장 전 최종 검증 — 미업로드 이미지 있으면 차단 ──────
+    const preCheck = auditImgSrcs(html);
+    const stillPending = preCheck.filter(d => d.status === 'pending');
+    if (stillPending.length > 0) {
+      setStatus(`⛔ 이미지 ${stillPending.length}개 업로드 실패 — 저장 중단. 재시도하거나 이미지를 확인하세요.`, true);
+      return;
+    }
+
+    // ── 4. PUT 저장 ─────────────────────────────────────────────
     setStatus('저장 중…');
     const r = await fetch('/api/posts/' + encodeURIComponent(currentPostId), {
       method: 'PUT',
@@ -237,18 +296,21 @@ async function savePost() {
     }).then(r => r.json());
     if (!r.ok) { setStatus('오류: ' + r.error, true); return; }
 
-    // ── 4. 저장 후 검증 ─────────────────────────────────────────
+    // ── 5. 저장 후 검증 ─────────────────────────────────────────
     const saved = auditImgSrcs(html);
     const failedCount = saved.filter(d => d.status === 'pending').length;
     const okCount     = saved.filter(d => d.status === 'uploaded').length;
     if (failedCount > 0) {
-      setStatus(`⚠️ 이미지 ${failedCount}개 업로드 실패`, true);
+      setStatus(`⚠️ 이미지 ${failedCount}개 미업로드 상태로 저장됨`, true);
     } else {
-      setStatus(okCount > 0
-        ? `저장 완료 — 이미지 ${okCount}개 확인 (전체 업로드됨)`
+      setStatus(total > 0
+        ? `저장 완료 — 이미지 ${okCount} / ${total}개 전체 업로드 확인`
         : '저장 완료', false, true);
     }
-  } catch (e) { setStatus('오류: ' + e.message, true); }
+  } catch (e) {
+    showProgress(false);
+    setStatus('오류: ' + e.message, true);
+  }
 }
 
 function setStatus(msg, isErr = false, isOk = false) {
