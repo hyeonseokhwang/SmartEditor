@@ -56,10 +56,23 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dataUrl: dataUrl })
-      }).then(function(r){ return r.json(); })
+      }).then(function(r){
+          // 4xx 클라이언트 에러는 즉시 실패 — retry 무의미 (400 Bad Request 등)
+          if (r.status >= 400 && r.status < 500) {
+            warn('upload attempt', attempt, 'HTTP', r.status, '— client error, no retry');
+            return r.json().catch(function(){ return null; });
+          }
+          // 5xx 서버 에러는 retry 대상
+          if (!r.ok && attempt < MAX_RETRY) {
+            warn('upload attempt', attempt, 'HTTP', r.status, '— server error, retrying');
+            return delay(RETRY_DELAY_MS).then(tryOnce);
+          }
+          return r.json();
+        })
         .then(function(j) {
+          if (!j) return j;
           if (j && j.url) return j;
-          // 서버 응답은 있으나 url 없음 → 재시도
+          // url 없는 응답 → retry (5xx 후 빈 응답 등)
           if (attempt < MAX_RETRY) {
             warn('upload attempt', attempt, 'no url, retrying in', RETRY_DELAY_MS, 'ms');
             return delay(RETRY_DELAY_MS).then(tryOnce);
@@ -67,8 +80,9 @@
           return j;
         })
         .catch(function(e) {
+          // 네트워크 에러만 retry
           if (attempt < MAX_RETRY) {
-            warn('upload attempt', attempt, 'error:', e.message, '— retrying in', RETRY_DELAY_MS, 'ms');
+            warn('upload attempt', attempt, 'network error:', e.message, '— retrying in', RETRY_DELAY_MS, 'ms');
             return delay(RETRY_DELAY_MS).then(tryOnce);
           }
           throw e;
@@ -84,8 +98,19 @@
       var form = new FormData();
       form.append('file', blob, name || 'pasted.png');
       return fetch('/api/upload', { method: 'POST', body: form })
-        .then(function(r){ return r.json(); })
+        .then(function(r){
+          if (r.status >= 400 && r.status < 500) {
+            warn('blob upload attempt', attempt, 'HTTP', r.status, '— client error, no retry');
+            return r.json().catch(function(){ return null; });
+          }
+          if (!r.ok && attempt < MAX_RETRY) {
+            warn('blob upload attempt', attempt, 'HTTP', r.status, '— retrying');
+            return delay(RETRY_DELAY_MS).then(tryOnce);
+          }
+          return r.json();
+        })
         .then(function(j) {
+          if (!j) return j;
           if (j && j.url) return j;
           if (attempt < MAX_RETRY) {
             warn('blob upload attempt', attempt, 'no url, retrying');
@@ -95,7 +120,7 @@
         })
         .catch(function(e) {
           if (attempt < MAX_RETRY) {
-            warn('blob upload attempt', attempt, 'error:', e.message, '— retrying');
+            warn('blob upload attempt', attempt, 'network error:', e.message, '— retrying');
             return delay(RETRY_DELAY_MS).then(tryOnce);
           }
           throw e;
