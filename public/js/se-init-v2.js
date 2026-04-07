@@ -82,11 +82,12 @@
   async function withOverlay(doc, totalCount, fn) {
     const d = doc || document;
     // 메인 페이지 외부 progress bar 직접 연동 (IIFE 클로저 내부에서 직접 접근)
-    const extWrap    = window.document.getElementById('save-progress-wrap');
-    const extLabel   = window.document.getElementById('save-progress-label');
-    const extBarInner= window.document.getElementById('save-progress-bar-inner');
-    const extDetail  = window.document.getElementById('save-progress-detail');
-    console.log('[withOverlay] 이미지', totalCount, '개 업로드 시작. extWrap:', !!extWrap, 'window:', typeof window);
+    const topDoc     = (function(){ try { return window.top.document; } catch { return window.document; } })();
+    const extWrap    = topDoc.getElementById('save-progress-wrap');
+    const extLabel   = topDoc.getElementById('save-progress-label');
+    const extBarInner= topDoc.getElementById('save-progress-bar-inner');
+    const extDetail  = topDoc.getElementById('save-progress-detail');
+    console.log('[withOverlay] 이미지', totalCount, '개 업로드 시작. extWrap:', !!extWrap, 'topDoc:', !!topDoc);
     let overlay;
     try {
       window.PASTE_BUSY = true;
