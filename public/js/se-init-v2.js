@@ -371,12 +371,23 @@
       const wrapperDoc = seWrapperEl && (seWrapperEl.contentDocument || seWrapperEl.contentWindow?.document);
       let iframe = null;
       if (wrapperDoc) {
+        // se-wrapper.html의 모든 iframe 탐색 (depth 1)
+        const wIframes = Array.from(wrapperDoc.querySelectorAll('iframe'));
+        if (retryCount === 0) DBG.log('[seInit] wrapperDoc iframes:', wIframes.length, wIframes.map(f=>f.className||f.src?.split('/').pop()).join(','));
         iframe = wrapperDoc.querySelector('iframe.se2_input_wysiwyg');
         if (!iframe) {
-          // skin iframe(SmartEditor2Skin.html) 내부에서 탐색
-          const skinFrame = wrapperDoc.querySelector('iframe');
-          const skinDoc = skinFrame && (skinFrame.contentDocument || skinFrame.contentWindow?.document);
-          if (skinDoc) iframe = skinDoc.querySelector('iframe.se2_input_wysiwyg');
+          for (const skinFrame of wIframes) {
+            try {
+              const skinDoc = skinFrame.contentDocument || skinFrame.contentWindow?.document;
+              if (retryCount === 0) DBG.log('[seInit] skinFrame src:', skinFrame.src?.split('/').pop(), 'skinDoc:', !!skinDoc);
+              if (skinDoc) {
+                const sIframes = Array.from(skinDoc.querySelectorAll('iframe'));
+                if (retryCount === 0) DBG.log('[seInit] skinDoc iframes:', sIframes.length, sIframes.map(f=>f.className||f.src?.split('/').pop()).join(','));
+                iframe = skinDoc.querySelector('iframe.se2_input_wysiwyg');
+                if (iframe) break;
+              }
+            } catch (e) { if (retryCount === 0) DBG.warn('[seInit] skinFrame access err:', e.message); }
+          }
         }
       }
       if (!iframe) iframe = editor && editor.elIRFrame;
