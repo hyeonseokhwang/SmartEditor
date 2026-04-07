@@ -260,6 +260,7 @@
         for (let attempt = 0; attempt < MAX_RETRY; attempt++) {
           try {
             if (t.kind === 'dataUrl') {
+              if (!t.dataUrl || typeof t.dataUrl !== 'string' || !t.dataUrl.startsWith('data:')) { result = null; break; }
               const res = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dataUrl: t.dataUrl }) });
               const j = await res.json();
               result = j && j.url ? j.url : null;

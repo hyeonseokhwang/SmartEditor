@@ -277,13 +277,19 @@ async function savePost() {
       const replaceFn = window.SE2_replaceDataUrls;
 
       // blob URL 포함 tasks 빌드 (blob: → dataUrl 변환 후 서버 전송)
+      // dataUrl=null(변환 실패) 항목은 result=null 처리 → 저장 차단
       const tasks = [];
       for (const d of pendingList) {
         let dataUrl = d.src;
         if (d.src.startsWith('blob:')) {
           try { dataUrl = await blobUrlToDataUrl(d.src); } catch { dataUrl = null; }
         }
-        tasks.push({ kind: 'dataUrl', dataUrl, key: d.src });
+        // null/비data URL은 kind='skip'으로 표시 → uploadQueue에서 null 반환
+        if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) {
+          tasks.push({ kind: 'skip', dataUrl: null, key: d.src });
+        } else {
+          tasks.push({ kind: 'dataUrl', dataUrl, key: d.src });
+        }
       }
 
       if (uploadFn && replaceFn) {

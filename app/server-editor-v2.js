@@ -144,12 +144,29 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 
     // base64 dataUrl 업로드
     const { dataUrl } = req.body;
-    if (!dataUrl) return res.status(400).json({ error: 'No file or dataUrl' });
+    if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) {
+      return res.status(400).json({ error: 'No file or dataUrl' });
+    }
 
     if (hasCloudinary) {
-      const r = await cloudinary.uploader.upload(dataUrl, {
-        folder: 'Hanwool', public_id: uuidv4(), resource_type: 'auto',
-      });
+      let uploadDataUrl = dataUrl;
+      // WMF/EMF 등 비표준 포맷은 Cloudinary가 거부 → PNG로 변환 시도
+      const mimeMatch = dataUrl.match(/^data:([^;]+);/);
+      const mime = mimeMatch ? mimeMatch[1].toLowerCase() : '';
+      const unsupportedFmts = ['image/x-wmf', 'image/wmf', 'image/x-emf', 'image/emf', 'image/x-bmp'];
+      if (unsupportedFmts.includes(mime) || (mime && !mime.startsWith('image/'))) {
+        // 지원 불가 포맷 — 스킵
+        return res.status(400).json({ error: `Unsupported image format: ${mime}` });
+      }
+      let r;
+      try {
+        r = await cloudinary.uploader.upload(uploadDataUrl, {
+          folder: 'Hanwool', public_id: uuidv4(), resource_type: 'image',
+        });
+      } catch (uploadErr) {
+        console.error('[upload] Cloudinary error:', uploadErr.message || uploadErr);
+        return res.status(400).json({ error: uploadErr.message || 'Cloudinary upload failed' });
+      }
       return res.json({ url: r.secure_url });
     }
 
