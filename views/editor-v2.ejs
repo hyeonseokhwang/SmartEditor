@@ -343,29 +343,33 @@ function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g
 // ── 붙여넣기 시 외부 progress bar 연동 ──────────────────────────
 // se-init-v2.js의 SE2_withOverlay를 래핑하여 iframe 내부뿐 아니라
 // 외부 페이지 progress bar도 함께 업데이트
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    var orig = window.SE2_withOverlay;
-    if (!orig) return;
-    window.SE2_withOverlay = async function(doc, totalCount, fn) {
-      showProgress(true);
-      document.getElementById('save-progress-label').textContent =
-        '이미지 ' + totalCount + '개 업로드 중… 0 / ' + totalCount + '개 (0%)';
-      document.getElementById('save-progress-bar-inner').style.width = '0%';
-      document.getElementById('save-progress-detail').textContent = '';
-      try {
-        return await orig(doc, totalCount, async function(update) {
-          return await fn(function(cur, tot, suc, fail) {
-            updateProgress(cur, tot, suc, fail);
-            if (update) update(cur, tot, suc, fail);
-          });
+// SE2_withOverlay 래핑 — 즉시 실행 (타임아웃 없음)
+function wrapSE2Overlay() {
+  var orig = window.SE2_withOverlay;
+  if (!orig || orig._wrapped) return;
+  var wrapped = async function(doc, totalCount, fn) {
+    showProgress(true);
+    document.getElementById('save-progress-label').textContent =
+      '이미지 ' + totalCount + '개 업로드 중… 0 / ' + totalCount + '개 (0%)';
+    document.getElementById('save-progress-bar-inner').style.width = '0%';
+    document.getElementById('save-progress-detail').textContent = '';
+    try {
+      return await orig(doc, totalCount, async function(update) {
+        return await fn(function(cur, tot, suc, fail) {
+          updateProgress(cur, tot, suc, fail);
+          if (update) update(cur, tot, suc, fail);
         });
-      } finally {
-        showProgress(false);
-      }
-    };
-  }, 1500);
-});
+      });
+    } finally {
+      showProgress(false);
+    }
+  };
+  wrapped._wrapped = true;
+  window.SE2_withOverlay = wrapped;
+}
+// 스크립트 로드 완료 즉시 + load 이벤트 시 재시도
+wrapSE2Overlay();
+window.addEventListener('load', wrapSE2Overlay);
 </script>
 </body>
 </html>
