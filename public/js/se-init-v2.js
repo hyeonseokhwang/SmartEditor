@@ -238,7 +238,9 @@
   // URL + 크기 → img 태그 문자열
   function makeImgTag(u, dim, alt) {
     const wh = (dim && dim.w > 0 && dim.h > 0) ? ` width="${dim.w}" height="${dim.h}"` : '';
-    return `<img src="${u}"${wh} style="max-width:100%;height:auto;" alt="${alt || 'pasted-image'}" />`;
+    // (4) 이미지 형태 오류 방지: dim이 있으면 max-width를 실제 픽셀로 제한 (원본보다 확대 방지)
+    const maxW = (dim && dim.w > 0) ? `${dim.w}px` : '100%';
+    return `<img src="${u}"${wh} style="max-width:${maxW};height:auto;" alt="${alt || 'pasted-image'}" />`;
   }
 
   function collectDataUrlsFromRTF(clipRTF) {
@@ -334,7 +336,8 @@
       let idx = 0;
       const nodesWithSrc = Array.from(container.querySelectorAll('[src^="file:"]'));
       for (const el of nodesWithSrc) {
-        if (idx >= urls.length) { el.removeAttribute('src'); continue; }
+        // (3) 이미지 누락 방지: URL 부족 시 src="" broken img 대신 요소 제거
+        if (idx >= urls.length) { el.remove(); continue; }
         const newUrl = urls[idx++];
         if (el.tagName && el.tagName.toLowerCase() === 'img') {
           const wAttr = el.getAttribute('width');
@@ -566,7 +569,9 @@
           const duListPre = collectDataUrlsFromHTML(clipHTML);
           const hwpDusPre = parseHwpJsonForDataUrls(clipHTML);
           const rtfDusPre = (duListPre.length + hwpDusPre.length === 0) ? collectDataUrlsFromRTF(clipRTF) : [];
-          const preCount = duListPre.length + hwpDusPre.length + rtfDusPre.length || 1;
+          // (1) 전체 이미지 개수 측정: file:// URL img 개수 포함 (dataUrl 추출 실패 시도 정확한 개수 표시)
+          const fileImgCount = (clipHTML.match(/<img\b[^>]*src\s*=\s*["']?file:/gi) || []).length;
+          const preCount = duListPre.length + hwpDusPre.length + rtfDusPre.length || fileImgCount || 1;
           await withOverlay(doc, preCount, async (update) => {
             const duList = duListPre;
             const hwpDus = hwpDusPre;
@@ -614,6 +619,8 @@
             const sanitized = clipHTML
               ? clipHTML.replace(/<img\b[^>]*\bsrc\s*=\s*['"]?file:[^'">]*['"]?[^>]*>/gi, '').replace(/url\((['"])?.*?file:[^)]*\)/gi, 'none')
               : (clipText || '');
+            // (2) 업로드 진행률 즉시 완료 표시 (이미지 없이 sanitize만 처리하는 경우)
+            update(1, 1, 0, 0);
             editor.exec('PASTE_HTML', [sanitized]);
             setTimeout(reportFinalContent, 50);
           });
