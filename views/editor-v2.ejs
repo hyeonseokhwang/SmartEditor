@@ -219,6 +219,11 @@ function updateProgress(current, total, successCount, failCount) {
 
 async function savePost() {
   if (!currentPostId) { setStatus('먼저 게시글을 불러오세요', true); return; }
+  // 붙여넣기 업로드 진행 중이면 저장 차단 — 누락 방지
+  if (window.PASTE_BUSY) {
+    setStatus('⏳ 이미지 업로드 진행 중입니다. 완료 후 다시 저장하세요.', true);
+    return;
+  }
   setStatus('이미지 감사 중…');
   try {
     let html = getSeHTML();
