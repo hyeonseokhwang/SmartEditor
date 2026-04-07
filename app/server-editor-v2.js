@@ -145,8 +145,15 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     // 로컬 파일 경로 업로드 (HWP 붙여넣기 시 file:/// URL에서 추출한 temp 파일)
     const { filePath } = req.body;
     if (filePath && typeof filePath === 'string') {
+      // file:/// URL 프리픽스 제거 (브라우저 file:/// → 서버 파일시스템 경로 변환)
+      let cleanPath = filePath;
+      if (cleanPath.startsWith('file:///')) {
+        cleanPath = cleanPath.slice(8); // 'file:///' 제거
+        if (cleanPath.startsWith('/')) cleanPath = cleanPath.slice(1); // leading slash 제거
+        cleanPath = cleanPath.replace(/\//g, '\\'); // forward slash → backslash
+      }
       // 보안: temp 디렉토리만 허용
-      const resolved = path.resolve(filePath);
+      const resolved = path.resolve(cleanPath);
       const tempDir = path.resolve(process.env.TEMP || process.env.TMP || 'C:\\Users\\hysra\\AppData\\Local\\Temp');
       if (!resolved.startsWith(tempDir)) {
         return res.status(403).json({ error: 'filePath must be in temp directory' });

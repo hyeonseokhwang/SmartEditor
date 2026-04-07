@@ -298,11 +298,12 @@
             if (typeof obj.bidt[k] === 'string' && obj.bidt[k].length > 50) bidt[k] = obj.bidt[k];
           }
         }
-        if (typeof obj.bi === 'string' && !seen[obj.bi]) { srOrder.push(obj.bi); seen[obj.bi] = true; }
+        // seen 중복체크 제거 — 같은 이미지가 여러 번 참조되는 경우 srOrder에 모두 포함 (CTO 지시)
+        if (typeof obj.bi === 'string') { srOrder.push(obj.bi); }
         if (Array.isArray(obj.bi)) {
           for (var i = 0; i < obj.bi.length; i++) {
             var it = obj.bi[i];
-            if (it && typeof it.sr === 'string' && !seen[it.sr]) { srOrder.push(it.sr); seen[it.sr] = true; }
+            if (it && typeof it.sr === 'string') { srOrder.push(it.sr); }
           }
         }
         for (var key in obj) if (Object.prototype.hasOwnProperty.call(obj, key)) collect(obj[key]);
