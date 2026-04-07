@@ -366,7 +366,10 @@
   window.seInitAttachToEditor = function (editor, _retryCount) {
     const retryCount = _retryCount || 0;
     try {
-      const iframe = editor && editor.elIRFrame;
+      // SE2는 elIRFrame 없음 — se2_input_wysiwyg iframe 직접 탐색 (SE2BasicCreator.js 확인)
+      const seWrapperEl = document.getElementById('se-iframe');
+      const wrapperDoc = seWrapperEl && (seWrapperEl.contentDocument || seWrapperEl.contentWindow?.document);
+      const iframe = (wrapperDoc && wrapperDoc.querySelector('iframe.se2_input_wysiwyg')) || (editor && editor.elIRFrame);
       const doc = iframe && (iframe.contentDocument || iframe.contentWindow?.document);
       if (!doc) {
         if (retryCount < 30) {
