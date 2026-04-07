@@ -203,7 +203,12 @@
               else if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) {
                 mime = 'image/png';
               }
-              // Otherwise try as PNG (canvas will handle conversion)
+              else {
+                // 순수 WMF/EMF 바이너리 — 브라우저/Cloudinary 미지원, skip
+                log('RTF: WMF/EMF at', pos, '— not uploadable (magic bytes mismatch), skip');
+                pos = rtf.indexOf(searchKey, ci > pos ? ci : pos + 5);
+                continue;
+              }
             }
             // Convert to base64 in chunks to avoid stack overflow
             var binParts = [];
