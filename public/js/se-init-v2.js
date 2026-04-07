@@ -598,11 +598,10 @@
         } else {
           console.log('[paste] path4: else fallback — HWP/텍스트 경로 (imageItems=0, data:image 없음, file:// 없음)');
           setTimeout(async () => {
-            // path4 전체를 withOverlay로 래핑: 붙여넣기 직후 DOM 이미지 스캔 후 overlay 표시
-            const preDocImgs = Array.from(doc.querySelectorAll('img')).filter(img => { const s = img.getAttribute('src')||''; return s && !isHttpUrl(s); });
-            console.log('[paste] path4: preDocImgs=', preDocImgs.length);
-            const overlayCount = preDocImgs.length || 1;
-            await withOverlay(doc, overlayCount, async (update) => {
+            // 300ms 후 body img 재스캔 — HWP 이미지 삽입 완료 시간 확보
+            const bodyImgs = Array.from(doc.querySelectorAll('img')).filter(img => { const s = img.getAttribute('src')||''; return s && !isHttpUrl(s); });
+            console.log('[paste] path4: bodyImgs (non-http)=', bodyImgs.length);
+            const runReplace = async (update) => {
               try {
                 const sel = (doc.getSelection && doc.getSelection()) || (doc.selection && doc.selection);
                 if (sel && sel.rangeCount > 0) {
@@ -615,7 +614,7 @@
                     let done = 0;
                     for (const cimg of candidateImgs) {
                       const src = cimg.getAttribute('src') || '';
-                      if (!src) { done++; update(done, candidateImgs.length, done, 0); continue; }
+                      if (!src) { done++; if (update) update(done, candidateImgs.length, done, 0); continue; }
                       try {
                         if (src.startsWith('data:image/')) {
                           const res = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dataUrl: src }) });
@@ -629,16 +628,21 @@
                         }
                       } catch (e) { /* ignore */ }
                       done++;
-                      update(done, candidateImgs.length, done, 0);
+                      if (update) update(done, candidateImgs.length, done, 0);
                     }
                   }
                 }
               } catch (e) { /* ignore */ }
               await replaceInlineDataAndBlobImages();
               DBG.log('post-paste replacement pass completed');
-            });
+            };
+            if (bodyImgs.length > 0) {
+              await withOverlay(doc, bodyImgs.length, runReplace);
+            } else {
+              await runReplace(null);
+            }
             setTimeout(reportFinalContent, 50);
-          }, 150);
+          }, 300);
         }
       };
 
