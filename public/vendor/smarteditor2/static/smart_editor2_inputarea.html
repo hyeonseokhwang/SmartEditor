@@ -211,31 +211,35 @@
     }
   };
 
-  // Upload array of data URLs, return array of remote URLs (with progress tracking)
+  // Upload array of data URLs SEQUENTIALLY (1개씩 순차 — 동시 업로드 금지, Lucas 직접 지시)
   function uploadAll(dataUrls) {
     var total = dataUrls.length;
-    var done = 0, success = 0, fail = 0;
-    var promises = [];
+    var results = [];
+    var success = 0, fail = 0;
+    var chain = Promise.resolve();
     for (var i = 0; i < total; i++) {
-      promises.push(
-        uploadDataUrl(dataUrls[i])
-          .then(function(j){
-            done++;
-            var url = (j && j.url) ? j.url : null;
-            if (url) success++; else fail++;
-            topProgress.update(done, total, success, fail);
-            log('upload ' + done + '/' + total + (url ? ' OK' : ' FAIL'));
-            return url;
-          })
-          .catch(function(e){
-            done++; fail++;
-            topProgress.update(done, total, success, fail);
-            warn('upload ' + done + '/' + total + ' ERROR', e);
-            return null;
-          })
-      );
+      (function(idx) {
+        chain = chain.then(function() {
+          topProgress.update(idx, total, success, fail);
+          log('uploading ' + (idx+1) + '/' + total + '...');
+          return uploadDataUrl(dataUrls[idx])
+            .then(function(j){
+              var url = (j && j.url) ? j.url : null;
+              if (url) success++; else fail++;
+              results[idx] = url;
+              topProgress.update(idx+1, total, success, fail);
+              log('upload ' + (idx+1) + '/' + total + (url ? ' OK: ' + url.substring(0,60) : ' FAIL'));
+            })
+            .catch(function(e){
+              fail++;
+              results[idx] = null;
+              topProgress.update(idx+1, total, success, fail);
+              warn('upload ' + (idx+1) + '/' + total + ' ERROR', e);
+            });
+        });
+      })(i);
     }
-    return Promise.all(promises).then(function(results) {
+    return chain.then(function() {
       topProgress.done(total, success, fail);
       return results;
     });
@@ -306,39 +310,44 @@
       hasDataImages: hasDataImages
     });
 
-    // CASE 1: Direct image blobs in clipboard (screenshot, image copy)
+    // CASE 1: Direct image blobs in clipboard (screenshot, image copy) — 순차 업로드
     if (imageFiles.length && !hasFileUrls) {
       event.preventDefault();
       BUSY = true;
       var totalBlobs = imageFiles.length;
-      var blobDone = 0, blobSuc = 0, blobFail = 0;
+      var blobSuc = 0, blobFail = 0;
       var ov = showOverlay('이미지 ' + totalBlobs + '개 업로드 중…');
-      var uploads = [];
+      var blobResults = [];
+      var blobChain = Promise.resolve();
       for (var fi = 0; fi < imageFiles.length; fi++) {
-        uploads.push(uploadBlob(imageFiles[fi], imageFiles[fi].name || 'pasted.png')
-          .then(function(j){
-            blobDone++;
-            var url = (j && j.url) ? j.url : null;
-            if (url) blobSuc++; else blobFail++;
-            topProgress.update(blobDone, totalBlobs, blobSuc, blobFail);
-            return url;
-          })
-          .catch(function(){
-            blobDone++; blobFail++;
-            topProgress.update(blobDone, totalBlobs, blobSuc, blobFail);
-            return null;
-          }));
+        (function(idx) {
+          blobChain = blobChain.then(function() {
+            topProgress.update(idx, totalBlobs, blobSuc, blobFail);
+            return uploadBlob(imageFiles[idx], imageFiles[idx].name || 'pasted.png')
+              .then(function(j){
+                var url = (j && j.url) ? j.url : null;
+                if (url) blobSuc++; else blobFail++;
+                blobResults[idx] = url;
+                topProgress.update(idx+1, totalBlobs, blobSuc, blobFail);
+              })
+              .catch(function(){
+                blobFail++;
+                blobResults[idx] = null;
+                topProgress.update(idx+1, totalBlobs, blobSuc, blobFail);
+              });
+          });
+        })(fi);
       }
-      Promise.all(uploads).then(function(urls) {
+      blobChain.then(function() {
         var html = '';
-        for (var u = 0; u < urls.length; u++) {
-          if (urls[u]) html += '<img src="' + urls[u] + '" style="max-width:100%;" alt="pasted-image" />';
+        for (var u = 0; u < blobResults.length; u++) {
+          if (blobResults[u]) html += '<img src="' + blobResults[u] + '" style="max-width:100%;" alt="pasted-image" />';
         }
         if (html) insertHTML(html);
         topProgress.done(totalBlobs, blobSuc, blobFail);
         removeOverlay();
         BUSY = false;
-        log('blob upload done', urls.filter(Boolean).length, 'images');
+        log('blob upload done', blobResults.filter(Boolean).length, 'images');
       });
       return;
     }
@@ -428,32 +437,37 @@
           log('HWP upload done', successUrls, 'images in-place');
         });
       } else if (imageFiles.length) {
-        // Fall back to blob upload
-        var bfTotal = imageFiles.length, bfDone = 0, bfSuc = 0, bfFail = 0;
+        // Fall back to blob upload — 순차 1건씩
+        var bfTotal = imageFiles.length, bfSuc = 0, bfFail = 0;
+        var bfResults = [];
         topProgress.update(0, bfTotal, 0, 0);
-        var blobUploads = [];
+        var bfChain = Promise.resolve();
         for (var bi = 0; bi < imageFiles.length; bi++) {
-          blobUploads.push(uploadBlob(imageFiles[bi], 'hwp-image.png')
-            .then(function(j){
-              bfDone++;
-              var url = (j && j.url) ? j.url : null;
-              if (url) bfSuc++; else bfFail++;
-              topProgress.update(bfDone, bfTotal, bfSuc, bfFail);
-              return url;
-            })
-            .catch(function(){
-              bfDone++; bfFail++;
-              topProgress.update(bfDone, bfTotal, bfSuc, bfFail);
-              return null;
-            }));
+          (function(idx) {
+            bfChain = bfChain.then(function() {
+              topProgress.update(idx, bfTotal, bfSuc, bfFail);
+              return uploadBlob(imageFiles[idx], 'hwp-image.png')
+                .then(function(j){
+                  var url = (j && j.url) ? j.url : null;
+                  if (url) bfSuc++; else bfFail++;
+                  bfResults[idx] = url;
+                  topProgress.update(idx+1, bfTotal, bfSuc, bfFail);
+                })
+                .catch(function(){
+                  bfFail++;
+                  bfResults[idx] = null;
+                  topProgress.update(idx+1, bfTotal, bfSuc, bfFail);
+                });
+            });
+          })(bi);
         }
-        Promise.all(blobUploads).then(function(urls) {
-          var result = replaceFileImgsInPlace(clipHTML, urls);
+        bfChain.then(function() {
+          var result = replaceFileImgsInPlace(clipHTML, bfResults);
           insertHTML(result);
           topProgress.done(bfTotal, bfSuc, bfFail);
           removeOverlay();
           BUSY = false;
-          log('HWP blob fallback done', urls.filter(Boolean).length, 'images in-place');
+          log('HWP blob fallback done', bfResults.filter(Boolean).length, 'images in-place');
         });
       } else {
         // No image data found - remove broken file:/// imgs, keep text
