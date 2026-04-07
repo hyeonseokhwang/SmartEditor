@@ -677,6 +677,12 @@
     if (outer) outer.addEventListener('load', () => attachViaIframePolling(outer));
   });
 
+  // Expose utilities for savePost() image audit (editor-v2.ejs)
+  window.SE2_withOverlay = withOverlay;
+  window.SE2_uploadQueue = uploadQueue;
+  window.SE2_collectDataUrls = collectDataUrlsFromHTML;
+  window.SE2_replaceDataUrls = replaceDataUrlsInHTMLWithMap;
+
   // Allow auto-repeat via query param: ?autoRepeat=20 (runs after first paste is captured)
   window.addEventListener('load', () => {
     try {

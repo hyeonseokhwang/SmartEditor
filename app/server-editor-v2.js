@@ -166,6 +166,33 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+// 이미지 감사 API — GET /api/posts/:postId/image-audit
+app.get('/api/posts/:postId/image-audit', async (req, res) => {
+  try {
+    const post = await pool.query('SELECT content_html FROM yeouiseonwon.posts WHERE post_id = $1', [req.params.postId]);
+    if (!post.rows.length) return res.status(404).json({ error: 'Not found' });
+    const html = post.rows[0].content_html || '';
+    const details = [];
+    const imgTagRe = /<img\b([^>]*)>/gi;
+    let m;
+    while ((m = imgTagRe.exec(html)) !== null) {
+      const srcM = /\bsrc\s*=\s*["']([^"']*)["']/i.exec(m[1]);
+      const src = srcM ? srcM[1] : '';
+      let status;
+      if (!src) status = 'broken';
+      else if (/^https?:\/\//i.test(src)) status = 'uploaded';
+      else status = 'pending';
+      const preview = src.length > 120 ? src.slice(0, 120) + '…' : src;
+      details.push({ src: preview, status });
+    }
+    const total    = details.length;
+    const uploaded = details.filter(d => d.status === 'uploaded').length;
+    const pending  = details.filter(d => d.status === 'pending').length;
+    const broken   = details.filter(d => d.status === 'broken').length;
+    res.json({ total, uploaded, pending, broken, details });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // 클립보드 디버그 로그
 app.post('/api/log/clipboard', (req, res) => {
   console.log('[SE2][clipboard]', JSON.stringify(req.body).slice(0, 200));
