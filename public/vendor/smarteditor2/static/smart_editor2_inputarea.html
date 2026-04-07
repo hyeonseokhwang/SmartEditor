@@ -43,19 +43,65 @@
     }
   }
 
+  var MAX_RETRY = 10;       // 최대 10회 재시도
+  var RETRY_DELAY_MS = 1500; // 재시도 간격 1.5초
+
+  function delay(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
   function uploadDataUrl(dataUrl) {
-    return fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dataUrl: dataUrl })
-    }).then(function(r){ return r.json(); });
+    var attempt = 0;
+    function tryOnce() {
+      attempt++;
+      return fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dataUrl: dataUrl })
+      }).then(function(r){ return r.json(); })
+        .then(function(j) {
+          if (j && j.url) return j;
+          // 서버 응답은 있으나 url 없음 → 재시도
+          if (attempt < MAX_RETRY) {
+            warn('upload attempt', attempt, 'no url, retrying in', RETRY_DELAY_MS, 'ms');
+            return delay(RETRY_DELAY_MS).then(tryOnce);
+          }
+          return j;
+        })
+        .catch(function(e) {
+          if (attempt < MAX_RETRY) {
+            warn('upload attempt', attempt, 'error:', e.message, '— retrying in', RETRY_DELAY_MS, 'ms');
+            return delay(RETRY_DELAY_MS).then(tryOnce);
+          }
+          throw e;
+        });
+    }
+    return tryOnce();
   }
 
   function uploadBlob(blob, name) {
-    var form = new FormData();
-    form.append('file', blob, name || 'pasted.png');
-    return fetch('/api/upload', { method: 'POST', body: form })
-      .then(function(r){ return r.json(); });
+    var attempt = 0;
+    function tryOnce() {
+      attempt++;
+      var form = new FormData();
+      form.append('file', blob, name || 'pasted.png');
+      return fetch('/api/upload', { method: 'POST', body: form })
+        .then(function(r){ return r.json(); })
+        .then(function(j) {
+          if (j && j.url) return j;
+          if (attempt < MAX_RETRY) {
+            warn('blob upload attempt', attempt, 'no url, retrying');
+            return delay(RETRY_DELAY_MS).then(tryOnce);
+          }
+          return j;
+        })
+        .catch(function(e) {
+          if (attempt < MAX_RETRY) {
+            warn('blob upload attempt', attempt, 'error:', e.message, '— retrying');
+            return delay(RETRY_DELAY_MS).then(tryOnce);
+          }
+          throw e;
+        });
+    }
+    return tryOnce();
   }
 
   // Extract data:image URLs from HTML string
