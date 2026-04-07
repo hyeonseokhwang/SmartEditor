@@ -142,6 +142,37 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       return res.json({ url: `/public/uploads/${req.file.filename}` });
     }
 
+    // 로컬 파일 경로 업로드 (HWP 붙여넣기 시 file:/// URL에서 추출한 temp 파일)
+    const { filePath } = req.body;
+    if (filePath && typeof filePath === 'string') {
+      // 보안: temp 디렉토리만 허용
+      const resolved = path.resolve(filePath);
+      const tempDir = path.resolve(process.env.TEMP || process.env.TMP || 'C:\\Users\\hysra\\AppData\\Local\\Temp');
+      if (!resolved.startsWith(tempDir)) {
+        return res.status(403).json({ error: 'filePath must be in temp directory' });
+      }
+      if (!fs.existsSync(resolved)) {
+        return res.status(404).json({ error: 'File not found: ' + path.basename(resolved) });
+      }
+      if (hasCloudinary) {
+        try {
+          const r = await cloudinary.uploader.upload(resolved, {
+            folder: 'Hanwool', public_id: uuidv4(), resource_type: 'auto',
+          });
+          console.log('[upload] filePath OK:', path.basename(resolved), '->', r.secure_url);
+          return res.json({ url: r.secure_url });
+        } catch (uploadErr) {
+          console.error('[upload] filePath Cloudinary error:', uploadErr.message);
+          return res.status(400).json({ error: uploadErr.message || 'Cloudinary upload failed' });
+        }
+      }
+      // 로컬 fallback
+      const ext = path.extname(resolved).replace('.', '') || 'jpg';
+      const name = `${uuidv4()}.${ext}`;
+      fs.copyFileSync(resolved, path.join(UPLOADS_DIR, name));
+      return res.json({ url: `/public/uploads/${name}` });
+    }
+
     // base64 dataUrl 업로드
     const { dataUrl } = req.body;
     if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) {

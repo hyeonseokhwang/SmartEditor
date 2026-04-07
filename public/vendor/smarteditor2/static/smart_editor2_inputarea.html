@@ -129,6 +129,29 @@
     return tryOnce();
   }
 
+  // file:/// URL → 서버에서 로컬 파일 직접 업로드 (HWP temp 파일)
+  function uploadFilePath(fileUrl) {
+    // file:///C:/Users/.../Temp/tmpXXXX.jpg → C:\Users\...\Temp\tmpXXXX.jpg
+    var filePath = fileUrl.replace(/^file:\/\/\//i, '').replace(/\//g, '\\');
+    // URL decode
+    try { filePath = decodeURIComponent(filePath); } catch(e){}
+    log('uploading local file:', filePath);
+    return fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filePath: filePath })
+    }).then(function(r){
+      if (r.status >= 400 && r.status < 500) {
+        warn('filePath upload HTTP', r.status, '— no retry');
+        return { url: null };
+      }
+      return r.json();
+    }).catch(function(e){
+      warn('filePath upload error:', e.message);
+      return { url: null };
+    });
+  }
+
   // Extract data:image URLs from HTML string
   function collectDataUrls(html) {
     if (!html) return [];
@@ -599,25 +622,74 @@
         warn('image shortfall:', fileImgCount - allDataUrls.length, '— some images may be missing');
       }
 
-      if (allDataUrls.length > 0) {
-        log('uploading', allDataUrls.length, 'extracted images for', fileImgCount, 'file:/// img tags');
-        topProgress.update(0, allDataUrls.length, 0, 0);
+      // file:/// URL 목록 추출 (순서대로)
+      var fileUrls = [];
+      var fileUrlRe = /<img\b[^>]*\bsrc\s*=\s*["']?(file:\/\/\/[^"'\s>]+)/gi;
+      var fum;
+      while ((fum = fileUrlRe.exec(clipHTML)) !== null) {
+        fileUrls.push(fum[1]);
+      }
+      log('file:/// URLs extracted:', fileUrls.length, fileUrls.map(function(u){ return u.split('/').pop(); }));
+
+      if (allDataUrls.length > 0 || fileUrls.length > 0) {
+        var totalToUpload = Math.max(allDataUrls.length, fileUrls.length);
+        log('uploading', allDataUrls.length, 'base64 +', Math.max(0, fileUrls.length - allDataUrls.length), 'filePath for', fileImgCount, 'file:/// img tags');
+        topProgress.update(0, totalToUpload, 0, 0);
+
+        // 1단계: base64 이미지 업로드
         uploadAll(allDataUrls).then(function(urls) {
           var successUrls = urls.filter(Boolean).length;
-          log('HWP upload results:', successUrls, '/', allDataUrls.length, 'success');
-          // Replace file:/// img srcs in their original positions
-          var result = replaceFileImgsInPlace(clipHTML, urls);
-          // Also replace any remaining data:image URLs that were in the HTML
-          for (var h = 0; h < htmlDus.length; h++) {
-            if (urls[h]) {
-              var esc = htmlDus[h].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-              result = result.replace(new RegExp(esc, 'g'), urls[h]);
+          log('base64 upload results:', successUrls, '/', allDataUrls.length, 'success');
+
+          // 2단계: 부족분 file:/// → 서버 filePath 업로드
+          // urls[0..N-1]은 base64 업로드 결과, fileUrls[0..M-1]은 file:/// 순서
+          // base64가 부족하면 나머지 슬롯을 filePath로 채움
+          var finalUrls = [];
+          var base64Idx = 0;
+          var filePathChain = Promise.resolve();
+          var fpSuc = 0, fpFail = 0;
+
+          for (var fi = 0; fi < fileUrls.length; fi++) {
+            if (base64Idx < urls.length && urls[base64Idx]) {
+              // base64 업로드 성공한 것 사용
+              finalUrls.push(urls[base64Idx]);
+              base64Idx++;
+            } else {
+              // base64 부족 또는 실패 → filePath로 시도
+              if (base64Idx < urls.length) base64Idx++; // 실패한 슬롯 건너뜀
+              finalUrls.push(null); // placeholder
+              (function(slot, fUrl) {
+                filePathChain = filePathChain.then(function() {
+                  topProgress.update(allDataUrls.length + slot, totalToUpload, successUrls + fpSuc, fpFail);
+                  return uploadFilePath(fUrl).then(function(j) {
+                    var u = (j && j.url) ? j.url : null;
+                    if (u) { finalUrls[slot] = u; fpSuc++; } else fpFail++;
+                    log('filePath upload slot', slot, u ? 'OK: ' + u.substring(0,60) : 'FAIL');
+                  });
+                });
+              })(fi, fileUrls[fi]);
             }
           }
-          insertHTML(result);
-          removeOverlay();
-          BUSY = false;
-          log('HWP upload done', successUrls, 'images in-place');
+
+          return filePathChain.then(function() {
+            var totalSuccess = finalUrls.filter(Boolean).length;
+            log('final upload results:', totalSuccess, '/', fileUrls.length, '(base64:', successUrls, '+ filePath:', fpSuc, ')');
+
+            // Replace file:/// img srcs in their original positions
+            var result = replaceFileImgsInPlace(clipHTML, finalUrls);
+            // Also replace any remaining data:image URLs that were in the HTML
+            for (var h = 0; h < htmlDus.length; h++) {
+              if (urls[h]) {
+                var esc = htmlDus[h].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                result = result.replace(new RegExp(esc, 'g'), urls[h]);
+              }
+            }
+            insertHTML(result);
+            topProgress.done(fileUrls.length, totalSuccess, fileUrls.length - totalSuccess);
+            removeOverlay();
+            BUSY = false;
+            log('HWP upload done', totalSuccess, 'images in-place');
+          });
         });
       } else if (imageFiles.length) {
         // Fall back to blob upload — 순차 1건씩
