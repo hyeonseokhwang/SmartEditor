@@ -598,7 +598,12 @@
     .ed-status.ok{color:#4A8A3A}
     .ed-status.err{color:#C05050}
     .ed-frame{background:#fff;border:1px solid <%= t.bd %>;border-radius:6px;overflow:hidden;margin-bottom:20px}
-    #se-iframe2{width:100%;height:480px;border:none;display:block}
+    #se-iframe{width:100%;height:480px;border:none;display:block}
+    #save-progress-wrap{display:none;margin-top:8px;padding:0 2px}
+    #save-progress-label{font-size:11px;color:<%= t.t2 %>;margin-bottom:4px;letter-spacing:.04em}
+    #save-progress-bar-outer{height:8px;background:<%= t.bg3 %>;border-radius:4px;overflow:hidden;width:100%}
+    #save-progress-bar-inner{height:100%;width:0%;background:<%= t.ac %>;border-radius:4px;transition:width .2s}
+    #save-progress-detail{font-size:10px;color:<%= t.gr %>;margin-top:2px}
     .ed-posts-hd{font-family:'Noto Serif KR',serif;font-size:13px;font-weight:400;color:<%= t.t2 %>;margin-bottom:10px;letter-spacing:.03em}
     .ed-post-item{background:<%= t.bg2 %>;border:1px solid <%= t.bd %>;border-radius:5px;padding:10px 14px;margin-bottom:7px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
     .ed-post-item:hover{background:<%= t.bg3 %>}
@@ -1136,11 +1141,16 @@
       <div class="ed-toolbar">
         <input type="text" id="ed-post-id" placeholder="게시글 ID 입력 후 불러오기…">
         <button class="ed-btn ed-btn-s" onclick="edLoadPost()">불러오기</button>
-        <button class="ed-btn ed-btn-p" onclick="edSavePost()">저장</button>
+        <button class="ed-btn ed-btn-p" id="save-btn" onclick="edSavePost()">저장</button>
         <span class="ed-status" id="ed-status"></span>
       </div>
       <div class="ed-frame">
-        <iframe id="se-iframe2" src="/public/se-wrapper.html" title="SmartEditor2 법문 에디터"></iframe>
+        <iframe id="se-iframe" src="/public/se-wrapper.html?v=<%= Date.now() %>" title="SmartEditor2 법문 에디터"></iframe>
+      </div>
+      <div id="save-progress-wrap">
+        <div id="save-progress-label">이미지 업로드 중…</div>
+        <div id="save-progress-bar-outer"><div id="save-progress-bar-inner"></div></div>
+        <div id="save-progress-detail"></div>
       </div>
       <div>
         <div class="ed-posts-hd">최근 게시글 (클릭하여 편집)</div>
@@ -1150,7 +1160,7 @@
   </div>
 </div>
 
-<script src="/public/js/se-init.js"></script>
+<script src="/public/js/se-init-v2.js?v=<%= Date.now() %>"></script>
 <script>
 (function(){
   let edState={board:'',search:'',page:1};
@@ -1164,9 +1174,15 @@
   document.querySelectorAll('a[href="/editor"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();openEditorModal();});});
   document.getElementById('ed-overlay').addEventListener('click',function(e){if(e.target===this)closeEditorModal();});
 
-  function edGetEditor(){try{const cw=document.getElementById('se-iframe2').contentWindow;return cw&&cw.oEditors&&cw.oEditors.getById&&cw.oEditors.getById['ir1'];}catch{return null;}}
-  function edGetHTML(){const ed=edGetEditor();if(!ed)return'';try{ed.exec('UPDATE_CONTENTS_FIELD',[]);}catch{}try{return document.getElementById('se-iframe2').contentWindow.document.getElementById('ir1').value||'';}catch{return'';}}
-  function edSetHTML(html){const ed=edGetEditor();if(!ed){setTimeout(()=>edSetHTML(html),300);return;}try{ed.exec('SET_IR_VALUE',[html||'']);}catch{try{const ta=document.getElementById('se-iframe2').contentWindow.document.getElementById('ir1');if(ta)ta.value=html||'';}catch{}}}
+  function edGetEditor(){try{const cw=document.getElementById('se-iframe').contentWindow;return cw&&cw.oEditors&&cw.oEditors.getById&&cw.oEditors.getById['ir1'];}catch{return null;}}
+  function edGetHTML(){
+    const ed=edGetEditor();if(!ed)return'';
+    try{ed.exec('UPDATE_CONTENTS_FIELD',[]);}catch{}
+    try{const val=document.getElementById('se-iframe').contentWindow.document.getElementById('ir1').value;if(val)return val;}catch{}
+    try{if(ed.elIRFrame){const d=ed.elIRFrame.contentWindow||ed.elIRFrame.contentDocument;const doc=d.document||d;return doc.body?doc.body.innerHTML:''}}catch{}
+    return'';
+  }
+  function edSetHTML(html){const ed=edGetEditor();if(!ed){setTimeout(()=>edSetHTML(html),300);return;}try{ed.exec('SET_IR_VALUE',[html||'']);}catch{try{const ta=document.getElementById('se-iframe').contentWindow.document.getElementById('ir1');if(ta)ta.value=html||'';}catch{}}}
 
   async function edLoadPost(){
     const pid=document.getElementById('ed-post-id').value.trim();if(!pid)return;edSetStatus('불러오는 중…');
@@ -1174,7 +1190,9 @@
     catch(e){edSetStatus('오류: '+e.message,true);}
   }
   async function edSavePost(){
-    if(!edCurrentId){edSetStatus('먼저 게시글을 불러오세요',true);return;}edSetStatus('저장 중…');
+    if(!edCurrentId){edSetStatus('먼저 게시글을 불러오세요',true);return;}
+    if(window.PASTE_BUSY){edSetStatus('⏳ 이미지 업로드 진행 중입니다. 완료 후 저장하세요.',true);return;}
+    edSetStatus('저장 중…');
     try{const html=edGetHTML();const r=await fetch('/api/posts/'+encodeURIComponent(edCurrentId),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content_html:html})}).then(r=>r.json());edSetStatus(r.ok?'저장 완료':'오류: '+r.error,!r.ok,r.ok);}
     catch(e){edSetStatus('오류: '+e.message,true);}
   }

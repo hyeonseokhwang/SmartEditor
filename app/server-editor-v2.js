@@ -75,8 +75,10 @@ const pool = new pg.Pool({
   user: 'postgres', password: 'postgres',
 });
 
-// 에디터 메인
-app.get('/', (req, res) => res.render('editor-v2'));
+// 홈페이지 (siann-22)
+app.get('/', (req, res) => res.render('siann-22'));
+// 에디터 직접 접근
+app.get('/editor', (req, res) => res.render('editor-v2'));
 
 // 게시글 조회 (에디터용)
 app.get('/api/posts', async (req, res) => {
