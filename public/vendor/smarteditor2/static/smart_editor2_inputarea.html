@@ -311,12 +311,16 @@
       collect(root);
 
       // srOrder 순서대로 유효한 base64만 순차 배열 반환 (인덱스 = HTML file:/// 등장 순서)
+      // DFS 중복 방문 dedup: 같은 sr 키는 한 번만 (srOrder 19개 → 고유 9개)
       var dataUrls = [];
+      var seenSr = {};
       for (var si = 0; si < srOrder.length; si++) {
-        var b64 = bidt[srOrder[si]];
-        if (b64) dataUrls.push('data:image/png;base64,' + b64);
+        var srKey = srOrder[si];
+        if (seenSr[srKey]) continue;
+        var b64 = bidt[srKey];
+        if (b64) { seenSr[srKey] = true; dataUrls.push('data:image/png;base64,' + b64); }
       }
-      log('HWP JSON: srOrder', srOrder.length, '→ valid', dataUrls.length, 'images (slot=index)');
+      log('HWP JSON: srOrder', srOrder.length, '→ dedup', dataUrls.length, 'unique images (slot=index)');
 
       var valid = dataUrls.length;
       log('HWP JSON: total', dataUrls.length, 'slots,', valid, 'valid');
