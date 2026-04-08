@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-04-08T00:11:52.433Z",
+  "html": "",
+  "rtf": "",
+  "text": "http://211.104.37.65:8082/",
+  "itemTypes": [
+    "text/plain"
+  ],
+  "files": [],
+  "flags": {
+    "hasFileUrls": false,
+    "hasDataImg": false,
+    "rtfPict": false
+  },
+  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+  "referrer": "https://hanwool-board.duckdns.org/",
+  "verdict": "pass"
+}
