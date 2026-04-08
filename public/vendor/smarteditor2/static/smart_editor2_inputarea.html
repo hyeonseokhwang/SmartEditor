@@ -337,7 +337,8 @@
       var dataUrls = [];
       if (htmlFileNames.length > 0 && fnKeys.length > 0) {
         // fn 매핑 기반: HTML 파일명 순서로 bi key 조회
-        var missing = [];
+        var usedBiKeys = {};
+        var pendingSlots = []; // fn 매핑 실패 슬롯 인덱스
         for (var fi = 0; fi < htmlFileNames.length; fi++) {
           var htmlFn = htmlFileNames[fi];
           var biKey = fnToBi[htmlFn];
@@ -350,19 +351,32 @@
           var b64 = biKey ? bidt[biKey] : null;
           if (b64) {
             dataUrls.push('data:image/png;base64,' + b64);
+            usedBiKeys[biKey] = true;
           } else {
-            dataUrls.push(null); // 매핑 실패 → filePath fallback에서 처리
-            missing.push(htmlFn + '(biKey=' + (biKey || 'none') + ')');
+            dataUrls.push(null); // 임시 null — 아래 srOrder fallback으로 채움
+            pendingSlots.push(fi);
+            if (biKey) usedBiKeys[biKey] = true;
           }
         }
-        if (missing.length > 0) warn('HWP JSON fn-mapped missing:', missing.length, missing.slice(0,5));
+        // 미사용 bidt를 srOrder 순서로 수집하여 pending 슬롯 채움
+        if (pendingSlots.length > 0) {
+          var unusedData = [];
+          for (var ui = 0; ui < srOrder.length; ui++) {
+            var sr = srOrder[ui];
+            if (!usedBiKeys[sr] && bidt[sr]) unusedData.push('data:image/png;base64,' + bidt[sr]);
+          }
+          for (var pi = 0; pi < pendingSlots.length; pi++) {
+            if (pi < unusedData.length) dataUrls[pendingSlots[pi]] = unusedData[pi];
+          }
+          log('HWP JSON: fn-mapped', htmlFileNames.length - pendingSlots.length, '+ srOrder fallback', Math.min(pendingSlots.length, unusedData.length));
+        }
       } else {
-        // fn 필드 없음 — JSON DFS 순서로 fallback
+        // fn 필드 없음 — JSON DFS srOrder 순서로 유효한 이미지만 순차 배치
         log('HWP JSON: fn 필드 없음, JSON DFS 순서 사용');
         for (var si = 0; si < srOrder.length; si++) {
           var b64f = bidt[srOrder[si]];
           if (b64f) dataUrls.push('data:image/png;base64,' + b64f);
-          else { dataUrls.push(null); warn('HWP JSON: missing bidt for', srOrder[si]); }
+          // null 제거 — 순서 공백 없이 유효한 데이터만 배치
         }
       }
 
