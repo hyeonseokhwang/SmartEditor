@@ -283,15 +283,15 @@
   }
 
   // Extract from HWP JSON comment embedded in HTML
-  // HTML 순서 기반 매핑: fn(파일명) 필드로 file:/// URL 순서와 1:1 매핑
+  // 단순 순차 추출: bidt 유효 이미지를 srOrder(JSON DFS) 순서대로 flat array 반환
+  // file:/// 파일명 매핑 없음 — HTML 등장 순서 == data 인덱스 1:1 가정
   function collectFromHwpJson(html) {
     try {
       var m = html && html.match(/<!--\[data-hwpjson\]\s*(\{[\s\S]*?\})\s*-->/i);
       if (!m) return [];
       var root = JSON.parse(m[1]);
       var bidt = {};
-      var fnToBi = {}; // 파일명 → bi key 매핑 (HTML 순서 기반 정렬용)
-      var srOrder = []; // JSON DFS 순서 (fallback)
+      var srOrder = [];
 
       var collect = function(obj) {
         if (!obj || typeof obj !== 'object') return;
@@ -300,87 +300,25 @@
             if (typeof obj.bidt[k] === 'string' && obj.bidt[k].length > 50) bidt[k] = obj.bidt[k];
           }
         }
-        // bi 참조 수집 (fn 파일명 포함)
-        if (typeof obj.bi === 'string') {
-          srOrder.push(obj.bi);
-          // fn 필드: HWP가 생성하는 파일명 (EMBxxxxxxxx.jpg 등)
-          var fn = obj.fn || obj.name || obj.fileName || null;
-          if (fn) { fnToBi[fn.split('/').pop().split('\\').pop()] = obj.bi; }
-        }
+        if (typeof obj.bi === 'string') srOrder.push(obj.bi);
         if (Array.isArray(obj.bi)) {
           for (var i = 0; i < obj.bi.length; i++) {
-            var it = obj.bi[i];
-            if (it && typeof it.sr === 'string') {
-              srOrder.push(it.sr);
-              var fn2 = it.fn || it.name || it.fileName || null;
-              if (fn2) { fnToBi[fn2.split('/').pop().split('\\').pop()] = it.sr; }
-            }
+            if (obj.bi[i] && typeof obj.bi[i].sr === 'string') srOrder.push(obj.bi[i].sr);
           }
         }
         for (var key in obj) if (Object.prototype.hasOwnProperty.call(obj, key)) collect(obj[key]);
       };
       collect(root);
 
-      var bidtKeys = Object.keys(bidt);
-      var fnKeys = Object.keys(fnToBi);
-      log('HWP JSON: bidt keys:', bidtKeys.length, '| srOrder:', srOrder.length, '| fnToBi:', fnKeys.length);
-
-      // HTML에서 file:/// URL 순서 추출
-      var htmlFileNames = [];
-      var fre = /<img\b[^>]*\bsrc\s*=\s*["']?(file:\/\/\/[^"'>\s]+)/gi;
-      var fu;
-      while ((fu = fre.exec(html)) !== null) {
-        htmlFileNames.push(fu[1].split('/').pop());
-      }
-      log('HWP JSON: htmlFileNames:', htmlFileNames.length, fnKeys.length > 0 ? '→ fn매핑 사용' : '→ JSON순서 fallback');
-
+      // srOrder 순서대로 유효한 base64만 순차 배열 반환 (인덱스 = HTML file:/// 등장 순서)
       var dataUrls = [];
-      if (htmlFileNames.length > 0 && fnKeys.length > 0) {
-        // fn 매핑 기반: HTML 파일명 순서로 bi key 조회
-        var usedBiKeys = {};
-        var pendingSlots = []; // fn 매핑 실패 슬롯 인덱스
-        for (var fi = 0; fi < htmlFileNames.length; fi++) {
-          var htmlFn = htmlFileNames[fi];
-          var biKey = fnToBi[htmlFn];
-          if (!biKey) {
-            // 부분 매칭 (tmpXXXX.jpg 등은 fn 없을 수 있음)
-            for (var fk in fnToBi) {
-              if (htmlFn.indexOf(fk) !== -1 || fk.indexOf(htmlFn) !== -1) { biKey = fnToBi[fk]; break; }
-            }
-          }
-          var b64 = biKey ? bidt[biKey] : null;
-          if (b64) {
-            dataUrls.push('data:image/png;base64,' + b64);
-            usedBiKeys[biKey] = true;
-          } else {
-            dataUrls.push(null); // 임시 null — 아래 srOrder fallback으로 채움
-            pendingSlots.push(fi);
-            if (biKey) usedBiKeys[biKey] = true;
-          }
-        }
-        // 미사용 bidt를 srOrder 순서로 수집하여 pending 슬롯 채움
-        if (pendingSlots.length > 0) {
-          var unusedData = [];
-          for (var ui = 0; ui < srOrder.length; ui++) {
-            var sr = srOrder[ui];
-            if (!usedBiKeys[sr] && bidt[sr]) unusedData.push('data:image/png;base64,' + bidt[sr]);
-          }
-          for (var pi = 0; pi < pendingSlots.length; pi++) {
-            if (pi < unusedData.length) dataUrls[pendingSlots[pi]] = unusedData[pi];
-          }
-          log('HWP JSON: fn-mapped', htmlFileNames.length - pendingSlots.length, '+ srOrder fallback', Math.min(pendingSlots.length, unusedData.length));
-        }
-      } else {
-        // fn 필드 없음 — JSON DFS srOrder 순서로 유효한 이미지만 순차 배치
-        log('HWP JSON: fn 필드 없음, JSON DFS 순서 사용');
-        for (var si = 0; si < srOrder.length; si++) {
-          var b64f = bidt[srOrder[si]];
-          if (b64f) dataUrls.push('data:image/png;base64,' + b64f);
-          // null 제거 — 순서 공백 없이 유효한 데이터만 배치
-        }
+      for (var si = 0; si < srOrder.length; si++) {
+        var b64 = bidt[srOrder[si]];
+        if (b64) dataUrls.push('data:image/png;base64,' + b64);
       }
+      log('HWP JSON: srOrder', srOrder.length, '→ valid', dataUrls.length, 'images (slot=index)');
 
-      var valid = dataUrls.filter(function(x){ return x !== null; }).length;
+      var valid = dataUrls.length;
       log('HWP JSON: total', dataUrls.length, 'slots,', valid, 'valid');
       return dataUrls;
     } catch(e) { warn('HWP JSON parse error:', e); return []; }
