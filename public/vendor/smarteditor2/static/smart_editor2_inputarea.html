@@ -292,6 +292,7 @@
       var root = JSON.parse(m[1]);
       var bidt = {};
       var srOrder = [];
+      var srMimeMap = {}; // sr → MIME 타입 (bi.ty에서 수집)
 
       var collect = function(obj) {
         if (!obj || typeof obj !== 'object') return;
@@ -303,7 +304,13 @@
         if (typeof obj.bi === 'string') srOrder.push(obj.bi);
         if (Array.isArray(obj.bi)) {
           for (var i = 0; i < obj.bi.length; i++) {
-            if (obj.bi[i] && typeof obj.bi[i].sr === 'string') srOrder.push(obj.bi[i].sr);
+            if (obj.bi[i] && typeof obj.bi[i].sr === 'string') {
+              srOrder.push(obj.bi[i].sr);
+              // bi.ty 필드로 실제 MIME 타입 수집 (예: "image/jpg" → "image/jpeg")
+              if (obj.bi[i].ty && !srMimeMap[obj.bi[i].sr]) {
+                srMimeMap[obj.bi[i].sr] = obj.bi[i].ty.replace('image/jpg', 'image/jpeg');
+              }
+            }
           }
         }
         for (var key in obj) if (Object.prototype.hasOwnProperty.call(obj, key)) collect(obj[key]);
@@ -334,7 +341,10 @@
         var srKey = srOrder[si];
         var b64 = bidt[srKey];
         if (b64) {
-          dataUrls.push('data:image/png;base64,' + b64);
+          // 실제 MIME 타입 사용 (bi.ty 맵 → 파일명 확장자 → fallback: image/jpeg)
+          var mime = srMimeMap[srKey] ||
+            (srKey.match(/\.png$/i) ? 'image/png' : 'image/jpeg');
+          dataUrls.push('data:' + mime + ';base64,' + b64);
           sizes.push(csSizemap[srKey] || {wPx: null, hPx: null});
         }
       }
