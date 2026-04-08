@@ -43,9 +43,8 @@
     }
   }
 
-  var MAX_RETRY = 3;         // 최대 3회 재시도 (5xx/네트워크만. 4xx 즉시 실패)
+  var MAX_RETRY = 10;       // 최대 10회 재시도
   var RETRY_DELAY_MS = 1500; // 재시도 간격 1.5초
-  var BATCH_SIZE = 3;        // 병렬 업로드 배치 크기
 
   function delay(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 
@@ -451,69 +450,55 @@
     }
   };
 
-  // Upload array of data URLs PARALLEL (BATCH_SIZE개 동시 — Promise.all 배치)
+  // Upload array of data URLs SEQUENTIALLY (1개씩 순차 — 동시 업로드 금지, Lucas 직접 지시)
   // 동일 base64 캐시 — 같은 이미지 재사용 시 중복 업로드 방지 (CTO 지시)
   function uploadAll(dataUrls) {
     var total = dataUrls.length;
-    var results = new Array(total).fill(null);
-    var successCount = 0, failCount = 0;
+    var results = [];
+    var success = 0, fail = 0;
     var uploadCache = {}; // dataUrl → uploaded URL 캐시
-
-    topProgress.update(0, total, 0, 0);
-
-    function processOne(idx) {
-      var dataUrl = dataUrls[idx];
-
-      // 캐시 히트: 동일 dataUrl이 이미 업로드된 경우 재사용
-      if (dataUrl && uploadCache[dataUrl]) {
-        successCount++;
-        results[idx] = uploadCache[dataUrl];
-        topProgress.update(successCount + failCount, total, successCount, failCount);
-        log('upload ' + (idx+1) + '/' + total + ' CACHE HIT: ' + uploadCache[dataUrl].substring(0,60));
-        return Promise.resolve();
-      }
-      // null dataUrl → filePath fallback에서 처리 (fn 매핑 실패 시)
-      if (!dataUrl) {
-        failCount++;
-        results[idx] = null;
-        topProgress.update(successCount + failCount, total, successCount, failCount);
-        log('upload ' + (idx+1) + '/' + total + ' SKIP(null→filePath fallback)');
-        return Promise.resolve();
-      }
-      log('uploading ' + (idx+1) + '/' + total + '...');
-      return uploadDataUrl(dataUrl)
-        .then(function(j) {
-          var url = (j && j.url) ? j.url : null;
-          if (url) { successCount++; uploadCache[dataUrl] = url; } else failCount++;
-          results[idx] = url;
-          topProgress.update(successCount + failCount, total, successCount, failCount);
-          log('upload ' + (idx+1) + '/' + total + (url ? ' OK: ' + url.substring(0,60) : ' FAIL'));
-        })
-        .catch(function(e) {
-          failCount++;
-          results[idx] = null;
-          topProgress.update(successCount + failCount, total, successCount, failCount);
-          warn('upload ' + (idx+1) + '/' + total + ' ERROR', e);
-        });
-    }
-
-    // 배치 단위로 BATCH_SIZE개씩 병렬 처리
     var chain = Promise.resolve();
-    for (var b = 0; b < total; b += BATCH_SIZE) {
-      (function(batchStart) {
-        var batchEnd = Math.min(batchStart + BATCH_SIZE, total);
+    for (var i = 0; i < total; i++) {
+      (function(idx) {
         chain = chain.then(function() {
-          var promises = [];
-          for (var i = batchStart; i < batchEnd; i++) {
-            promises.push(processOne(i));
+          topProgress.update(idx, total, success, fail);
+          // 캐시 히트: 동일 dataUrl이 이미 업로드된 경우 재사용
+          if (uploadCache[dataUrls[idx]]) {
+            var cachedUrl = uploadCache[dataUrls[idx]];
+            success++;
+            results[idx] = cachedUrl;
+            topProgress.update(idx+1, total, success, fail);
+            log('upload ' + (idx+1) + '/' + total + ' CACHE HIT: ' + cachedUrl.substring(0,60));
+            return;
           }
-          return Promise.all(promises);
+          // null dataUrl → filePath fallback에서 처리 (fn 매핑 실패 시)
+          if (!dataUrls[idx]) {
+            fail++;
+            results[idx] = null;
+            topProgress.update(idx+1, total, success, fail);
+            log('upload ' + (idx+1) + '/' + total + ' SKIP(null→filePath fallback)');
+            return;
+          }
+          log('uploading ' + (idx+1) + '/' + total + '...');
+          return uploadDataUrl(dataUrls[idx])
+            .then(function(j){
+              var url = (j && j.url) ? j.url : null;
+              if (url) { success++; uploadCache[dataUrls[idx]] = url; } else fail++;
+              results[idx] = url;
+              topProgress.update(idx+1, total, success, fail);
+              log('upload ' + (idx+1) + '/' + total + (url ? ' OK: ' + url.substring(0,60) : ' FAIL'));
+            })
+            .catch(function(e){
+              fail++;
+              results[idx] = null;
+              topProgress.update(idx+1, total, success, fail);
+              warn('upload ' + (idx+1) + '/' + total + ' ERROR', e);
+            });
         });
-      })(b);
+      })(i);
     }
-
     return chain.then(function() {
-      topProgress.done(total, successCount, failCount);
+      topProgress.done(total, success, fail);
       return results;
     });
   }
