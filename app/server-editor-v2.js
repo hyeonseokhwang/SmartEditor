@@ -64,6 +64,7 @@ const PORT = process.env.EDITOR_PORT_V2 || 9082;
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use('/public', express.static(path.join(__dirname, '..', 'public')));
+app.use('/uploads', express.static(UPLOADS_DIR));  // Phase 1: /uploads/{uuid}.ext 직접 접근
 
 app.set('views', path.join(__dirname, '..', 'views'));
 app.set('view engine', 'ejs');
@@ -132,94 +133,99 @@ app.get('/api/boards', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// 이미지 업로드 (multer 파일 또는 base64 dataUrl) — Cloudinary or 로컬 fallback
+// ── Phase 1: 세션별 동시 업로드 semaphore (IP 기반, max 3) ──
+const _uploadSem = new Map(); // ip → { count, queue[] }
+const MAX_UPLOAD_CONCURRENT = 3;
+async function _semAcquire(ip) {
+  if (!_uploadSem.has(ip)) _uploadSem.set(ip, { count: 0, queue: [] });
+  const s = _uploadSem.get(ip);
+  if (s.count < MAX_UPLOAD_CONCURRENT) { s.count++; return; }
+  await new Promise(resolve => s.queue.push(resolve));
+  s.count++;
+}
+function _semRelease(ip) {
+  const s = _uploadSem.get(ip);
+  if (!s) return;
+  s.count = Math.max(0, s.count - 1);
+  if (s.queue.length > 0) s.queue.shift()();
+}
+
+// 이미지 업로드 (multer 파일 또는 base64 dataUrl) — Phase 1: 로컬 우선 + Cloudinary fallback
 app.post('/api/upload', upload.single('file'), async (req, res) => {
+  const ip = req.ip || 'unknown';
+  await _semAcquire(ip);
   try {
     // multer 파일 업로드
     if (req.file) {
-      if (hasCloudinary) {
-        const url = req.file.path || req.file.secure_url;
-        return res.json({ url });
-      }
-      return res.json({ url: `/public/uploads/${req.file.filename}` });
+      // Cloudinary storage: req.file.path is the CDN URL
+      const url = (hasCloudinary && req.file.path) ? req.file.path : `/uploads/${req.file.filename}`;
+      return res.json({ url });
     }
 
-    // 로컬 파일 경로 업로드 (HWP 붙여넣기 시 file:/// URL에서 추출한 temp 파일)
+    // 로컬 파일 경로 업로드 (레거시 filePath 경로 — 보안 제한 유지)
     const { filePath } = req.body;
     if (filePath && typeof filePath === 'string') {
-      // file:/// URL 프리픽스 제거 (브라우저 file:/// → 서버 파일시스템 경로 변환)
       let cleanPath = filePath;
       if (cleanPath.startsWith('file:///')) {
-        cleanPath = cleanPath.slice(8); // 'file:///' 제거
-        if (cleanPath.startsWith('/')) cleanPath = cleanPath.slice(1); // leading slash 제거
-        cleanPath = cleanPath.replace(/\//g, '\\'); // forward slash → backslash
+        cleanPath = cleanPath.slice(8);
+        if (cleanPath.startsWith('/')) cleanPath = cleanPath.slice(1);
+        cleanPath = cleanPath.replace(/\//g, '\\');
       }
-      // 보안: temp 디렉토리만 허용
       const resolved = path.resolve(cleanPath);
       const tempDir = path.resolve(process.env.TEMP || process.env.TMP || 'C:\\Users\\hysra\\AppData\\Local\\Temp');
-      if (!resolved.startsWith(tempDir)) {
-        return res.status(403).json({ error: 'filePath must be in temp directory' });
-      }
-      if (!fs.existsSync(resolved)) {
-        return res.status(404).json({ error: 'File not found: ' + path.basename(resolved) });
-      }
-      if (hasCloudinary) {
-        try {
-          const r = await cloudinary.uploader.upload(resolved, {
-            folder: 'Hanwool', public_id: uuidv4(), resource_type: 'auto',
-          });
-          console.log('[upload] filePath OK:', path.basename(resolved), '->', r.secure_url);
-          return res.json({ url: r.secure_url });
-        } catch (uploadErr) {
-          console.error('[upload] filePath Cloudinary error:', uploadErr.message);
-          return res.status(400).json({ error: uploadErr.message || 'Cloudinary upload failed' });
-        }
-      }
-      // 로컬 fallback
+      if (!resolved.startsWith(tempDir)) return res.status(403).json({ error: 'filePath must be in temp directory' });
+      if (!fs.existsSync(resolved)) return res.status(404).json({ error: 'File not found: ' + path.basename(resolved) });
       const ext = path.extname(resolved).replace('.', '') || 'jpg';
       const name = `${uuidv4()}.${ext}`;
       fs.copyFileSync(resolved, path.join(UPLOADS_DIR, name));
-      return res.json({ url: `/public/uploads/${name}` });
+      return res.json({ url: `/uploads/${name}` });
     }
 
-    // base64 dataUrl 업로드
+    // base64 dataUrl 업로드 — Phase 1: 로컬 저장 우선, Cloudinary fallback
     const { dataUrl } = req.body;
     if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) {
       return res.status(400).json({ error: 'No file or dataUrl' });
     }
 
-    if (hasCloudinary) {
-      let uploadDataUrl = dataUrl;
-      // WMF/EMF 등 비표준 포맷은 Cloudinary가 거부 → PNG로 변환 시도
-      const mimeMatch = dataUrl.match(/^data:([^;]+);/);
-      const mime = mimeMatch ? mimeMatch[1].toLowerCase() : '';
-      const unsupportedFmts = ['image/x-wmf', 'image/wmf', 'image/x-emf', 'image/emf', 'image/x-bmp'];
-      if (unsupportedFmts.includes(mime) || (mime && !mime.startsWith('image/'))) {
-        // 지원 불가 포맷 — 스킵
-        return res.status(400).json({ error: `Unsupported image format: ${mime}` });
-      }
-      let r;
-      try {
-        r = await cloudinary.uploader.upload(uploadDataUrl, {
-          folder: 'Hanwool', public_id: uuidv4(), resource_type: 'image',
-        });
-      } catch (uploadErr) {
-        console.error('[upload] Cloudinary error:', uploadErr.message || uploadErr);
-        return res.status(400).json({ error: uploadErr.message || 'Cloudinary upload failed' });
-      }
-      return res.json({ url: r.secure_url });
+    // 비지원 포맷 조기 거부
+    const mimeMatch = dataUrl.match(/^data:([^;]+);/);
+    const mime = mimeMatch ? mimeMatch[1].toLowerCase() : '';
+    const unsupportedFmts = ['image/x-wmf', 'image/wmf', 'image/x-emf', 'image/emf', 'image/x-bmp'];
+    if (unsupportedFmts.includes(mime) || (mime && !mime.startsWith('image/'))) {
+      return res.status(400).json({ error: `Unsupported image format: ${mime}` });
     }
 
-    // 로컬 fallback
-    const match = dataUrl.match(/^data:(.*?);base64,(.*)$/);
+    // 로컬 저장 (항상 시도)
+    const match = dataUrl.match(/^data:(.*?);base64,(.*)$/s);
     if (!match) return res.status(400).json({ error: 'Invalid data URL' });
-    const ext = (match[1].split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '');
+    const ext = (match[1].split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '').substring(0, 10);
     const name = `${uuidv4()}.${ext}`;
-    fs.writeFileSync(path.join(UPLOADS_DIR, name), Buffer.from(match[2], 'base64'));
-    return res.json({ url: `/public/uploads/${name}` });
+    const localPath = path.join(UPLOADS_DIR, name);
+    try {
+      fs.writeFileSync(localPath, Buffer.from(match[2], 'base64'));
+      console.log('[upload] local OK:', name);
+      return res.json({ url: `/uploads/${name}` });
+    } catch (localErr) {
+      console.error('[upload] local save failed, trying Cloudinary fallback:', localErr.message);
+      // Cloudinary fallback
+      if (hasCloudinary) {
+        try {
+          const r = await cloudinary.uploader.upload(dataUrl, {
+            folder: 'Hanwool', public_id: uuidv4(), resource_type: 'image',
+          });
+          return res.json({ url: r.secure_url });
+        } catch (cloudErr) {
+          console.error('[upload] Cloudinary fallback error:', cloudErr.message);
+          return res.status(500).json({ error: 'Upload failed (local+cloudinary)' });
+        }
+      }
+      return res.status(500).json({ error: 'Local upload failed: ' + localErr.message });
+    }
   } catch (err) {
     console.error('[upload]', err);
     res.status(500).json({ error: 'Upload failed' });
+  } finally {
+    _semRelease(ip);
   }
 });
 
