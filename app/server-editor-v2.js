@@ -351,6 +351,30 @@ app.get('/api/debug/clipboard', (req, res) => {
   });
 });
 
+// 클립보드 로우데이터 전체 저장 (진단용 — clipHTML + clipRTF 원본 포함)
+app.post('/api/log/clipboard-raw', express.json({ limit: '200mb' }), (req, res) => {
+  try {
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `raw-${ts}.json`;
+    const data = {
+      timestamp: new Date().toISOString(),
+      clipHTMLLen: (req.body.clipHTML || '').length,
+      clipRTFLen: (req.body.clipRTF || '').length,
+      imageCount: req.body.imageCount || 0,
+      fileUrlCount: req.body.fileUrlCount || 0,
+      clipHTML: req.body.clipHTML || '',
+      clipRTF: req.body.clipRTF || '',
+      clipText: (req.body.clipText || '').slice(0, 2000),
+    };
+    fs.writeFileSync(path.join(CLIPBOARD_LOG_DIR, filename), JSON.stringify(data, null, 2), 'utf8');
+    console.log('[clipboard-raw] saved:', filename, '| htmlLen:', data.clipHTMLLen, '| rtfLen:', data.clipRTFLen, '| fileUrls:', data.fileUrlCount);
+    res.json({ ok: true, filename });
+  } catch (err) {
+    console.error('[clipboard-raw]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 최종 저장 로그
 app.post('/api/log/final', (req, res) => {
   console.log('[SE2][final]', JSON.stringify(req.body).slice(0, 200));

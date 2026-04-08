@@ -560,6 +560,21 @@
     var hasFileUrls = /file:\/\//i.test(clipHTML);
     var hasDataImages = /data:image\//i.test(clipHTML);
 
+    // 로우데이터 서버 저장 (진단용 — clipHTML+clipRTF 전체 원본)
+    try {
+      fetch('/api/log/clipboard-raw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clipHTML: clipHTML,
+          clipRTF: clipRTF,
+          clipText: clipText.slice(0, 500),
+          imageCount: imageFiles.length,
+          fileUrlCount: (clipHTML.match(/file:\/\//gi) || []).length
+        })
+      }).catch(function(){});
+    } catch(e){}
+
     log('paste detected', {
       imageFiles: imageFiles.length,
       htmlLen: clipHTML.length,
