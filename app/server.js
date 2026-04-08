@@ -148,9 +148,8 @@ app.get('/siann-:layout(\\d+)/:theme(\\d+)?', (req, res) => {
 // /archive → 아카이브 페이지
 app.get('/archive', (req, res) => res.render('archive'));
 
-// /chat, /chatbot → AI 챗봇 페이지
+// /chat → AI 챗봇 페이지
 app.get('/chat', (req, res) => res.render('chat'));
-app.get('/chatbot', (req, res) => res.render('chat'));
 
 // /editor → SmartEditor2 (standalone 편집 전용 — 메인은 siann-22 통합)
 app.get('/editor', (req, res) => res.render('editor'));
