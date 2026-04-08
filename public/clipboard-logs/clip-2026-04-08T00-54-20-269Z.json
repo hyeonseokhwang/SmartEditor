@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-04-08T00:54:20.269Z",
+  "htmlLen": 199272,
+  "rtfLen": 1086019,
+  "fileImgCount": 10,
+  "sourceA_htmlDataImg": 0,
+  "sourceB_hwpJsonBidt": 1,
+  "sourceC_rtfPict": 10,
+  "sourceD_clipFiles": 0,
+  "clipTypes": [
+    "text/plain",
+    "text/html",
+    "text/rtf"
+  ],
+  "fileUrls": [
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2354.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2365.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2376.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2377.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2387.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2388.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2399.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp239A.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp239B.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp23AC.jpg"
+  ]
+}

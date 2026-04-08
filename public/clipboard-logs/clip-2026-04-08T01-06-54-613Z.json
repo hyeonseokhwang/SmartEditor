@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-04-08T01:06:54.613Z",
+  "htmlLen": 199272,
+  "rtfLen": 1086019,
+  "fileImgCount": 10,
+  "fileUrlNames": [
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2354.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2365.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2376.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2377.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2387.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2388.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp2399.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp239A.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp239B.jpg",
+    "C:\\Users\\hysra\\AppData\\Local\\Temp\\tmp23AC.jpg"
+  ],
+  "hwpJsonImages": 19,
+  "rtfImages": 0,
+  "htmlDataImages": 0,
+  "clipboardFiles": 0,
+  "hwpMeta": {
+    "bidtKeys": {
+      "01DCC6F23BC6C5A00000044D.jpg": 5564,
+      "01DCC6F23BC6C5A00000044E.jpg": 13996,
+      "01DCC6F23BC713C00000044F.jpg": 10064,
+      "01DCC6F23BC73AD000000450.jpg": 2872,
+      "01DCC6F23BC761E000000451.jpg": 14668,
+      "01DCC6F23BC788F000000452.jpg": 660,
+      "01DCC6F23BC7B00000000453.jpg": 2836,
+      "01DCC6F23BC7D71000000454.jpg": 796,
+      "01DCC6F23BC7FE2000000455.jpg": 5144
+    },
+    "srOrder": [
+      "01DCC6F23BC6C5A00000044D.jpg",
+      "01DCC6F23BC6C5A00000044E.jpg",
+      "01DCC6F23BC713C00000044F.jpg",
+      "01DCC6F23BC73AD000000450.jpg",
+      "01DCC6F23BC761E000000451.jpg",
+      "01DCC6F23BC788F000000452.jpg",
+      "01DCC6F23BC7B00000000453.jpg",
+      "01DCC6F23BC7D71000000454.jpg",
+      "01DCC6F23BC7FE2000000455.jpg"
+    ],
+    "matched": 19,
+    "total": 9
+  }
+}
