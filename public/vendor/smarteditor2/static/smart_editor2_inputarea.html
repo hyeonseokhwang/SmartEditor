@@ -325,23 +325,20 @@
         log('HWP JSON: cs sizemap', Object.keys(csSizemap).length, 'entries');
       }
 
-      // srOrder 순서대로 유효한 base64만 순차 배열 반환 (인덱스 = HTML file:/// 등장 순서)
-      // DFS 중복 방문 dedup: 같은 sr 키는 한 번만 (srOrder 19개 → 고유 9개)
+      // srOrder 전체를 중복 허용하여 push (dedup 제거)
+      // 이유: DFS가 2번 방문하므로 후반부 N개가 실제 본문 배치 순서
+      // 재사용 이미지(slot[7]=0452 재사용)도 bidt에서 같은 base64 재사용으로 정확 매핑
       var dataUrls = [];
       var sizes = [];
-      var seenSr = {};
       for (var si = 0; si < srOrder.length; si++) {
         var srKey = srOrder[si];
-        if (seenSr[srKey]) continue;
         var b64 = bidt[srKey];
         if (b64) {
-          seenSr[srKey] = true;
           dataUrls.push('data:image/png;base64,' + b64);
           sizes.push(csSizemap[srKey] || {wPx: null, hPx: null});
         }
       }
-      log('HWP JSON: srOrder', srOrder.length, '→ dedup', dataUrls.length, 'unique images (slot=index)');
-      log('HWP JSON: sizes extracted', sizes.filter(function(s){return s.wPx;}).length, '/', sizes.length);
+      log('HWP JSON: srOrder', srOrder.length, '→ total (no dedup)', dataUrls.length, 'images');
 
       dataUrls.sizes = sizes;
       return dataUrls;
@@ -742,9 +739,20 @@
 
       // 1순위: HWP JSON (정상 PNG/JPEG base64)
       if (hwpDus.length > 0) {
-        allDataUrls = hwpDus.slice();
-        allSizes = (hwpDus.sizes || []).slice();
-        log('primary source: HWP JSON (' + hwpDus.length + ' images), sizes:', allSizes.filter(function(s){return s&&s.wPx;}).length);
+        var rawDus = hwpDus.slice();
+        var rawSizes = (hwpDus.sizes || []).slice();
+        // DFS 2회 방문으로 총 N개 반환 → 후반부 fileImgCount개 = 실제 본문 배치 순서
+        // (재사용 이미지 포함 slot[7]=0452 재사용이 후반부에 정확히 반영됨)
+        if (rawDus.length > fileImgCount) {
+          var offset = rawDus.length - fileImgCount;
+          allDataUrls = rawDus.slice(offset);
+          allSizes = rawSizes.slice(offset);
+          log('HWP JSON slice: total', rawDus.length, '→ tail', fileImgCount, '(offset=' + offset + ')');
+        } else {
+          allDataUrls = rawDus;
+          allSizes = rawSizes;
+        }
+        log('primary source: HWP JSON (' + allDataUrls.length + ' images), sizes:', allSizes.filter(function(s){return s&&s.wPx;}).length);
       }
 
       // 2순위: HTML inline data:image
