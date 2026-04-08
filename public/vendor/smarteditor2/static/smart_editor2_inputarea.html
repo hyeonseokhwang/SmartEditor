@@ -785,16 +785,15 @@
       log('file:/// URLs extracted:', fileUrls.length, fileUrls.map(function(u){ return u.split('/').pop(); }));
 
       if (fileUrls.length > 0) {
-        // ★ 순서 보장 전략: 각 file:/// img 태그를 HTML 순서대로 개별 업로드
-        // filePath 우선 (같은 기기 — 순서 보장), 실패 시 HWP JSON base64 fallback
+        // ★ 순서 보장 전략: 각 file:/// img 태그를 HTML 순서대로 base64(dataUrl) 순차 업로드
+        // filePath(서버 로컬 파일시스템 접근) 제거 — 설계 결함. base64만 사용.
         var totalToUpload = fileUrls.length;
-        log('uploading', totalToUpload, 'images (filePath primary, HWP JSON fallback)');
+        log('uploading', totalToUpload, 'images (base64 dataUrl, sequential order guaranteed)');
         topProgress.update(0, totalToUpload, 0, 0);
 
         var finalUrls = [];
         var fpSuc = 0, fpFail = 0;
         var uploadChain = Promise.resolve();
-        var filePathCache = {}; // filePath → URL 캐시 (동일 파일 중복 업로드 방지)
 
         for (var fi = 0; fi < fileUrls.length; fi++) {
           (function(slot, fUrl) {
@@ -802,49 +801,25 @@
               topProgress.update(slot, totalToUpload, fpSuc, fpFail);
               log('slot ' + slot + '/' + totalToUpload + ': ' + fUrl.split('/').pop());
 
-              // 캐시 확인 (같은 temp 파일이 여러 번 참조될 수 있음)
-              if (filePathCache[fUrl]) {
-                fpSuc++;
-                finalUrls[slot] = filePathCache[fUrl];
-                topProgress.update(slot+1, totalToUpload, fpSuc, fpFail);
-                log('slot ' + slot + ' CACHE HIT: ' + filePathCache[fUrl].substring(0,60));
-                return;
-              }
-
-              // 1순위: filePath 업로드 (같은 기기일 때 순서 정확)
-              return uploadFilePath(fUrl)
-                .then(function(j) {
-                  var u = (j && j.url) ? j.url : null;
-                  if (u) {
-                    fpSuc++;
-                    finalUrls[slot] = u;
-                    filePathCache[fUrl] = u;
-                    topProgress.update(slot+1, totalToUpload, fpSuc, fpFail);
-                    log('slot ' + slot + ' filePath OK: ' + u.substring(0,60));
-                    return;
-                  }
-                  // filePath 실패 → HWP JSON base64 fallback (인덱스 기반)
-                  if (slot < allDataUrls.length && allDataUrls[slot]) {
-                    log('slot ' + slot + ' filePath failed, trying HWP JSON base64 fallback');
-                    return uploadDataUrl(allDataUrls[slot]).then(function(j2) {
-                      var u2 = (j2 && j2.url) ? j2.url : null;
-                      if (u2) { fpSuc++; finalUrls[slot] = u2; }
-                      else { fpFail++; finalUrls[slot] = null; }
-                      topProgress.update(slot+1, totalToUpload, fpSuc, fpFail);
-                      log('slot ' + slot + ' base64 fallback ' + (u2 ? 'OK' : 'FAIL'));
-                    });
-                  }
-                  fpFail++;
-                  finalUrls[slot] = null;
+              // base64 dataUrl 순차 업로드 (순서 보장 — slot 인덱스 기반)
+              if (slot < allDataUrls.length && allDataUrls[slot]) {
+                return uploadDataUrl(allDataUrls[slot]).then(function(j2) {
+                  var u2 = (j2 && j2.url) ? j2.url : null;
+                  if (u2) { fpSuc++; finalUrls[slot] = u2; }
+                  else { fpFail++; finalUrls[slot] = null; }
                   topProgress.update(slot+1, totalToUpload, fpSuc, fpFail);
-                  log('slot ' + slot + ' all methods failed');
-                })
-                .catch(function(e) {
+                  log('slot ' + slot + ' base64 ' + (u2 ? 'OK: ' + u2.substring(0,60) : 'FAIL'));
+                }).catch(function(e) {
                   fpFail++;
                   finalUrls[slot] = null;
                   topProgress.update(slot+1, totalToUpload, fpSuc, fpFail);
                   warn('slot ' + slot + ' ERROR', e);
                 });
+              }
+              fpFail++;
+              finalUrls[slot] = null;
+              topProgress.update(slot+1, totalToUpload, fpSuc, fpFail);
+              log('slot ' + slot + ' no base64 data available');
             });
           })(fi, fileUrls[fi]);
         }
