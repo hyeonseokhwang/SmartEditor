@@ -1189,12 +1189,99 @@
     try{const d=await fetch('/api/posts/'+encodeURIComponent(pid)).then(r=>r.json());if(d.error){edSetStatus('오류: '+d.error,true);return;}edCurrentId=d.post_id;edSetHTML(d.content_html||'<p>'+(d.content||'').replace(/\n/g,'<br>')+'</p>');edSetStatus('"'+d.title+'" 불러옴',false,true);}
     catch(e){edSetStatus('오류: '+e.message,true);}
   }
+  // blob: URL → dataUrl 변환 (서버는 blob URL 처리 불가 — 클라이언트에서 변환 필수)
+  async function edBlobUrlToDataUrl(blobUrl){
+    const res=await fetch(blobUrl);const blob=await res.blob();
+    const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});
+    if(!dataUrl.startsWith('data:image/jpeg')&&!dataUrl.startsWith('data:image/png')&&!dataUrl.startsWith('data:image/gif')&&!dataUrl.startsWith('data:image/webp')){
+      return new Promise((resolve)=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.naturalWidth||800;c.height=img.naturalHeight||600;c.getContext('2d').drawImage(img,0,0);resolve(c.toDataURL('image/png'));};img.onerror=()=>resolve(dataUrl);img.src=blobUrl;});
+    }
+    return dataUrl;
+  }
+  // img src 분류: uploaded(http/https) / pending(data:/blob:/file:) / broken(src없음)
+  function edAuditImgSrcs(html){
+    const details=[];const re=/<img\b([^>]*)>/gi;let m;
+    while((m=re.exec(html))!==null){const srcM=/\bsrc\s*=\s*["']([^"']*)["']/i.exec(m[1]);const src=srcM?srcM[1]:'';let status;if(!src)status='broken';else if(/^https?:\/\//i.test(src))status='uploaded';else status='pending';details.push({src,status});}
+    return details;
+  }
+  function edShowProgress(visible){document.getElementById('save-progress-wrap').style.display=visible?'block':'none';document.getElementById('save-btn').disabled=visible;}
+  function edUpdateProgress(current,total,successCount,failCount){
+    const pct=total>0?Math.round((current/total)*100):0;
+    document.getElementById('save-progress-bar-inner').style.width=pct+'%';
+    document.getElementById('save-progress-label').textContent=`이미지 업로드 중… ${current} / ${total}개 (${pct}%)`;
+    const f=typeof failCount==='number'?failCount:0;
+    document.getElementById('save-progress-detail').textContent=`성공 ${successCount}건${f>0?' / 실패 '+f+'건':''}`;
+  }
   async function edSavePost(){
     if(!edCurrentId){edSetStatus('먼저 게시글을 불러오세요',true);return;}
     if(window.PASTE_BUSY){edSetStatus('⏳ 이미지 업로드 진행 중입니다. 완료 후 저장하세요.',true);return;}
-    edSetStatus('저장 중…');
-    try{const html=edGetHTML();const r=await fetch('/api/posts/'+encodeURIComponent(edCurrentId),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content_html:html})}).then(r=>r.json());edSetStatus(r.ok?'저장 완료':'오류: '+r.error,!r.ok,r.ok);}
-    catch(e){edSetStatus('오류: '+e.message,true);}
+    edSetStatus('이미지 감사 중…');
+    try{
+      let html=edGetHTML();
+      // ── 1. 이미지 감사 ──────────────────────────────────────────
+      const details=edAuditImgSrcs(html);
+      const total=details.length;
+      const pendingList=details.filter(d=>d.status==='pending');
+      console.log('[edSavePost] 이미지 총',total,'개 / 미업로드',pendingList.length,'개');
+      if(total>0)edSetStatus(`이미지 총 ${total}개 — 미업로드 ${pendingList.length}개`);
+      // ── 2. 진행 상태바 표시 ──────────────────────────────────────
+      if(total>0){
+        edShowProgress(true);
+        if(pendingList.length===0){
+          document.getElementById('save-progress-label').textContent=`이미지 ${total}개 전체 업로드 확인 완료 (${total}/${total})`;
+          document.getElementById('save-progress-bar-inner').style.width='100%';
+          document.getElementById('save-progress-detail').textContent=`업로드 완료 ${total}건`;
+          await new Promise(r=>{setTimeout(r,900);});
+          edShowProgress(false);
+        }
+      }
+      // ── 3. 미업로드 이미지 순차 업로드 ──────────────────────────
+      if(pendingList.length>0){
+        edShowProgress(true);
+        document.getElementById('save-progress-label').textContent=`이미지 업로드 시작… 0 / ${pendingList.length}개 (0%)`;
+        document.getElementById('save-progress-bar-inner').style.width='0%';
+        const uploadFn=window.SE2_uploadQueue;const replaceFn=window.SE2_replaceDataUrls;
+        const tasks=[];
+        for(const d of pendingList){
+          let dataUrl=d.src;
+          if(d.src.startsWith('blob:')){try{dataUrl=await edBlobUrlToDataUrl(d.src);}catch{dataUrl=null;}}
+          if(!dataUrl||typeof dataUrl!=='string'||!dataUrl.startsWith('data:')){tasks.push({kind:'skip',dataUrl:null,key:d.src});}
+          else{tasks.push({kind:'dataUrl',dataUrl,key:d.src});}
+        }
+        if(uploadFn&&replaceFn){
+          const urls=await uploadFn(tasks,1,edUpdateProgress);
+          const map=new Map();tasks.forEach((t,i)=>{if(urls[i])map.set(t.key,urls[i]);});
+          html=replaceFn(html,map);
+        }else{
+          let suc=0;let fail=0;
+          for(let i=0;i<tasks.length;i++){
+            edUpdateProgress(i,tasks.length,suc,fail);const t=tasks[i];
+            if(!t.dataUrl){fail++;continue;}
+            let uploaded=null;
+            for(let attempt=0;attempt<3;attempt++){
+              try{const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dataUrl:t.dataUrl})});const j=await r.json();if(j&&j.url){uploaded=j.url;break;}}catch{if(attempt===2)break;}
+            }
+            if(uploaded){html=html.split(t.key).join(uploaded);suc++;}else fail++;
+          }
+          edUpdateProgress(tasks.length,tasks.length,suc,fail);
+        }
+        edShowProgress(false);
+      }
+      // ── 4. 저장 전 최종 검증 — 미업로드 이미지 있으면 차단 ──────
+      const preCheck=edAuditImgSrcs(html);
+      const stillPending=preCheck.filter(d=>d.status==='pending');
+      if(stillPending.length>0){edSetStatus(`⛔ 이미지 ${stillPending.length}개 업로드 실패 — 저장 중단. 재시도하거나 이미지를 확인하세요.`,true);return;}
+      // ── 5. PUT 저장 ─────────────────────────────────────────────
+      edSetStatus('저장 중…');
+      const r=await fetch('/api/posts/'+encodeURIComponent(edCurrentId),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content_html:html})}).then(r=>r.json());
+      if(!r.ok){edSetStatus('오류: '+r.error,true);return;}
+      // ── 6. 저장 후 검증 ─────────────────────────────────────────
+      const saved=edAuditImgSrcs(html);
+      const failedCount=saved.filter(d=>d.status==='pending').length;
+      const okCount=saved.filter(d=>d.status==='uploaded').length;
+      if(failedCount>0){edSetStatus(`⚠️ 이미지 ${failedCount}개 미업로드 상태로 저장됨`,true);}
+      else{edSetStatus(total>0?`저장 완료 — 이미지 ${okCount} / ${total}개 전체 업로드 확인`:'저장 완료',false,true);}
+    }catch(e){edShowProgress(false);edSetStatus('오류: '+e.message,true);}
   }
   function edSetStatus(msg,isErr=false,isOk=false){const el=document.getElementById('ed-status');el.textContent=msg;el.className='ed-status'+(isErr?' err':isOk?' ok':'');}
   async function edLoadBoards(){const boards=await fetch('/api/boards').then(r=>r.json());const sel=document.getElementById('ed-board');sel.innerHTML='<option value="">전체 게시판</option>'+boards.map(b=>`<option value="${edEsc(b.board)}">${edEsc(b.board)} (${b.count})</option>`).join('');}
