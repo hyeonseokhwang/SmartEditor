@@ -687,6 +687,10 @@
     .chat-send-btn{padding:8px 14px;background:<%= t.ac %>;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:'Noto Sans KR',sans-serif;align-self:flex-end;transition:.2s}
     .chat-send-btn:hover{opacity:.85}
     .chat-send-btn:disabled{opacity:.4;cursor:default}
+    .c-cursor{display:inline-block;animation:blink .7s step-end infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .c-sources{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;padding-left:36px}
+    .c-src-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:<%= t.bg3 %>;color:<%= t.gr %>;border:1px solid <%= t.bd %>}
   </style>
 </head>
 <body>
@@ -1533,40 +1537,72 @@
     a.addEventListener('click',function(e){e.preventDefault();toggleChat();});
   });
 
+  var chatBusy=false;
   async function chatSend(){
     var inp=document.getElementById('chat-input');
-    var q=(inp.value||'').trim();if(!q)return;
+    var q=(inp.value||'').trim();if(!q||chatBusy)return;
     var btn=document.getElementById('chat-send-btn');
-    inp.value='';btn.disabled=true;
+    inp.value='';btn.disabled=true;chatBusy=true;
     var msgs=document.getElementById('chat-msgs');
 
     // User bubble
     msgs.insertAdjacentHTML('beforeend',
       '<div class="c-msg user"><div class="c-avatar">나</div><div class="c-bubble">'+chatEsc(q)+'</div></div>');
 
-    // Typing indicator
-    var tid='ct-'+Date.now();
+    // Bot bubble (스트리밍 대상)
+    var bid='cb-'+Date.now();
     msgs.insertAdjacentHTML('beforeend',
-      '<div class="c-msg bot" id="'+tid+'"><div class="c-avatar">韓</div>'+
-      '<div class="c-bubble" style="display:flex;gap:4px;align-items:center">'+
-      '<span style="font-size:11px;opacity:.6">응답 중</span>'+
-      '<span style="display:inline-block;width:5px;height:5px;background:currentColor;border-radius:50%;animation:bounce .8s infinite alternate"></span>'+
-      '<span style="display:inline-block;width:5px;height:5px;background:currentColor;border-radius:50%;animation:bounce .8s .2s infinite alternate"></span>'+
-      '<span style="display:inline-block;width:5px;height:5px;background:currentColor;border-radius:50%;animation:bounce .8s .4s infinite alternate"></span>'+
-      '</div></div>');
+      '<div class="c-msg bot" id="'+bid+'"><div class="c-avatar">韓</div>'+
+      '<div class="c-bubble"><span class="c-cursor">▌</span></div></div>');
     msgs.scrollTop=msgs.scrollHeight;
+
+    var bubble=document.querySelector('#'+bid+' .c-bubble');
+    var fullText='';
 
     try{
       var r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
-      var d=await r.json();
-      var tidEl=document.getElementById(tid);
-      if(tidEl)tidEl.outerHTML='<div class="c-msg bot"><div class="c-avatar">韓</div><div class="c-bubble">'+chatMd(d.answer||d.error||'오류')+'</div></div>';
+      var reader=r.body.getReader();
+      var decoder=new TextDecoder();
+      var buf='';
+      while(true){
+        var _a=await reader.read(),done=_a.done,value=_a.value;
+        if(done)break;
+        buf+=decoder.decode(value,{stream:true});
+        var lines=buf.split('\n');
+        buf=lines.pop();
+        for(var li=0;li<lines.length;li++){
+          var line=lines[li].trim();
+          if(!line.startsWith('data:'))continue;
+          var json=line.slice(5).trim();
+          if(!json)continue;
+          try{
+            var ev=JSON.parse(json);
+            if(ev.type==='token'){
+              fullText+=ev.text;
+              bubble.innerHTML=chatMd(fullText)+'<span class="c-cursor">▌</span>';
+              msgs.scrollTop=msgs.scrollHeight;
+            } else if(ev.type==='sources'&&ev.sources&&ev.sources.length){
+              var srcHtml='<div class="c-sources">';
+              ev.sources.slice(0,3).forEach(function(s){
+                if(s.type==='book')srcHtml+='<span class="c-src-tag">'+chatEsc(s.book)+'</span>';
+                else if(s.type==='post')srcHtml+='<span class="c-src-tag">'+chatEsc(s.title)+'</span>';
+              });
+              srcHtml+='</div>';
+              bubble.insertAdjacentHTML('afterend',srcHtml);
+            } else if(ev.type==='done'||ev.type==='error'){
+              if(ev.type==='error')fullText=ev.message||'오류';
+              bubble.innerHTML=chatMd(fullText);
+            }
+          }catch(_){}
+        }
+      }
+      if(!fullText)bubble.innerHTML='<span style="opacity:.5">응답 없음</span>';
+      else bubble.innerHTML=chatMd(fullText);
     }catch(e){
-      var tidEl2=document.getElementById(tid);
-      if(tidEl2)tidEl2.outerHTML='<div class="c-msg bot"><div class="c-avatar">韓</div><div class="c-bubble" style="color:#c05">오류: '+chatEsc(e.message)+'</div></div>';
+      bubble.innerHTML='<span style="color:#c05">오류: '+chatEsc(e.message)+'</span>';
     }
     msgs.scrollTop=msgs.scrollHeight;
-    btn.disabled=false;
+    btn.disabled=false;chatBusy=false;
     inp.focus();
   }
   window.chatSend=chatSend;
