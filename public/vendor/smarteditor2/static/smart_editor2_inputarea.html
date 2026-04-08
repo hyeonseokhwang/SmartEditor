@@ -310,20 +310,40 @@
       };
       collect(root);
 
+      // root.cs에서 sr별 표시 크기 맵 추출 (swi/she HWPUNIT → px, 96dpi 기준)
+      var csSizemap = {};
+      if (root.cs && typeof root.cs === 'object') {
+        for (var csId in root.cs) {
+          var csEntry = root.cs[csId];
+          if (csEntry && csEntry.rc && csEntry.rc.img && csEntry.rc.img.bi) {
+            var csSr = csEntry.rc.img.bi;
+            var csW = csEntry.swi ? Math.round(csEntry.swi / 100) : null;
+            var csH = csEntry.she ? Math.round(csEntry.she / 100) : null;
+            csSizemap[csSr] = {wPx: csW, hPx: csH};
+          }
+        }
+        log('HWP JSON: cs sizemap', Object.keys(csSizemap).length, 'entries');
+      }
+
       // srOrder 순서대로 유효한 base64만 순차 배열 반환 (인덱스 = HTML file:/// 등장 순서)
       // DFS 중복 방문 dedup: 같은 sr 키는 한 번만 (srOrder 19개 → 고유 9개)
       var dataUrls = [];
+      var sizes = [];
       var seenSr = {};
       for (var si = 0; si < srOrder.length; si++) {
         var srKey = srOrder[si];
         if (seenSr[srKey]) continue;
         var b64 = bidt[srKey];
-        if (b64) { seenSr[srKey] = true; dataUrls.push('data:image/png;base64,' + b64); }
+        if (b64) {
+          seenSr[srKey] = true;
+          dataUrls.push('data:image/png;base64,' + b64);
+          sizes.push(csSizemap[srKey] || {wPx: null, hPx: null});
+        }
       }
       log('HWP JSON: srOrder', srOrder.length, '→ dedup', dataUrls.length, 'unique images (slot=index)');
+      log('HWP JSON: sizes extracted', sizes.filter(function(s){return s.wPx;}).length, '/', sizes.length);
 
-      var valid = dataUrls.length;
-      log('HWP JSON: total', dataUrls.length, 'slots,', valid, 'valid');
+      dataUrls.sizes = sizes;
       return dataUrls;
     } catch(e) { warn('HWP JSON parse error:', e); return []; }
   }
@@ -460,7 +480,7 @@
   }
 
   // Replace file:/// img srcs in-place with uploaded URLs (preserving position)
-  function replaceFileImgsInPlace(html, uploadedUrls) {
+  function replaceFileImgsInPlace(html, uploadedUrls, sizes) {
     var container = document.createElement('div');
     container.innerHTML = html;
     var fileImgs = [];
@@ -473,7 +493,13 @@
     for (var j = 0; j < fileImgs.length; j++) {
       if (j < uploadedUrls.length && uploadedUrls[j]) {
         fileImgs[j].setAttribute('src', uploadedUrls[j]);
-        fileImgs[j].style.maxWidth = '100%';
+        // 원본 width/height 보존: sizes에서 정확한 크기 설정, maxWidth는 제거하여 레이아웃 왜곡 방지
+        var sz = sizes && sizes[j];
+        if (sz && sz.wPx) {
+          fileImgs[j].setAttribute('width', sz.wPx);
+          fileImgs[j].setAttribute('height', sz.hPx);
+        }
+        fileImgs[j].style.maxWidth = '';  // maxWidth 제거 — HTML 원본 width/height 속성 우선
       } else {
         // No image data for this slot - remove the broken img
         fileImgs[j].parentNode.removeChild(fileImgs[j]);
@@ -712,11 +738,13 @@
       // 소스 선택: HWP JSON 우선 (PNG/JPEG 정상 포맷)
       // RTF는 WMF/EMF 메타파일을 반환하여 Cloudinary 400 에러 발생 — 보충용으로만 사용
       var allDataUrls = [];
+      var allSizes = []; // 각 slot의 {wPx, hPx} 크기 메타
 
       // 1순위: HWP JSON (정상 PNG/JPEG base64)
       if (hwpDus.length > 0) {
         allDataUrls = hwpDus.slice();
-        log('primary source: HWP JSON (' + hwpDus.length + ' images)');
+        allSizes = (hwpDus.sizes || []).slice();
+        log('primary source: HWP JSON (' + hwpDus.length + ' images), sizes:', allSizes.filter(function(s){return s&&s.wPx;}).length);
       }
 
       // 2순위: HTML inline data:image
@@ -800,7 +828,7 @@
           log('final upload results:', totalSuccess, '/', fileUrls.length);
 
           // Replace file:/// img srcs in their original positions
-          var result = replaceFileImgsInPlace(clipHTML, finalUrls);
+          var result = replaceFileImgsInPlace(clipHTML, finalUrls, allSizes);
           insertHTML(result);
           topProgress.done(fileUrls.length, totalSuccess, fileUrls.length - totalSuccess);
           removeOverlay();
