@@ -155,8 +155,8 @@
     }
   }
 
-  // HWP JSON -> data URLs
-  function parseHwpJsonForDataUrls(html) {
+  // HWP JSON -> data URLs (fileImgCount: file:// img 개수, tail slice용)
+  function parseHwpJsonForDataUrls(html, fileImgCount) {
     try {
       const m = html && html.match(/<!--\[data-hwpjson]\s*({[\s\S]*?})\s*-->/i);
       if (!m) return [];
@@ -164,7 +164,7 @@
       const bidt = new Map();
       const srMeta = new Map();
       const srOrder = [];
-      const seen = new Set();
+      // dedup 완전 제거 — DFS가 같은 노드를 2회 방문하므로 중복 허용
       const collect = (obj) => {
         if (!obj || typeof obj !== 'object') return;
         if (obj.bidt && typeof obj.bidt === 'object') {
@@ -173,26 +173,26 @@
           }
         }
         if (typeof obj.bi === 'string') {
-          if (!seen.has(obj.bi)) { srOrder.push(obj.bi); seen.add(obj.bi); }
-          if (obj.ty && typeof obj.ty === 'string') srMeta.set(obj.bi, { ty: obj.ty });
+          srOrder.push(obj.bi);
+          if (obj.ty && typeof obj.ty === 'string' && !srMeta.has(obj.bi)) srMeta.set(obj.bi, { ty: obj.ty });
         }
         if (Array.isArray(obj.bi)) {
           for (const it of obj.bi) {
             if (it && typeof it.sr === 'string') {
-              if (!seen.has(it.sr)) { srOrder.push(it.sr); seen.add(it.sr); }
-              if (it.ty && typeof it.ty === 'string') srMeta.set(it.sr, { ty: it.ty });
+              srOrder.push(it.sr);
+              if (it.ty && typeof it.ty === 'string' && !srMeta.has(it.sr)) srMeta.set(it.sr, { ty: it.ty });
             }
           }
         }
         if (obj.img && typeof obj.img === 'object' && typeof obj.img.bi === 'string') {
-          if (!seen.has(obj.img.bi)) { srOrder.push(obj.img.bi); seen.add(obj.img.bi); }
+          srOrder.push(obj.img.bi);
         }
         for (const k in obj) if (Object.prototype.hasOwnProperty.call(obj, k)) collect(obj[k]);
       };
       collect(root);
       const mimeFor = (sr) => {
         const meta = srMeta.get(sr);
-        if (meta && meta.ty && /^image\//.test(meta.ty)) return meta.ty;
+        if (meta && meta.ty && /^image\//.test(meta.ty)) return meta.ty.replace('image/jpg', 'image/jpeg');
         if (/\.jpe?g$/i.test(sr)) return 'image/jpeg';
         if (/\.png$/i.test(sr)) return 'image/png';
         if (/\.gif$/i.test(sr)) return 'image/gif';
@@ -203,6 +203,11 @@
         const b64 = bidt.get(sr);
         if (!b64) continue;
         dataUrls.push(`data:${mimeFor(sr)};base64,${b64}`);
+      }
+      // tail slice: DFS 2회 방문으로 총량이 fileImgCount의 2배 → 후반부 N개가 실제 본문 배치 순서
+      if (fileImgCount && dataUrls.length > fileImgCount) {
+        console.log('[hwp] parseHwpJsonForDataUrls slice: total', dataUrls.length, '→ tail', fileImgCount);
+        return dataUrls.slice(dataUrls.length - fileImgCount);
       }
       return dataUrls;
     } catch { return []; }
@@ -564,7 +569,8 @@
           console.log('[paste] path3: file:// URLs detected');
           event.preventDefault();
           const duListPre = collectDataUrlsFromHTML(clipHTML);
-          const hwpDusPre = parseHwpJsonForDataUrls(clipHTML);
+          const fileImgCount = (clipHTML && clipHTML.match(/<img\b[^>]*\bsrc\s*=\s*['"]?file:[^'">]*['"]?/gi) || []).length;
+          const hwpDusPre = parseHwpJsonForDataUrls(clipHTML, fileImgCount);
           const rtfDusPre = (duListPre.length + hwpDusPre.length === 0) ? collectDataUrlsFromRTF(clipRTF) : [];
           const preCount = duListPre.length + hwpDusPre.length + rtfDusPre.length || 1;
           await withOverlay(doc, preCount, async (update) => {
