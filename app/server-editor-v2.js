@@ -54,8 +54,8 @@ const pool = new pg.Pool({
   user: 'postgres', password: 'postgres',
 });
 
-// 홈페이지 (siann-22) — themeId 기본값 1 (쿼리 파라미터로 변경 가능: ?theme=2)
-app.get('/', (req, res) => res.render('siann-22', { themeId: parseInt(req.query.theme) || 1 }));
+// GET / → 스마트에디터 2.0으로 redirect (Lucas님 지시: 9082는 에디터 전용)
+app.get('/', (req, res) => res.redirect('/editor'));
 // 에디터 직접 접근
 app.get('/editor', (req, res) => res.render('editor-v2'));
 
