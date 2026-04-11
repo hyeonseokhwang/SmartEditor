@@ -577,6 +577,37 @@ app.get('/api/auth/me', (req, res) => {
   res.json({ user: req.session?.user || null });
 });
 
+// ── 온라인 신청 폼 ──────────────────────────────────────────────
+app.post('/api/apply', async (req, res) => {
+  try {
+    const { name, phone, email, program, message } = req.body;
+    if (!name || !phone || !program) {
+      return res.status(400).json({ ok: false, error: '필수 항목을 입력해주세요.' });
+    }
+    await pool.query(
+      `CREATE TABLE IF NOT EXISTS yeouiseonwon.applications (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        email TEXT,
+        program TEXT NOT NULL,
+        message TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )`
+    );
+    await pool.query(
+      `INSERT INTO yeouiseonwon.applications (name, phone, email, program, message)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [name, phone, email || '', program, message || '']
+    );
+    console.log(`[신청접수] ${name} / ${phone} / ${program}`);
+    res.json({ ok: true, message: '신청이 접수되었습니다. 담당자가 연락드리겠습니다.' });
+  } catch (err) {
+    console.error('[/api/apply]', err);
+    res.status(500).json({ ok: false, error: '신청 처리 중 오류가 발생했습니다.' });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`한울사상 통합 서버 http://0.0.0.0:${PORT}`);
   console.log('  /        — A팀 홈페이지 (siann-22)');
