@@ -309,8 +309,14 @@ function renderCards(posts) {
 }
 
 
+// URL 파라미터에서 board 자동 선택
+const _urlBoard = new URLSearchParams(location.search).get('board');
+if (_urlBoard) state.board = _urlBoard;
+
 loadStats();
-loadBoards();
+loadBoards().then(() => {
+  if (_urlBoard) highlightBoard();
+});
 loadPosts();
 </script>
 </body>

@@ -474,6 +474,37 @@
       .gallery-grid{grid-template-columns:1fr}
     }
 
+    /* ── 법문 ── */
+    .dharma-sec{background:<%= t.dark %>;padding:100px 80px}
+    .dharma-inner{max-width:1100px;margin:0 auto}
+    .dharma-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:200;color:#fff;margin:16px 0 40px;letter-spacing:.02em}
+    .dharma-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px}
+    .dharma-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:24px;cursor:pointer;transition:background .2s}
+    .dharma-card:hover{background:rgba(255,255,255,.08)}
+    .dharma-badge{font-size:10px;letter-spacing:.08em;color:<%= t.ac %>;margin-bottom:10px;display:block}
+    .dharma-title{font-size:13.5px;line-height:1.6;color:#fff;margin-bottom:10px;font-family:'Noto Serif KR',serif;font-weight:300}
+    .dharma-preview{font-size:12px;line-height:1.7;color:rgba(255,255,255,.45);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+    .dharma-date{font-size:10px;color:rgba(255,255,255,.3);margin-top:12px;letter-spacing:.04em}
+    .dharma-more{display:inline-block;margin-top:8px;font-size:11px;letter-spacing:.1em;color:<%= t.ac %>;text-decoration:none;border-bottom:1px solid <%= t.ac %>40;padding-bottom:2px}
+    .dharma-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;overflow-y:auto;padding:60px 20px}
+    .dharma-modal-bg.open{display:flex;align-items:flex-start;justify-content:center}
+    .dharma-modal{background:<%= t.dark2 %>;width:100%;max-width:760px;border-radius:10px;overflow:hidden}
+    .dm-header{padding:20px 28px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+    .dm-title{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:300;color:#fff;line-height:1.4}
+    .dm-close{background:none;border:none;color:rgba(255,255,255,.5);font-size:24px;cursor:pointer;line-height:1;padding:0 4px;flex-shrink:0}
+    .dm-meta{padding:12px 28px;font-size:11px;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.06);display:flex;gap:16px}
+    .dm-body{padding:24px 28px;font-size:14px;line-height:2;color:rgba(255,255,255,.75);max-height:60vh;overflow-y:auto;font-family:'Noto Serif KR',serif;font-weight:300;white-space:pre-wrap}
+    /* ── 공지 ── */
+    .notices-sec{background:<%= t.dark2 %>;padding:80px 80px}
+    .notices-inner{max-width:960px;margin:0 auto}
+    .notices-h{font-family:'Noto Serif KR',serif;font-size:clamp(1.4rem,2.5vw,2rem);font-weight:200;color:#fff;margin:16px 0 28px;letter-spacing:.02em}
+    .notice-list{list-style:none}
+    .notice-item{border-bottom:1px solid rgba(255,255,255,.07);padding:14px 0;display:flex;align-items:baseline;gap:16px;cursor:pointer;transition:opacity .2s}
+    .notice-item:hover{opacity:.8}
+    .notice-date{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.06em;flex-shrink:0;min-width:60px}
+    .notice-title{font-size:13.5px;color:rgba(255,255,255,.8);letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    @media(max-width:900px){.dharma-grid{grid-template-columns:1fr 1fr}.dharma-sec,.notices-sec{padding:64px 44px}}
+    @media(max-width:600px){.dharma-grid{grid-template-columns:1fr}.dharma-sec,.notices-sec{padding:64px 24px}}
     /* ── 연혁 ── */
     .history-sec{background:<%= t.dark %>;padding:100px 80px}
     .history-inner{max-width:960px;margin:0 auto}
@@ -1220,6 +1251,48 @@
   </div>
 </section>
 
+<!-- ══ 공지사항 ══ -->
+<section class="notices-sec" id="notices">
+  <div class="notices-inner">
+    <span class="sec-label r" data-ko>공지</span>
+    <span class="sec-label r" data-en>Announcements</span>
+    <h2 class="notices-h r d1" data-ko>공지사항</h2>
+    <h2 class="notices-h r d1" data-en>Announcements</h2>
+    <ul class="notice-list r d2" id="noticeList">
+      <li class="notice-item"><span class="notice-date">—</span><span class="notice-title" data-ko>불러오는 중…</span></li>
+    </ul>
+    <a href="/archive?board=공지사항" class="dharma-more r d3" data-ko>공지 전체 보기 →</a>
+    <a href="/archive?board=%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD" class="dharma-more r d3" data-en>All Announcements →</a>
+  </div>
+</section>
+
+<!-- ══ 법문 / 말씀 ══ -->
+<section class="dharma-sec" id="dharma">
+  <div class="dharma-inner">
+    <span class="sec-label r" data-ko>법문 · 말씀</span>
+    <span class="sec-label r" data-en>Teachings</span>
+    <h2 class="dharma-h r d1" data-ko>스승님 말씀</h2>
+    <h2 class="dharma-h r d1" data-en>Dharma Teachings</h2>
+    <div class="dharma-grid r d2" id="dharmaGrid">
+      <div class="dharma-card"><span class="dharma-badge">불러오는 중…</span></div>
+    </div>
+    <a href="/archive?board=큰스승님말씀중에서" class="dharma-more r d3" data-ko>법문 아카이브 전체 보기 →</a>
+    <a href="/archive" class="dharma-more r d3" data-en>Full Dharma Archive →</a>
+  </div>
+</section>
+
+<!-- 법문 모달 -->
+<div class="dharma-modal-bg" id="dharmaModalBg" onclick="if(event.target===this)closeDharmaModal()">
+  <div class="dharma-modal">
+    <div class="dm-header">
+      <p class="dm-title" id="dmTitle"></p>
+      <button class="dm-close" onclick="closeDharmaModal()">×</button>
+    </div>
+    <div class="dm-meta" id="dmMeta"></div>
+    <div class="dm-body" id="dmBody"></div>
+  </div>
+</div>
+
 <!-- ══ 연혁 ══ -->
 <section class="history-sec" id="history">
   <div class="history-inner">
@@ -1380,6 +1453,69 @@
 </footer>
 
 <script>
+  /* ── 공지사항 로드 ── */
+  (async()=>{
+    try{
+      const r=await fetch('/api/posts?board='+encodeURIComponent('공지사항')+'&limit=6').then(x=>x.json());
+      const ul=document.getElementById('noticeList');
+      if(!ul||!r.posts?.length)return;
+      ul.innerHTML=r.posts.map(p=>{
+        const dt=p.created_at?new Date(p.created_at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'}):'';
+        return`<li class="notice-item" onclick="openDharmaPost('${p.post_id}')"><span class="notice-date">${dt}</span><span class="notice-title">${escD(p.title||'')}</span></li>`;
+      }).join('');
+    }catch(e){console.warn('notice load fail',e);}
+  })();
+
+  /* ── 법문 로드 ── */
+  (async()=>{
+    try{
+      const boards=['큰스승님말씀중에서','무견선생님말씀','이달의 말씀'];
+      const params='board='+boards.map(b=>encodeURIComponent(b)).join('&board=');
+      // 각 보드에서 2건씩 fetch
+      const results=await Promise.all(boards.map(b=>
+        fetch('/api/posts?board='+encodeURIComponent(b)+'&limit=2').then(x=>x.json())
+      ));
+      const posts=results.flatMap(r=>r.posts||[]).slice(0,6);
+      const grid=document.getElementById('dharmaGrid');
+      if(!grid||!posts.length)return;
+      grid.innerHTML=posts.map(p=>{
+        const dt=p.created_at?new Date(p.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'short'}):'';
+        const preview=(p.preview||'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim().substring(0,80);
+        return`<div class="dharma-card" onclick="openDharmaPost('${p.post_id}')">
+          <span class="dharma-badge">${escD(p.board||'')}</span>
+          <p class="dharma-title">${escD(p.title||'')}</p>
+          <p class="dharma-preview">${escD(preview)}</p>
+          <p class="dharma-date">${dt}</p>
+        </div>`;
+      }).join('');
+    }catch(e){console.warn('dharma load fail',e);}
+  })();
+
+  /* ── 법문/공지 모달 ── */
+  async function openDharmaPost(postId){
+    try{
+      const data=await fetch('/api/posts/'+postId).then(r=>r.json());
+      document.getElementById('dmTitle').textContent=data.title||'';
+      const dt=data.created_at?new Date(data.created_at).toLocaleDateString('ko-KR'):'';
+      document.getElementById('dmMeta').innerHTML=`<span>${escD(data.board||'')}</span><span>${escD(data.author||'')}</span><span>${dt}</span>`;
+      const body=document.getElementById('dmBody');
+      if(data.content_html){
+        body.innerHTML=data.content_html;
+        body.style.whiteSpace='normal';
+      }else{
+        body.style.whiteSpace='pre-wrap';
+        body.textContent=data.content||'(내용 없음)';
+      }
+      document.getElementById('dharmaModalBg').classList.add('open');
+      document.body.style.overflow='hidden';
+    }catch(e){console.warn('post load fail',e);}
+  }
+  function closeDharmaModal(){
+    document.getElementById('dharmaModalBg').classList.remove('open');
+    document.body.style.overflow='';
+  }
+  function escD(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
   /* ── 신청 폼 submit ── */
   async function submitApply(e){
     e.preventDefault();
